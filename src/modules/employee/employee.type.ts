@@ -16,13 +16,14 @@ export type EmployeeType = {
   marital_status: string;
   present_address: string;
   permanent_address: string;
-  status: string;
+  status: "pending" | "active" | "archived";
   note: string;
 };
 
 export type EmployeeCreateType = {
   personal_email: string;
   department: string;
+  job_type: "full_time" | "part_time" | "remote" | "contractual";
   joining_date: Date;
   designation: string;
 };

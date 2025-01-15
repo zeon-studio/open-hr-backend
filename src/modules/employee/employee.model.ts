@@ -58,6 +58,7 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     },
     status: {
       type: String,
+      default: "pending",
     },
     note: {
       type: String,

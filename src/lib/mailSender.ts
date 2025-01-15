@@ -1,10 +1,10 @@
 import config from "@/config/variables";
 import nodemailer from "nodemailer";
 import {
+  invitationTemplate,
   leaveRequestApprovedTemplate,
   leaveRequestRejectedTemplate,
   leaveRequestTemplate,
-  otpSenderTemplate,
 } from "./mailTemplate";
 
 let mailTransporter = nodemailer.createTransport({
@@ -15,13 +15,17 @@ let mailTransporter = nodemailer.createTransport({
   },
 });
 
-// send OTP
-const otpSender = async (email: string, otp: string) => {
+// invitation
+const invitationRequest = async (
+  email: string,
+  designation: string,
+  joining_date: Date
+) => {
   let mailDetails = {
     from: config.sender_email,
     to: email,
-    subject: "Themefisher Account Verification",
-    html: otpSenderTemplate(otp),
+    subject: "Invitation from Themefisher",
+    html: invitationTemplate(designation, joining_date),
   };
   await mailTransporter.sendMail(mailDetails);
 };
@@ -32,8 +36,8 @@ const leaveRequest = async (
   name: string,
   leaveType: string,
   dayCount: number,
-  startDate: string,
-  endDate: string,
+  startDate: Date,
+  endDate: Date,
   reason: string
 ) => {
   let mailDetails = {
@@ -58,8 +62,8 @@ const leaveRequestResponse = async (
   name: string,
   leaveType: string,
   dayCount: number,
-  startDate: string,
-  endDate: string,
+  startDate: Date,
+  endDate: Date,
   reason: string,
   status: string
 ) => {
@@ -90,7 +94,7 @@ const leaveRequestResponse = async (
 };
 
 export const mailSender = {
-  otpSender,
+  invitationRequest,
   leaveRequest,
   leaveRequestResponse,
 };

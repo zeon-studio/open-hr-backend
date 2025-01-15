@@ -14,6 +14,7 @@ const make3digit = (num: number) => {
   return num.toString().padStart(3, "0");
 };
 
+// employee id generator
 export const generateEmployeeId = (
   department: string,
   joining_date: Date,
@@ -26,4 +27,10 @@ export const generateEmployeeId = (
     make3digit(departmentSerial);
 
   return userId;
+};
+
+// asset id generator
+export const generateAssetId = (assetType: string, assetSerial: string) => {
+  const assetId = "TF" + assetType + assetSerial;
+  return assetId;
 };

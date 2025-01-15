@@ -1,9 +1,11 @@
 import ApiError from "@/errors/ApiError";
-import { generateEmployeeId } from "@/lib/employeeIdGenerator";
+import { generateEmployeeId } from "@/lib/IdGenerator";
+import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import httpStatus from "http-status";
 import { PipelineStage } from "mongoose";
+import { EmployeeJob } from "../employee-job/employee-job.model";
 import { Employee } from "./employee.model";
 import {
   EmployeeCreateType,
@@ -133,27 +135,54 @@ const getSingleEmployeeService = async (
 
 // insert employee
 const createEmployeeService = async (employeeData: EmployeeCreateType) => {
-  // count data by department
-  const departmentSerial =
-    (await Employee.countDocuments({ department: employeeData.department })) +
-    1;
+  const session = await Employee.startSession();
+  session.startTransaction();
+  try {
+    // count data by department
+    const departmentSerial =
+      (await Employee.countDocuments({ department: employeeData.department })) +
+      1;
 
-  const employeeId = generateEmployeeId(
-    employeeData.department,
-    employeeData.joining_date,
-    departmentSerial
-  );
+    const employeeId = generateEmployeeId(
+      employeeData.department,
+      employeeData.joining_date,
+      departmentSerial
+    );
 
-  const newEmployeeData = {
-    id: employeeId,
-    department: employeeData.department,
-    personal_email: employeeData.personal_email,
-  };
+    const createEmployeeData = {
+      id: employeeId,
+      department: employeeData.department,
+      personal_email: employeeData.personal_email,
+    };
 
-  const newData = new Employee(newEmployeeData);
-  const insertedEmployee = await newData.save();
+    const createEmployeeJobData = {
+      employee_id: employeeId,
+      job_type: employeeData.job_type,
+      designation: employeeData.designation,
+      joining_date: employeeData.joining_date,
+    };
 
-  return insertedEmployee;
+    const newEmployeeData = new Employee(createEmployeeData);
+    const insertedEmployee = await newEmployeeData.save({ session });
+
+    const newEmployeeJobData = new EmployeeJob(createEmployeeJobData);
+    await newEmployeeJobData.save({ session });
+
+    await mailSender.invitationRequest(
+      employeeData.personal_email,
+      employeeData.designation,
+      employeeData.joining_date
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return insertedEmployee;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 };
 
 // update

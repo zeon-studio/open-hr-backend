@@ -1,6 +1,7 @@
 import express from "express";
 import assetRouter from "./modules/asset/asset.routes";
 import calendarRouter from "./modules/calendar/calendar.routes";
+import authenticationRouter from "./modules/common/authentication.route";
 import bucketRouter from "./modules/common/bucket.route";
 import courseRouter from "./modules/course/course.routes";
 import employeeAchievementRouter from "./modules/employee-achievement/employee-achievement.route";
@@ -82,6 +83,10 @@ const moduleRoutes = [
   {
     path: "/bucket",
     route: bucketRouter,
+  },
+  {
+    path: "/authentication",
+    route: authenticationRouter,
   },
 ];
 

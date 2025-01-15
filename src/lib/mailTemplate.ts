@@ -1,20 +1,25 @@
 import { dateFormat } from "@/lib/dateFormat";
 
-// otp sender template
-export function otpSenderTemplate(otp: string): string {
+// invitation template
+export function invitationTemplate(
+  designation: string,
+  joining_date: Date
+): string {
   return `<div style="text-align: center;">
-    <h1>Thank you for choosing Themefisher!</h1>
+    <h1>Welcome to Teamosis!</h1>
     <br>
     <br>
     <br>
-    <h2>Use this OTP to verify your account</h2>
-    <div style="border: 1px solid #ccc; padding: 4px 20px; border-radius: 5px; display: inline-block;">
-    <h2>${otp}</h2>
+    <p>We are excited to welcome you to our team as a ${designation}! Your contributions will be invaluable to our success.</p>
+    <p>Your joining date is ${dateFormat(
+      joining_date
+    )}. You can start using your account from now.</p>
     </div>
     <br>
     <br>
     <br>
-    If you encounter any issues or have questions, please contact our support <a href="https://themefisher.com/contact" style="color: #007bff;">here</a>`;
+    
+    <a href="https://erp.teamosis.com" style="color: #007bff;">Click here</a> to join the team.`;
 }
 
 // leave request template
@@ -22,8 +27,8 @@ export function leaveRequestTemplate(
   name: string,
   leaveType: string,
   dayCount: number,
-  startDate: string,
-  endDate: string,
+  startDate: Date,
+  endDate: Date,
   reason: string
 ): string {
   return `
@@ -44,8 +49,8 @@ export function leaveRequestApprovedTemplate(
   name: string,
   leaveType: string,
   dayCount: number,
-  startDate: string,
-  endDate: string,
+  startDate: Date,
+  endDate: Date,
   reason: string
 ): string {
   return `
@@ -72,8 +77,8 @@ export function leaveRequestRejectedTemplate(
   name: string,
   leaveType: string,
   dayCount: number,
-  startDate: string,
-  endDate: string,
+  startDate: Date,
+  endDate: Date,
   reason: string
 ): string {
   return `
