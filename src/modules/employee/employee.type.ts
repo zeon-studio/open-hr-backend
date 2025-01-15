@@ -16,6 +16,9 @@ export type EmployeeType = {
   marital_status: string;
   present_address: string;
   permanent_address: string;
+  facebook: string;
+  twitter: string;
+  linkedin: string;
   status: "pending" | "active" | "archived";
   note: string;
 };

@@ -1,11 +1,13 @@
 import ApiError from "@/errors/ApiError";
 import { generateEmployeeId } from "@/lib/IdGenerator";
+import { calculateRemainingLeave } from "@/lib/leaveCount";
 import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import httpStatus from "http-status";
 import { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
+import { Leave } from "../leave/leave.model";
 import { Employee } from "./employee.model";
 import {
   EmployeeCreateType,
@@ -64,25 +66,33 @@ const getAllEmployeeService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "employee_personas",
-        localField: "id",
-        foreignField: "id",
-        as: "persona",
-      },
+  pipeline.push({
+    $project: {
+      id: 1,
+      name: 1,
+      image: 1,
+      work_email: 1,
+      personal_email: 1,
+      department: 1,
+      manager: 1,
+      role: 1,
+      dob: 1,
+      nid: 1,
+      tin: 1,
+      phone: 1,
+      gender: 1,
+      blood_group: 1,
+      marital_status: 1,
+      present_address: 1,
+      permanent_address: 1,
+      facebook: 1,
+      twitter: 1,
+      linkedin: 1,
+      status: 1,
+      note: 1,
+      createdAt: 1,
     },
-    {
-      $project: {
-        id: 1,
-        name: 1,
-        image: 1,
-        createdAt: 1,
-        "persona.image": 1,
-      },
-    }
-  );
+  });
 
   // Reapply sorting after grouping
   pipeline.push({
@@ -162,11 +172,39 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
       joining_date: employeeData.joining_date,
     };
 
+    const createEmployeeLeaveData = {
+      employee_id: employeeId,
+      years: [
+        {
+          year: employeeData.joining_date.getFullYear(),
+          casual: {
+            alloted: calculateRemainingLeave(employeeData.joining_date, 10),
+            consumed: 0,
+          },
+          sick: {
+            alloted: calculateRemainingLeave(employeeData.joining_date, 5),
+            consumed: 0,
+          },
+          earned: {
+            alloted: 0,
+            consumed: 0,
+          },
+          without_pay: {
+            alloted: calculateRemainingLeave(employeeData.joining_date, 30),
+            consumed: 0,
+          },
+        },
+      ],
+    };
+
     const newEmployeeData = new Employee(createEmployeeData);
     const insertedEmployee = await newEmployeeData.save({ session });
 
     const newEmployeeJobData = new EmployeeJob(createEmployeeJobData);
     await newEmployeeJobData.save({ session });
+
+    const newEmployeeLeaveData = new Leave(createEmployeeLeaveData);
+    await newEmployeeLeaveData.save({ session });
 
     await mailSender.invitationRequest(
       employeeData.personal_email,

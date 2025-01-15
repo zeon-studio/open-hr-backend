@@ -15,10 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeService = void 0;
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const IdGenerator_1 = require("../../lib/IdGenerator");
+const leaveCount_1 = require("../../lib/leaveCount");
 const mailSender_1 = require("../../lib/mailSender");
 const paginationHelper_1 = require("../../lib/paginationHelper");
 const http_status_1 = __importDefault(require("http-status"));
 const employee_job_model_1 = require("../employee-job/employee-job.model");
+const leave_model_1 = require("../leave/leave.model");
 const employee_model_1 = require("./employee.model");
 // get all employees
 const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -60,19 +62,30 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employee_personas",
-            localField: "id",
-            foreignField: "id",
-            as: "persona",
-        },
-    }, {
         $project: {
             id: 1,
             name: 1,
             image: 1,
+            work_email: 1,
+            personal_email: 1,
+            department: 1,
+            manager: 1,
+            role: 1,
+            dob: 1,
+            nid: 1,
+            tin: 1,
+            phone: 1,
+            gender: 1,
+            blood_group: 1,
+            marital_status: 1,
+            present_address: 1,
+            permanent_address: 1,
+            facebook: 1,
+            twitter: 1,
+            linkedin: 1,
+            status: 1,
+            note: 1,
             createdAt: 1,
-            "persona.image": 1,
         },
     });
     // Reapply sorting after grouping
@@ -137,10 +150,36 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
             designation: employeeData.designation,
             joining_date: employeeData.joining_date,
         };
+        const createEmployeeLeaveData = {
+            employee_id: employeeId,
+            years: [
+                {
+                    year: employeeData.joining_date.getFullYear(),
+                    casual: {
+                        alloted: (0, leaveCount_1.calculateRemainingLeave)(employeeData.joining_date, 10),
+                        consumed: 0,
+                    },
+                    sick: {
+                        alloted: (0, leaveCount_1.calculateRemainingLeave)(employeeData.joining_date, 5),
+                        consumed: 0,
+                    },
+                    earned: {
+                        alloted: 0,
+                        consumed: 0,
+                    },
+                    without_pay: {
+                        alloted: (0, leaveCount_1.calculateRemainingLeave)(employeeData.joining_date, 30),
+                        consumed: 0,
+                    },
+                },
+            ],
+        };
         const newEmployeeData = new employee_model_1.Employee(createEmployeeData);
         const insertedEmployee = yield newEmployeeData.save({ session });
         const newEmployeeJobData = new employee_job_model_1.EmployeeJob(createEmployeeJobData);
         yield newEmployeeJobData.save({ session });
+        const newEmployeeLeaveData = new leave_model_1.Leave(createEmployeeLeaveData);
+        yield newEmployeeLeaveData.save({ session });
         yield mailSender_1.mailSender.invitationRequest(employeeData.personal_email, employeeData.designation, employeeData.joining_date);
         yield session.commitTransaction();
         session.endSession();

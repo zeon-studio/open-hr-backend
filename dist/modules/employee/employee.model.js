@@ -89,6 +89,15 @@ const employeeSchema = new mongoose_1.default.Schema({
     permanent_address: {
         type: String,
     },
+    facebook: {
+        type: String,
+    },
+    twitter: {
+        type: String,
+    },
+    linkedin: {
+        type: String,
+    },
     status: {
         type: String,
         default: "pending",
