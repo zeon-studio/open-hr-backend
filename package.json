@@ -16,6 +16,7 @@
     "@aws-sdk/s3-request-presigner": "^3.726.1",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
+    "date-fns": "^3.6.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "http-status": "^1.7.4",

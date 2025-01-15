@@ -1,18 +1,18 @@
+import { add, format, parseISO } from "date-fns";
+
 export const dateFormat = (
-  date: Date | string,
-  pattern: string = "EEEE, dd MMMM, yyyy"
-): string => {
+  date: string | number | Date,
+  pattern = "EEEE, dd MMMM, yyyy"
+) => {
+  if (!date || typeof date !== "string") return;
   const dateObj = new Date(date);
-  const day = dateObj.getDate();
-  const month = dateObj.toLocaleString("default", { month: "long" });
-  const year = dateObj.getFullYear();
-  const dayName = dateObj.toLocaleString("default", { weekday: "long" });
-
-  const output = pattern
-    .replace("dd", day.toString().padStart(2, "0"))
-    .replace("MMMM", month)
-    .replace("yyyy", year.toString())
-    .replace("EEEE", dayName);
-
+  const output = format(dateObj, pattern);
   return output;
+};
+
+export const dateConvert = (date: any) => {
+  const utcDate = parseISO(date);
+  const dhakaTime = add(utcDate, { hours: 6 });
+  const formattedDate = format(dhakaTime, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+  return formattedDate;
 };
