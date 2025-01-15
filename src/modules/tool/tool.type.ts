@@ -1,6 +1,6 @@
 export type Organization = {
   name: string;
-  user_id: string;
+  login_id: string;
   password: string;
   price: number;
   currency: string;

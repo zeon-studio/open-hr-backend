@@ -84,7 +84,7 @@ const getEmployeeOnboardingService = async (id: string) => {
   return result;
 };
 
-// add or update
+// update
 const updateEmployeeOnboardingService = async (
   id: string,
   updateData: EmployeeOnboardingType

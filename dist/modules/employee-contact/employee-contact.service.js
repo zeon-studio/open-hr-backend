@@ -69,11 +69,29 @@ const getEmployeeContactService = (id) => __awaiter(void 0, void 0, void 0, func
 });
 // add or update
 const updateEmployeeContactService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_contact_model_1.EmployeeContact.findOneAndUpdate({ employee_id: id }, { $set: updateData }, {
-        new: true,
-        upsert: true,
-    });
-    return result;
+    const contact = yield employee_contact_model_1.EmployeeContact.findOne({ platform: id });
+    if (contact) {
+        // Update existing contacts or add new ones
+        updateData.contacts.forEach((newContact) => {
+            const existingContactIndex = contact.contacts.findIndex((contact) => contact.name === newContact.name);
+            if (existingContactIndex !== -1) {
+                // Update existing contact
+                contact.contacts[existingContactIndex] = Object.assign(Object.assign({}, contact.contacts[existingContactIndex]), newContact);
+            }
+            else {
+                // Add new contact
+                contact.contacts.push(newContact);
+            }
+        });
+        yield contact.save();
+        return contact;
+    }
+    else {
+        // Create new contact if it doesn't exist
+        const newEmployeeContact = new employee_contact_model_1.EmployeeContact(updateData);
+        yield newEmployeeContact.save();
+        return newEmployeeContact;
+    }
 });
 // delete
 const deleteEmployeeContactService = (id) => __awaiter(void 0, void 0, void 0, function* () {

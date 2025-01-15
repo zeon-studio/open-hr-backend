@@ -74,7 +74,7 @@ const getEmployeeOffboardingService = (id) => __awaiter(void 0, void 0, void 0, 
     const result = yield employee_offboarding_model_1.EmployeeOffboarding.findOne({ employee_id: id });
     return result;
 });
-// add or update
+// update
 const updateEmployeeOffboardingService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield employee_offboarding_model_1.EmployeeOffboarding.findOneAndUpdate({ employee_id: id }, updateData, {
         new: true,

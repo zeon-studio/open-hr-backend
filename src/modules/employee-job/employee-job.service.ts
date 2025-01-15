@@ -96,15 +96,33 @@ const updateEmployeeJobService = async (
   id: string,
   updateData: EmployeeJobType
 ) => {
-  const result = await EmployeeJob.findOneAndUpdate(
-    { employee_id: id },
-    { $set: updateData },
-    {
-      new: true,
-      upsert: true,
-    }
-  );
-  return result;
+  const job = await EmployeeJob.findOne({ platform: id });
+
+  if (job) {
+    // Update existing jobs or add new ones
+    updateData.prev_jobs.forEach((newJob) => {
+      const existingJobIndex = job.prev_jobs.findIndex(
+        (job) => job.company_name === newJob.company_name
+      );
+      if (existingJobIndex !== -1) {
+        // Update existing job
+        job.prev_jobs[existingJobIndex] = {
+          ...job.prev_jobs[existingJobIndex],
+          ...newJob,
+        };
+      } else {
+        // Add new job
+        job.prev_jobs.push(newJob);
+      }
+    });
+    await job.save();
+    return job;
+  } else {
+    // Create new job if it doesn't exist
+    const newEmployeeJob = new EmployeeJob(updateData);
+    await newEmployeeJob.save();
+    return newEmployeeJob;
+  }
 };
 
 // delete

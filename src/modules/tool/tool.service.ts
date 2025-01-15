@@ -81,18 +81,35 @@ const getToolService = async (id: string) => {
   return result;
 };
 
-// create
-const createToolService = async (data: ToolType) => {
-  const result = await Tool.create(data);
-  return result;
-};
-
-// update
+// add or update
 const updateToolService = async (id: string, updateData: ToolType) => {
-  const result = await Tool.findOneAndUpdate({ tool_id: id }, updateData, {
-    new: true,
-  });
-  return result;
+  const tool = await Tool.findOne({ platform: id });
+
+  if (tool) {
+    // Update existing organizations or add new ones
+    updateData.organizations.forEach((newOrg) => {
+      const existingOrgIndex = tool.organizations.findIndex(
+        (org) => org.name === newOrg.name
+      );
+      if (existingOrgIndex !== -1) {
+        // Update existing organization
+        tool.organizations[existingOrgIndex] = {
+          ...tool.organizations[existingOrgIndex],
+          ...newOrg,
+        };
+      } else {
+        // Add new organization
+        tool.organizations.push(newOrg);
+      }
+    });
+    await tool.save();
+    return tool;
+  } else {
+    // Create new tool if it doesn't exist
+    const newTool = new Tool(updateData);
+    await newTool.save();
+    return newTool;
+  }
 };
 
 // delete
@@ -103,7 +120,6 @@ const deleteToolService = async (id: string) => {
 export const toolService = {
   getAllToolService,
   getToolService,
-  createToolService,
   updateToolService,
   deleteToolService,
 };

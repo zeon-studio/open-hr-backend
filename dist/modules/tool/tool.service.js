@@ -72,17 +72,31 @@ const getToolService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield tool_model_1.Tool.findOne({ tool_id: id });
     return result;
 });
-// create
-const createToolService = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield tool_model_1.Tool.create(data);
-    return result;
-});
-// update
+// add or update
 const updateToolService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield tool_model_1.Tool.findOneAndUpdate({ tool_id: id }, updateData, {
-        new: true,
-    });
-    return result;
+    const tool = yield tool_model_1.Tool.findOne({ platform: id });
+    if (tool) {
+        // Update existing organizations or add new ones
+        updateData.organizations.forEach((newOrg) => {
+            const existingOrgIndex = tool.organizations.findIndex((org) => org.name === newOrg.name);
+            if (existingOrgIndex !== -1) {
+                // Update existing organization
+                tool.organizations[existingOrgIndex] = Object.assign(Object.assign({}, tool.organizations[existingOrgIndex]), newOrg);
+            }
+            else {
+                // Add new organization
+                tool.organizations.push(newOrg);
+            }
+        });
+        yield tool.save();
+        return tool;
+    }
+    else {
+        // Create new tool if it doesn't exist
+        const newTool = new tool_model_1.Tool(updateData);
+        yield newTool.save();
+        return newTool;
+    }
 });
 // delete
 const deleteToolService = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -91,7 +105,6 @@ const deleteToolService = (id) => __awaiter(void 0, void 0, void 0, function* ()
 exports.toolService = {
     getAllToolService,
     getToolService,
-    createToolService,
     updateToolService,
     deleteToolService,
 };

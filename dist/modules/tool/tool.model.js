@@ -39,6 +39,7 @@ const toolSchema = new mongoose_1.default.Schema({
     platform: {
         type: String,
         required: true,
+        unique: true,
     },
     website: {
         type: String,
@@ -50,7 +51,7 @@ const toolSchema = new mongoose_1.default.Schema({
                 type: String,
                 required: true,
             },
-            user_id: {
+            login_id: {
                 type: String,
                 required: true,
             },
@@ -71,11 +72,9 @@ const toolSchema = new mongoose_1.default.Schema({
             ],
             purchase_date: {
                 type: Date,
-                required: true,
             },
             expire_date: {
                 type: Date,
-                required: true,
             },
         },
     ],

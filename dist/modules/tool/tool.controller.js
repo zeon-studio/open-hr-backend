@@ -42,17 +42,6 @@ const getToolController = (0, catchAsync_1.default)((req, res) => __awaiter(void
         message: "data get successfully",
     });
 }));
-// create data
-const createToolController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const toolData = req.body;
-    const tool = yield tool_service_1.toolService.createToolService(toolData);
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: 200,
-        result: tool,
-        message: "data created successfully",
-    });
-}));
 // update data
 const updateToolController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -77,7 +66,6 @@ const deleteToolController = (0, catchAsync_1.default)((req, res) => __awaiter(v
 exports.toolController = {
     getAllToolController,
     getToolController,
-    createToolController,
     updateToolController,
     deleteToolController,
 };

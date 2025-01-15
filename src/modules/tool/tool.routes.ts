@@ -22,19 +22,11 @@ toolRouter.get(
   toolController.getToolController
 );
 
-// create data
-toolRouter.post(
-  "/",
-  checkToken,
-  auth(ENUM_ROLE.ADMIN),
-  toolController.createToolController
-);
-
 // update data
 toolRouter.patch(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  // auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   toolController.updateToolController
 );
 

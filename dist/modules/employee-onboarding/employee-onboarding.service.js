@@ -73,7 +73,7 @@ const getEmployeeOnboardingService = (id) => __awaiter(void 0, void 0, void 0, f
     const result = yield employee_onboarding_model_1.EmployeeOnboarding.findOne({ employee_id: id });
     return result;
 });
-// add or update
+// update
 const updateEmployeeOnboardingService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield employee_onboarding_model_1.EmployeeOnboarding.findOneAndUpdate({ employee_id: id }, updateData, {
         new: true,

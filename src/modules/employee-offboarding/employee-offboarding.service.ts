@@ -85,7 +85,7 @@ const getEmployeeOffboardingService = async (id: string) => {
   return result;
 };
 
-// add or update
+// update
 const updateEmployeeOffboardingService = async (
   id: string,
   updateData: EmployeeOffboardingType

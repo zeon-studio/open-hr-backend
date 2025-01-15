@@ -69,11 +69,29 @@ const getEmployeeDocumentService = (id) => __awaiter(void 0, void 0, void 0, fun
 });
 // add or update
 const updateEmployeeDocumentService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_document_model_1.EmployeeDocument.findOneAndUpdate({ employee_id: id }, updateData, {
-        new: true,
-        upsert: true,
-    });
-    return result;
+    const document = yield employee_document_model_1.EmployeeDocument.findOne({ platform: id });
+    if (document) {
+        // Update existing documents or add new ones
+        updateData.documents.forEach((newDocument) => {
+            const existingDocumentIndex = document.documents.findIndex((document) => document.name === newDocument.name);
+            if (existingDocumentIndex !== -1) {
+                // Update existing document
+                document.documents[existingDocumentIndex] = Object.assign(Object.assign({}, document.documents[existingDocumentIndex]), newDocument);
+            }
+            else {
+                // Add new document
+                document.documents.push(newDocument);
+            }
+        });
+        yield document.save();
+        return document;
+    }
+    else {
+        // Create new document if it doesn't exist
+        const newEmployeeDocument = new employee_document_model_1.EmployeeDocument(updateData);
+        yield newEmployeeDocument.save();
+        return newEmployeeDocument;
+    }
 });
 // delete
 const deleteEmployeeDocumentService = (id) => __awaiter(void 0, void 0, void 0, function* () {

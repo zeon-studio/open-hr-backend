@@ -83,15 +83,33 @@ const updateEmployeeContactService = async (
   id: string,
   updateData: EmployeeContactType
 ) => {
-  const result = await EmployeeContact.findOneAndUpdate(
-    { employee_id: id },
-    { $set: updateData },
-    {
-      new: true,
-      upsert: true,
-    }
-  );
-  return result;
+  const contact = await EmployeeContact.findOne({ platform: id });
+
+  if (contact) {
+    // Update existing contacts or add new ones
+    updateData.contacts.forEach((newContact) => {
+      const existingContactIndex = contact.contacts.findIndex(
+        (contact) => contact.name === newContact.name
+      );
+      if (existingContactIndex !== -1) {
+        // Update existing contact
+        contact.contacts[existingContactIndex] = {
+          ...contact.contacts[existingContactIndex],
+          ...newContact,
+        };
+      } else {
+        // Add new contact
+        contact.contacts.push(newContact);
+      }
+    });
+    await contact.save();
+    return contact;
+  } else {
+    // Create new contact if it doesn't exist
+    const newEmployeeContact = new EmployeeContact(updateData);
+    await newEmployeeContact.save();
+    return newEmployeeContact;
+  }
 };
 
 // delete

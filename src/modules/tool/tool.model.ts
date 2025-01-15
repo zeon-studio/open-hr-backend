@@ -6,6 +6,7 @@ const toolSchema = new mongoose.Schema<ToolType>(
     platform: {
       type: String,
       required: true,
+      unique: true,
     },
     website: {
       type: String,
@@ -17,7 +18,7 @@ const toolSchema = new mongoose.Schema<ToolType>(
           type: String,
           required: true,
         },
-        user_id: {
+        login_id: {
           type: String,
           required: true,
         },
@@ -38,11 +39,9 @@ const toolSchema = new mongoose.Schema<ToolType>(
         ],
         purchase_date: {
           type: Date,
-          required: true,
         },
         expire_date: {
           type: Date,
-          required: true,
         },
       },
     ],
