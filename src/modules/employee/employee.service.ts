@@ -153,9 +153,11 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
       (await Employee.countDocuments({ department: employeeData.department })) +
       1;
 
+    const joiningDate = new Date(employeeData.joining_date);
+
     const employeeId = generateEmployeeId(
       employeeData.department,
-      employeeData.joining_date,
+      joiningDate,
       departmentSerial
     );
 
@@ -169,28 +171,28 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
       employee_id: employeeId,
       job_type: employeeData.job_type,
       designation: employeeData.designation,
-      joining_date: employeeData.joining_date,
+      joining_date: joiningDate,
     };
 
     const createEmployeeLeaveData = {
       employee_id: employeeId,
       years: [
         {
-          year: employeeData.joining_date.getFullYear(),
+          year: joiningDate.getFullYear(),
           casual: {
-            alloted: calculateRemainingLeave(employeeData.joining_date, 10),
+            allotted: calculateRemainingLeave(joiningDate, 10),
             consumed: 0,
           },
           sick: {
-            alloted: calculateRemainingLeave(employeeData.joining_date, 5),
+            allotted: calculateRemainingLeave(joiningDate, 5),
             consumed: 0,
           },
           earned: {
-            alloted: 0,
+            allotted: 0,
             consumed: 0,
           },
           without_pay: {
-            alloted: calculateRemainingLeave(employeeData.joining_date, 30),
+            allotted: calculateRemainingLeave(joiningDate, 30),
             consumed: 0,
           },
         },
@@ -209,7 +211,7 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
     await mailSender.invitationRequest(
       employeeData.personal_email,
       employeeData.designation,
-      employeeData.joining_date
+      joiningDate
     );
 
     await session.commitTransaction();

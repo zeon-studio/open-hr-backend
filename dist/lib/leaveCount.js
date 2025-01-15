@@ -14,6 +14,6 @@ function calculateRemainingLeave(joinDate, leaveAllottedPerYear) {
     // Calculate remaining leave based on proportional days worked
     const remainingLeave = (daysWorked / totalDaysInYear) * leaveAllottedPerYear;
     // Return remaining leave rounded to two decimal places
-    return Math.round(remainingLeave * 100) / 100;
+    return Math.round((remainingLeave * 100) / 100);
 }
 //# sourceMappingURL=leaveCount.js.map

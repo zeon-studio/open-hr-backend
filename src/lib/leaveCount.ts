@@ -1,5 +1,5 @@
 export function calculateRemainingLeave(
-  joinDate: Date,
+  joinDate: string | Date,
   leaveAllottedPerYear: number
 ): number {
   // Convert joinDate to a Date object
@@ -20,5 +20,5 @@ export function calculateRemainingLeave(
   const remainingLeave = (daysWorked / totalDaysInYear) * leaveAllottedPerYear;
 
   // Return remaining leave rounded to two decimal places
-  return Math.round(remainingLeave * 100) / 100;
+  return Math.round((remainingLeave * 100) / 100);
 }

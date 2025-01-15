@@ -58,10 +58,12 @@ const employeeJobSchema = new mongoose_1.default.Schema({
     company_name: {
         type: String,
         required: true,
+        default: "themefisher",
     },
     company_website: {
         type: String,
         required: true,
+        default: "https://themefisher.com",
     },
     resignation_date: {
         type: Date,
