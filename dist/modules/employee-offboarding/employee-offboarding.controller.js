@@ -53,6 +53,17 @@ const updateEmployeeOffboardingController = (0, catchAsync_1.default)((req, res)
         message: "data updated successfully",
     });
 }));
+// update offboarding task status
+const updateOffboardingTaskStatusController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const task = req.params.task;
+    yield employee_offboarding_service_1.employeeOffboardingService.updateOffboardingTaskStatusService(id, task);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        message: "task status updated successfully",
+    });
+}));
 // delete data
 const deleteEmployeeOffboardingController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -66,7 +77,8 @@ const deleteEmployeeOffboardingController = (0, catchAsync_1.default)((req, res)
 exports.employeeOffboardingController = {
     getAllEmployeeOffboardingController,
     getEmployeeOffboardingController,
-    deleteEmployeeOffboardingController,
     updateEmployeeOffboardingController,
+    updateOffboardingTaskStatusController,
+    deleteEmployeeOffboardingController,
 };
 //# sourceMappingURL=employee-offboarding.controller.js.map

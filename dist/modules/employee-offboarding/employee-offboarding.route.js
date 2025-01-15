@@ -11,6 +11,8 @@ const employee_offboarding_controller_1 = require("./employee-offboarding.contro
 const employeeOffboardingRouter = express_1.default.Router();
 // get all data
 employeeOffboardingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_offboarding_controller_1.employeeOffboardingController.getAllEmployeeOffboardingController);
+// update task status
+employeeOffboardingRouter.patch("/task/:id/:task", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.updateOffboardingTaskStatusController);
 // get single data
 employeeOffboardingRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER), employee_offboarding_controller_1.employeeOffboardingController.getEmployeeOffboardingController);
 // update data

@@ -61,6 +61,23 @@ const updateEmployeeOffboardingController = catchAsync(
   }
 );
 
+// update offboarding task status
+const updateOffboardingTaskStatusController = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const task = req.params.task;
+    await employeeOffboardingService.updateOffboardingTaskStatusService(
+      id,
+      task
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: "task status updated successfully",
+    });
+  }
+);
+
 // delete data
 const deleteEmployeeOffboardingController = catchAsync(
   async (req: Request, res: Response) => {
@@ -78,6 +95,7 @@ const deleteEmployeeOffboardingController = catchAsync(
 export const employeeOffboardingController = {
   getAllEmployeeOffboardingController,
   getEmployeeOffboardingController,
-  deleteEmployeeOffboardingController,
   updateEmployeeOffboardingController,
+  updateOffboardingTaskStatusController,
+  deleteEmployeeOffboardingController,
 };

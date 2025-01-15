@@ -14,6 +14,14 @@ employeeOffboardingRouter.get(
   employeeOffboardingController.getAllEmployeeOffboardingController
 );
 
+// update task status
+employeeOffboardingRouter.patch(
+  "/task/:id/:task",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  employeeOffboardingController.updateOffboardingTaskStatusController
+);
+
 // get single data
 employeeOffboardingRouter.get(
   "/:id",
