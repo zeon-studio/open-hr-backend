@@ -91,10 +91,33 @@ const createCourseService = async (data: CourseType) => {
 
 // update
 const updateCourseService = async (id: string, updateData: CourseType) => {
-  const result = await Course.findOneAndUpdate({ platform: id }, updateData, {
-    new: true,
-  });
-  return result;
+  const course = await Course.findOne({ platform: id });
+
+  if (course) {
+    // Update existing courses or add new ones
+    updateData.courses.forEach((newCourse) => {
+      const existingCourseIndex = course.courses.findIndex(
+        (course) => course.name === newCourse.name
+      );
+      if (existingCourseIndex !== -1) {
+        // Update existing course
+        course.courses[existingCourseIndex] = {
+          ...course.courses[existingCourseIndex],
+          ...newCourse,
+        };
+      } else {
+        // Add new course
+        course.courses.push(newCourse);
+      }
+    });
+    await course.save();
+    return course;
+  } else {
+    // Create new course if it doesn't exist
+    const newCourse = new Course(updateData);
+    await newCourse.save();
+    return newCourse;
+  }
 };
 
 // delete

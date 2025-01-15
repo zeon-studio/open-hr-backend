@@ -81,10 +81,29 @@ const createCourseService = (data) => __awaiter(void 0, void 0, void 0, function
 });
 // update
 const updateCourseService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield course_model_1.Course.findOneAndUpdate({ platform: id }, updateData, {
-        new: true,
-    });
-    return result;
+    const course = yield course_model_1.Course.findOne({ platform: id });
+    if (course) {
+        // Update existing courses or add new ones
+        updateData.courses.forEach((newCourse) => {
+            const existingCourseIndex = course.courses.findIndex((course) => course.name === newCourse.name);
+            if (existingCourseIndex !== -1) {
+                // Update existing course
+                course.courses[existingCourseIndex] = Object.assign(Object.assign({}, course.courses[existingCourseIndex]), newCourse);
+            }
+            else {
+                // Add new course
+                course.courses.push(newCourse);
+            }
+        });
+        yield course.save();
+        return course;
+    }
+    else {
+        // Create new course if it doesn't exist
+        const newCourse = new course_model_1.Course(updateData);
+        yield newCourse.save();
+        return newCourse;
+    }
 });
 // delete
 const deleteCourseService = (id) => __awaiter(void 0, void 0, void 0, function* () {
