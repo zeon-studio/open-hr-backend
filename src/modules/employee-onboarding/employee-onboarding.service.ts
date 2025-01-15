@@ -100,6 +100,18 @@ const updateEmployeeOnboardingService = async (
   return result;
 };
 
+// update onboarding task status
+const updateOnboardingTaskStatusService = async (id: string, task: string) => {
+  const result = await EmployeeOnboarding.findOneAndUpdate(
+    { employee_id: id },
+    { $set: { [`${task}.status`]: "completed" } },
+    {
+      new: true,
+    }
+  );
+  return result;
+};
+
 // delete
 const deleteEmployeeOnboardingService = async (id: string) => {
   await EmployeeOnboarding.findOneAndDelete({ employee_id: id });
@@ -108,6 +120,7 @@ const deleteEmployeeOnboardingService = async (id: string) => {
 export const employeeOnboardingService = {
   getAllEmployeeOnboardingService,
   getEmployeeOnboardingService,
-  deleteEmployeeOnboardingService,
   updateEmployeeOnboardingService,
+  updateOnboardingTaskStatusService,
+  deleteEmployeeOnboardingService,
 };

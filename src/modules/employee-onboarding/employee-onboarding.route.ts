@@ -14,6 +14,14 @@ employeeOnboardingRouter.get(
   employeeOnboardingController.getAllEmployeeOnboardingController
 );
 
+// update task status
+employeeOnboardingRouter.patch(
+  "/task/:id/:task",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  employeeOnboardingController.updateOnboardingTaskStatusController
+);
+
 // get single data
 employeeOnboardingRouter.get(
   "/:id",

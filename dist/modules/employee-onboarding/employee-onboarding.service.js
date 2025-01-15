@@ -81,6 +81,13 @@ const updateEmployeeOnboardingService = (id, updateData) => __awaiter(void 0, vo
     });
     return result;
 });
+// update onboarding task status
+const updateOnboardingTaskStatusService = (id, task) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield employee_onboarding_model_1.EmployeeOnboarding.findOneAndUpdate({ employee_id: id }, { $set: { [`${task}.status`]: "completed" } }, {
+        new: true,
+    });
+    return result;
+});
 // delete
 const deleteEmployeeOnboardingService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield employee_onboarding_model_1.EmployeeOnboarding.findOneAndDelete({ employee_id: id });
@@ -88,7 +95,8 @@ const deleteEmployeeOnboardingService = (id) => __awaiter(void 0, void 0, void 0
 exports.employeeOnboardingService = {
     getAllEmployeeOnboardingService,
     getEmployeeOnboardingService,
-    deleteEmployeeOnboardingService,
     updateEmployeeOnboardingService,
+    updateOnboardingTaskStatusService,
+    deleteEmployeeOnboardingService,
 };
 //# sourceMappingURL=employee-onboarding.service.js.map

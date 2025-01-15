@@ -61,6 +61,20 @@ const updateEmployeeOnboardingController = catchAsync(
   }
 );
 
+// update onboarding task status
+const updateOnboardingTaskStatusController = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const task = req.params.task;
+    await employeeOnboardingService.updateOnboardingTaskStatusService(id, task);
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: "task status updated successfully",
+    });
+  }
+);
+
 // delete data
 const deleteEmployeeOnboardingController = catchAsync(
   async (req: Request, res: Response) => {
@@ -78,6 +92,7 @@ const deleteEmployeeOnboardingController = catchAsync(
 export const employeeOnboardingController = {
   getAllEmployeeOnboardingController,
   getEmployeeOnboardingController,
-  deleteEmployeeOnboardingController,
   updateEmployeeOnboardingController,
+  updateOnboardingTaskStatusController,
+  deleteEmployeeOnboardingController,
 };
