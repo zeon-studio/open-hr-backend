@@ -1,0 +1,111 @@
+import { paginationHelpers } from "@/lib/paginationHelper";
+import { PaginationType } from "@/types";
+import { PipelineStage } from "mongoose";
+import { Course } from "./course.model";
+import { CourseFilterOptions, CourseType } from "./course.type";
+
+// get all data
+const getAllCourseService = async (
+  paginationOptions: Partial<PaginationType>,
+  filterOptions: Partial<CourseFilterOptions>
+) => {
+  let matchStage: any = {
+    $match: {},
+  };
+  const { limit, skip } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  // Extract search and filter options
+  const { search, platform } = filterOptions;
+
+  // Search condition
+  if (search) {
+    const searchKeyword = String(search).replace(/\+/g, " ");
+    const keywords = searchKeyword.split("|");
+    const searchConditions = keywords.map((keyword) => ({
+      $or: [{ name: { $regex: keyword, $options: "i" } }],
+    }));
+    matchStage.$match.$or = searchConditions;
+  }
+
+  // platform condition
+  if (platform) {
+    matchStage.$match.platform = platform;
+  }
+
+  let pipeline: PipelineStage[] = [matchStage];
+
+  pipeline.push({ $sort: { updatedAt: -1 } });
+
+  if (skip) {
+    pipeline.push({ $skip: skip });
+  }
+  if (limit) {
+    pipeline.push({ $limit: limit });
+  }
+
+  pipeline.push(
+    {
+      $lookup: {
+        from: "employees",
+        localField: "courses.user",
+        foreignField: "id",
+        as: "employee",
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        platform: 1,
+        website: 1,
+        email: 1,
+        password: 1,
+        courses: 1,
+        "employee.name": 1,
+        "employee.image": 1,
+      },
+    }
+  );
+
+  const result = await Course.aggregate(pipeline);
+  const total = await Course.countDocuments();
+  return {
+    result: result,
+    meta: {
+      total: total,
+    },
+  };
+};
+
+// get single data
+const getCourseService = async (id: string) => {
+  const result = await Course.findOne({ platform: id });
+  return result;
+};
+
+// create
+const createCourseService = async (data: CourseType) => {
+  const result = await Course.create(data);
+  return result;
+};
+
+// update
+const updateCourseService = async (id: string, updateData: CourseType) => {
+  const result = await Course.findOneAndUpdate({ platform: id }, updateData, {
+    new: true,
+  });
+  return result;
+};
+
+// delete
+const deleteCourseService = async (id: string) => {
+  await Course.findOneAndDelete({ platform: id });
+};
+
+export const courseService = {
+  getAllCourseService,
+  getCourseService,
+  createCourseService,
+  updateCourseService,
+  deleteCourseService,
+};
