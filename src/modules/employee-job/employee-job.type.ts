@@ -17,6 +17,8 @@ export type EmployeeJobType = {
   job_type: string;
   joining_date: Date;
   designation: string;
+  manager_id: string;
+  department: "development" | "design" | "marketing" | "admin";
   permanent_date: Date;
   company_name: string;
   company_website: string;

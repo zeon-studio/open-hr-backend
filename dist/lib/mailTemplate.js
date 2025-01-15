@@ -8,18 +8,19 @@ const dateFormat_1 = require("../lib/dateFormat");
 // invitation template
 function invitationTemplate(designation, joining_date) {
     return `<div style="text-align: center;">
-    <h1>Welcome to Teamosis!</h1>
+    <h1>Welcome to Themefisher!</h1>
     <br>
     <br>
     <br>
     <p>We are excited to welcome you to our team as a ${designation}! Your contributions will be invaluable to our success.</p>
     <p>Your joining date is ${(0, dateFormat_1.dateFormat)(joining_date)}. You can start using your account from now.</p>
-    </div>
     <br>
     <br>
     <br>
     
-    <a href="https://erp.teamosis.com" style="color: #007bff;">Click here</a> to join the team.`;
+    <a href="https://erp.teamosis.com" style="color: #007bff;">Click here</a> to join the team.
+    </div>
+    `;
 }
 // leave request template
 function leaveRequestTemplate(name, leaveType, dayCount, startDate, endDate, reason) {

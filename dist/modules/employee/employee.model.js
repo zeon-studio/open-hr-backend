@@ -59,12 +59,6 @@ const employeeSchema = new mongoose_1.default.Schema({
     personal_email: {
         type: String,
     },
-    department: {
-        type: String,
-    },
-    manager: {
-        type: String,
-    },
     role: {
         type: String,
     },

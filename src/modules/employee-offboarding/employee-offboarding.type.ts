@@ -10,6 +10,7 @@ export type EmployeeOffboardingType = {
   task_handover: OffboardingTask;
   collect_id_card: OffboardingTask;
   collect_email: OffboardingTask;
+  collect_devices: OffboardingTask;
   nda_agreement: OffboardingTask;
   provide_certificate: OffboardingTask;
   farewell: OffboardingTask;

@@ -96,6 +96,20 @@ const employeeOffboardingSchema = new mongoose_1.default.Schema({
             required: true,
         },
     },
+    collect_devices: {
+        task_name: {
+            type: String,
+            required: true,
+        },
+        assigned_to: {
+            type: String,
+            required: true,
+        },
+        status: {
+            type: String,
+            required: true,
+        },
+    },
     nda_agreement: {
         task_name: {
             type: String,

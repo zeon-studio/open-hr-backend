@@ -20,13 +20,14 @@ const mailSender_1 = require("../../lib/mailSender");
 const paginationHelper_1 = require("../../lib/paginationHelper");
 const http_status_1 = __importDefault(require("http-status"));
 const employee_job_model_1 = require("../employee-job/employee-job.model");
+const employee_onboarding_model_1 = require("../employee-onboarding/employee-onboarding.model");
 const leave_model_1 = require("../leave/leave.model");
 const employee_model_1 = require("./employee.model");
 // get all employees
 const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { limit, skip, sortBy, sortOrder } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
     // Extract search and filter options
-    const { search, department } = filterOptions;
+    const { search } = filterOptions;
     // Create a text search stage for multiple fields
     let matchStage = {
         $match: {},
@@ -42,10 +43,6 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
             ],
         }));
         matchStage.$match.$or = searchConditions;
-    }
-    // department condition
-    if (department) {
-        matchStage.$match.department = department;
     }
     let pipeline = [matchStage];
     // Sorting stage
@@ -68,8 +65,6 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
             image: 1,
             work_email: 1,
             personal_email: 1,
-            department: 1,
-            manager: 1,
             role: 1,
             dob: 1,
             nid: 1,
@@ -142,11 +137,12 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
         const employeeId = (0, IdGenerator_1.generateEmployeeId)(employeeData.department, joiningDate, departmentSerial);
         const createEmployeeData = {
             id: employeeId,
-            department: employeeData.department,
             personal_email: employeeData.personal_email,
         };
         const createEmployeeJobData = {
             employee_id: employeeId,
+            department: employeeData.department,
+            manager_id: employeeData.manager_id,
             job_type: employeeData.job_type,
             designation: employeeData.designation,
             joining_date: joiningDate,
@@ -175,12 +171,52 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
                 },
             ],
         };
+        const createEmployeeOnboardingData = {
+            employee_id: employeeId,
+            add_fingerprint: {
+                task_name: "Add Fingerprint",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            provide_id_card: {
+                task_name: "Provide ID Card",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            provide_appointment_letter: {
+                task_name: "Provide Appointment Letter",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            provide_employment_contract: {
+                task_name: "Provide Employment Contract",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            provide_welcome_kit: {
+                task_name: "Provide Welcome Kit",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            provide_devices: {
+                task_name: "Provide Devices",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            provide_office_intro: {
+                task_name: "Provide Office Intro",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+        };
         const newEmployeeData = new employee_model_1.Employee(createEmployeeData);
         const insertedEmployee = yield newEmployeeData.save({ session });
         const newEmployeeJobData = new employee_job_model_1.EmployeeJob(createEmployeeJobData);
         yield newEmployeeJobData.save({ session });
         const newEmployeeLeaveData = new leave_model_1.Leave(createEmployeeLeaveData);
         yield newEmployeeLeaveData.save({ session });
+        const newEmployeeOnboardingData = new employee_onboarding_model_1.EmployeeOnboarding(createEmployeeOnboardingData);
+        yield newEmployeeOnboardingData.save({ session });
         yield mailSender_1.mailSender.invitationRequest(employeeData.personal_email, employeeData.designation, joiningDate);
         yield session.commitTransaction();
         session.endSession();

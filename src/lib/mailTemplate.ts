@@ -6,7 +6,7 @@ export function invitationTemplate(
   joining_date: Date
 ): string {
   return `<div style="text-align: center;">
-    <h1>Welcome to Teamosis!</h1>
+    <h1>Welcome to Themefisher!</h1>
     <br>
     <br>
     <br>
@@ -14,12 +14,13 @@ export function invitationTemplate(
     <p>Your joining date is ${dateFormat(
       joining_date
     )}. You can start using your account from now.</p>
-    </div>
     <br>
     <br>
     <br>
     
-    <a href="https://erp.teamosis.com" style="color: #007bff;">Click here</a> to join the team.`;
+    <a href="https://erp.teamosis.com" style="color: #007bff;">Click here</a> to join the team.
+    </div>
+    `;
 }
 
 // leave request template

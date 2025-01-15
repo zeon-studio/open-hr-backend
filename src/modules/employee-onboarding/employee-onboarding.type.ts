@@ -6,12 +6,13 @@ export type OnboardingTask = {
 
 export type EmployeeOnboardingType = {
   employee_id: string;
-  fingerprint: OnboardingTask;
-  id_card: OnboardingTask;
-  appointment_letter: OnboardingTask;
-  employment_contract: OnboardingTask;
-  welcome_kit: OnboardingTask;
-  office_intro: OnboardingTask;
+  add_fingerprint: OnboardingTask;
+  provide_id_card: OnboardingTask;
+  provide_appointment_letter: OnboardingTask;
+  provide_employment_contract: OnboardingTask;
+  provide_welcome_kit: OnboardingTask;
+  provide_devices: OnboardingTask;
+  provide_office_intro: OnboardingTask;
 };
 
 export type EmployeeOnboardingFilterOptions = {

@@ -1,7 +1,7 @@
 const departmentShortName: { [key: string]: string } = {
   development: "DEV",
   marketing: "MKT",
-  design: "DES",
+  design: "DGN",
   admin: "ADM",
 };
 

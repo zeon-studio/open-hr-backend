@@ -7,6 +7,7 @@ import { PaginationType } from "@/types";
 import httpStatus from "http-status";
 import { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
+import { EmployeeOnboarding } from "../employee-onboarding/employee-onboarding.model";
 import { Leave } from "../leave/leave.model";
 import { Employee } from "./employee.model";
 import {
@@ -24,7 +25,7 @@ const getAllEmployeeService = async (
     paginationHelpers.calculatePagination(paginationOptions);
 
   // Extract search and filter options
-  const { search, department } = filterOptions;
+  const { search } = filterOptions;
 
   // Create a text search stage for multiple fields
   let matchStage: any = {
@@ -42,11 +43,6 @@ const getAllEmployeeService = async (
       ],
     }));
     matchStage.$match.$or = searchConditions;
-  }
-
-  // department condition
-  if (department) {
-    matchStage.$match.department = department;
   }
 
   let pipeline: PipelineStage[] = [matchStage];
@@ -73,8 +69,6 @@ const getAllEmployeeService = async (
       image: 1,
       work_email: 1,
       personal_email: 1,
-      department: 1,
-      manager: 1,
       role: 1,
       dob: 1,
       nid: 1,
@@ -163,12 +157,13 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
 
     const createEmployeeData = {
       id: employeeId,
-      department: employeeData.department,
       personal_email: employeeData.personal_email,
     };
 
     const createEmployeeJobData = {
       employee_id: employeeId,
+      department: employeeData.department,
+      manager_id: employeeData.manager_id,
       job_type: employeeData.job_type,
       designation: employeeData.designation,
       joining_date: joiningDate,
@@ -199,6 +194,45 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
       ],
     };
 
+    const createEmployeeOnboardingData = {
+      employee_id: employeeId,
+      add_fingerprint: {
+        task_name: "Add Fingerprint",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      provide_id_card: {
+        task_name: "Provide ID Card",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      provide_appointment_letter: {
+        task_name: "Provide Appointment Letter",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      provide_employment_contract: {
+        task_name: "Provide Employment Contract",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      provide_welcome_kit: {
+        task_name: "Provide Welcome Kit",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      provide_devices: {
+        task_name: "Provide Devices",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      provide_office_intro: {
+        task_name: "Provide Office Intro",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+    };
+
     const newEmployeeData = new Employee(createEmployeeData);
     const insertedEmployee = await newEmployeeData.save({ session });
 
@@ -207,6 +241,11 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
 
     const newEmployeeLeaveData = new Leave(createEmployeeLeaveData);
     await newEmployeeLeaveData.save({ session });
+
+    const newEmployeeOnboardingData = new EmployeeOnboarding(
+      createEmployeeOnboardingData
+    );
+    await newEmployeeOnboardingData.save({ session });
 
     await mailSender.invitationRequest(
       employeeData.personal_email,

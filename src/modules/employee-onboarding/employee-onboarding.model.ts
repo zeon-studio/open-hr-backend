@@ -7,7 +7,7 @@ const employeeOnboardingSchema = new mongoose.Schema<EmployeeOnboardingType>(
       type: String,
       required: true,
     },
-    fingerprint: {
+    add_fingerprint: {
       task_name: {
         type: String,
         required: true,
@@ -21,7 +21,7 @@ const employeeOnboardingSchema = new mongoose.Schema<EmployeeOnboardingType>(
         required: true,
       },
     },
-    id_card: {
+    provide_id_card: {
       task_name: {
         type: String,
         required: true,
@@ -35,7 +35,7 @@ const employeeOnboardingSchema = new mongoose.Schema<EmployeeOnboardingType>(
         required: true,
       },
     },
-    appointment_letter: {
+    provide_appointment_letter: {
       task_name: {
         type: String,
         required: true,
@@ -49,7 +49,7 @@ const employeeOnboardingSchema = new mongoose.Schema<EmployeeOnboardingType>(
         required: true,
       },
     },
-    employment_contract: {
+    provide_employment_contract: {
       task_name: {
         type: String,
         required: true,
@@ -63,7 +63,7 @@ const employeeOnboardingSchema = new mongoose.Schema<EmployeeOnboardingType>(
         required: true,
       },
     },
-    welcome_kit: {
+    provide_welcome_kit: {
       task_name: {
         type: String,
         required: true,
@@ -77,7 +77,7 @@ const employeeOnboardingSchema = new mongoose.Schema<EmployeeOnboardingType>(
         required: true,
       },
     },
-    office_intro: {
+    provide_office_intro: {
       task_name: {
         type: String,
         required: true,

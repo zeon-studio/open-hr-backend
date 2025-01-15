@@ -55,6 +55,8 @@ const getAllEmployeeJobService = (paginationOptions, filterOptions) => __awaiter
             job_type: 1,
             joining_date: 1,
             designation: 1,
+            department: 1,
+            manager_id: 1,
             permanent_date: 1,
             company_name: 1,
             company_website: 1,

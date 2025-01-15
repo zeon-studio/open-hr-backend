@@ -4,23 +4,21 @@ export type EmployeeType = {
   image: string;
   work_email: string;
   personal_email: string;
-  department: string;
-  manager: string;
-  role: string;
   dob: Date;
   nid: string;
   tin: string;
   phone: string;
-  gender: string;
-  blood_group: string;
-  marital_status: string;
+  gender: "male" | "female";
+  blood_group: "O+" | "O-" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-";
+  marital_status: "married" | "unmarried" | "divorced" | "widowed";
   present_address: string;
   permanent_address: string;
   facebook: string;
   twitter: string;
   linkedin: string;
-  status: "pending" | "active" | "archived";
   note: string;
+  status: "pending" | "active" | "archived";
+  role: "user" | "moderator" | "admin";
 };
 
 export type EmployeeCreateType = {
@@ -29,9 +27,9 @@ export type EmployeeCreateType = {
   job_type: "full_time" | "part_time" | "remote" | "contractual";
   joining_date: Date;
   designation: string;
+  manager_id: string;
 };
 
 export type EmployeeFilterOptions = {
   search?: string | number;
-  department?: string;
 };

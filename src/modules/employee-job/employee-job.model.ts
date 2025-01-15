@@ -15,6 +15,12 @@ const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
       type: Date,
       required: true,
     },
+    department: {
+      type: String,
+    },
+    manager_id: {
+      type: String,
+    },
     designation: {
       type: String,
       required: true,

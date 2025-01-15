@@ -48,6 +48,12 @@ const employeeJobSchema = new mongoose_1.default.Schema({
         type: Date,
         required: true,
     },
+    department: {
+        type: String,
+    },
+    manager_id: {
+        type: String,
+    },
     designation: {
         type: String,
         required: true,

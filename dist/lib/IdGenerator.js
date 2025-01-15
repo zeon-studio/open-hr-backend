@@ -4,7 +4,7 @@ exports.generateAssetId = exports.generateEmployeeId = void 0;
 const departmentShortName = {
     development: "DEV",
     marketing: "MKT",
-    design: "DES",
+    design: "DGN",
     admin: "ADM",
 };
 const findYear = (date) => {

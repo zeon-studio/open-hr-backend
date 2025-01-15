@@ -26,12 +26,6 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     personal_email: {
       type: String,
     },
-    department: {
-      type: String,
-    },
-    manager: {
-      type: String,
-    },
     role: {
       type: String,
     },
