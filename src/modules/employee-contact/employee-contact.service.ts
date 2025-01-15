@@ -78,16 +78,17 @@ const getEmployeeContactService = async (id: string) => {
   return result;
 };
 
-// update
+// add or update
 const updateEmployeeContactService = async (
   id: string,
   updateData: EmployeeContactType
 ) => {
   const result = await EmployeeContact.findOneAndUpdate(
     { employee_id: id },
-    updateData,
+    { $set: updateData },
     {
       new: true,
+      upsert: true,
     }
   );
   return result;

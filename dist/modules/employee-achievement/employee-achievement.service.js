@@ -69,7 +69,7 @@ const getEmployeeAchievementService = (id) => __awaiter(void 0, void 0, void 0, 
 });
 // add or update
 const updateEmployeeAchievementService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_achievement_model_1.EmployeeAchievement.findOneAndUpdate({ employee_id: id }, updateData, {
+    const result = yield employee_achievement_model_1.EmployeeAchievement.findOneAndUpdate({ employee_id: id }, { $set: updateData }, {
         new: true,
         upsert: true,
     });

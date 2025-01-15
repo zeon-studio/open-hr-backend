@@ -85,7 +85,7 @@ const updateEmployeeBankService = async (
 ) => {
   const result = await EmployeeBank.findOneAndUpdate(
     { employee_id: id },
-    updateData,
+    { $set: updateData },
     {
       new: true,
       upsert: true,

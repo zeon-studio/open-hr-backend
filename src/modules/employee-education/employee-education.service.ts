@@ -85,7 +85,7 @@ const updateEmployeeEducationService = async (
 ) => {
   const result = await EmployeeEducation.findOneAndUpdate(
     { employee_id: id },
-    updateData,
+    { $set: updateData },
     {
       new: true,
       upsert: true,

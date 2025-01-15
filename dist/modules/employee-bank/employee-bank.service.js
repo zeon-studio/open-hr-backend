@@ -69,7 +69,7 @@ const getEmployeeBankService = (id) => __awaiter(void 0, void 0, void 0, functio
 });
 // add or update
 const updateEmployeeBankService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_bank_model_1.EmployeeBank.findOneAndUpdate({ employee_id: id }, updateData, {
+    const result = yield employee_bank_model_1.EmployeeBank.findOneAndUpdate({ employee_id: id }, { $set: updateData }, {
         new: true,
         upsert: true,
     });

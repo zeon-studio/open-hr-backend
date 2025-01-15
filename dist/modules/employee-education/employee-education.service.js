@@ -69,7 +69,7 @@ const getEmployeeEducationService = (id) => __awaiter(void 0, void 0, void 0, fu
 });
 // add or update
 const updateEmployeeEducationService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_education_model_1.EmployeeEducation.findOneAndUpdate({ employee_id: id }, updateData, {
+    const result = yield employee_education_model_1.EmployeeEducation.findOneAndUpdate({ employee_id: id }, { $set: updateData }, {
         new: true,
         upsert: true,
     });

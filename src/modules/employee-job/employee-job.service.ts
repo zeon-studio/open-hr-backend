@@ -96,9 +96,10 @@ const updateEmployeeJobService = async (
 ) => {
   const result = await EmployeeJob.findOneAndUpdate(
     { employee_id: id },
-    updateData,
+    { $set: updateData },
     {
       new: true,
+      upsert: true,
     }
   );
   return result;

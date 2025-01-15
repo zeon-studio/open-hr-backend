@@ -67,10 +67,11 @@ const getEmployeeContactService = (id) => __awaiter(void 0, void 0, void 0, func
     const result = yield employee_contact_model_1.EmployeeContact.findOne({ employee_id: id });
     return result;
 });
-// update
+// add or update
 const updateEmployeeContactService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_contact_model_1.EmployeeContact.findOneAndUpdate({ employee_id: id }, updateData, {
+    const result = yield employee_contact_model_1.EmployeeContact.findOneAndUpdate({ employee_id: id }, { $set: updateData }, {
         new: true,
+        upsert: true,
     });
     return result;
 });

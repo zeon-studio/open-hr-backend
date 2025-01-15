@@ -82,8 +82,9 @@ const getEmployeeJobService = (id) => __awaiter(void 0, void 0, void 0, function
 });
 // update
 const updateEmployeeJobService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: id }, updateData, {
+    const result = yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: id }, { $set: updateData }, {
         new: true,
+        upsert: true,
     });
     return result;
 });
