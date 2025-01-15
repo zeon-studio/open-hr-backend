@@ -36,15 +36,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Asset = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const assetSchema = new mongoose_1.default.Schema({
+    asset_id: {
+        type: String,
+        required: true,
+    },
+    user_id: {
+        type: String,
+        required: true,
+    },
     name: {
         type: String,
         required: true,
     },
     type: {
-        type: String,
-        required: true,
-    },
-    asset_id: {
         type: String,
         required: true,
     },
@@ -57,10 +61,6 @@ const assetSchema = new mongoose_1.default.Schema({
         required: true,
     },
     currency: {
-        type: String,
-        required: true,
-    },
-    user: {
         type: String,
         required: true,
     },
@@ -77,7 +77,12 @@ const assetSchema = new mongoose_1.default.Schema({
     },
     logs: [
         {
-            type: mongoose_1.default.Schema.Types.Mixed,
+            log: {
+                type: String,
+            },
+            date: {
+                type: Date,
+            },
         },
     ],
 }, {

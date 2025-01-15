@@ -26,7 +26,7 @@ assetRouter.get(
 assetRouter.post(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  // auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   assetController.createAssetController
 );
 

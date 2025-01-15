@@ -14,7 +14,9 @@ assetRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_R
 // get single data
 assetRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER), asset_controller_1.assetController.getAssetController);
 // create data
-assetRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), asset_controller_1.assetController.createAssetController);
+assetRouter.post("/", checkToken_1.checkToken, 
+// auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+asset_controller_1.assetController.createAssetController);
 // update data
 assetRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), asset_controller_1.assetController.updateAssetController);
 // delete data

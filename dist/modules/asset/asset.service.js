@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assetService = void 0;
+const IdGenerator_1 = require("../../lib/IdGenerator");
 const paginationHelper_1 = require("../../lib/paginationHelper");
 const asset_model_1 = require("./asset.model");
 // get all data
@@ -52,12 +53,12 @@ const getAllAssetService = (paginationOptions, filterOptions) => __awaiter(void 
         $project: {
             _id: 0,
             asset_id: 1,
+            user_id: 1,
             name: 1,
             type: 1,
             serial_number: 1,
             price: 1,
             currency: 1,
-            user: 1,
             purchase_date: 1,
             archive: 1,
             note: 1,
@@ -82,8 +83,24 @@ const getAssetService = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // create
 const createAssetService = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield asset_model_1.Asset.create(data);
-    return result;
+    // count data by type
+    const assetSerial = (yield asset_model_1.Asset.countDocuments({ type: data.type })) + 1;
+    const assetId = (0, IdGenerator_1.generateAssetId)(data.type, assetSerial);
+    const createAssetData = {
+        asset_id: assetId,
+        user_id: data.user_id,
+        name: data.name,
+        type: data.type,
+        serial_number: data.serial_number,
+        price: data.price,
+        currency: data.currency,
+        purchase_date: data.purchase_date,
+        archive: data.archive,
+        note: data.note,
+    };
+    const newAssetData = new asset_model_1.Asset(createAssetData);
+    const insertedAsset = yield newAssetData.save();
+    return insertedAsset;
 });
 // update
 const updateAssetService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {

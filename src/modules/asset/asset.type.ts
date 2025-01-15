@@ -4,13 +4,13 @@ export type Log = {
 };
 
 export type AssetType = {
-  name: string;
-  type: string;
   asset_id: string;
+  user_id: string;
+  name: string;
+  type: "laptop" | "desktop" | "mobile" | "keyboard" | "mouse" | "monitor";
   serial_number: string;
   price: number;
-  currency: string;
-  user: string;
+  currency: "bdt" | "usd";
   purchase_date: Date;
   archive: boolean;
   note: string;

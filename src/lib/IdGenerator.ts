@@ -1,8 +1,17 @@
-const departmentShortName: { [key: string]: string } = {
+const departmentGenerator: { [key: string]: string } = {
   development: "DEV",
   marketing: "MKT",
   design: "DGN",
   admin: "ADM",
+};
+
+const assetTypeGenerator: { [key: string]: string } = {
+  laptop: "LPT",
+  desktop: "DPT",
+  mobile: "MBL",
+  monitor: "MON",
+  keyboard: "KBD",
+  mouse: "MUS",
 };
 
 const findYear = (date: Date) => {
@@ -22,7 +31,7 @@ export const generateEmployeeId = (
 ) => {
   const userId =
     "TF" +
-    departmentShortName[department] +
+    departmentGenerator[department] +
     findYear(joining_date) +
     make3digit(departmentSerial);
 
@@ -30,7 +39,8 @@ export const generateEmployeeId = (
 };
 
 // asset id generator
-export const generateAssetId = (assetType: string, assetSerial: string) => {
-  const assetId = "TF" + assetType + assetSerial;
+export const generateAssetId = (assetType: string, assetSerial: number) => {
+  const assetId =
+    "TF_" + assetTypeGenerator[assetType] + "_" + assetSerial.toString();
   return assetId;
 };

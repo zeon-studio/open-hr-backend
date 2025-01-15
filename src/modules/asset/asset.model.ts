@@ -3,15 +3,19 @@ import { AssetType } from "./asset.type";
 
 const assetSchema = new mongoose.Schema<AssetType>(
   {
+    asset_id: {
+      type: String,
+      required: true,
+    },
+    user_id: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
     },
     type: {
-      type: String,
-      required: true,
-    },
-    asset_id: {
       type: String,
       required: true,
     },
@@ -24,10 +28,6 @@ const assetSchema = new mongoose.Schema<AssetType>(
       required: true,
     },
     currency: {
-      type: String,
-      required: true,
-    },
-    user: {
       type: String,
       required: true,
     },
@@ -44,7 +44,12 @@ const assetSchema = new mongoose.Schema<AssetType>(
     },
     logs: [
       {
-        type: mongoose.Schema.Types.Mixed,
+        log: {
+          type: String,
+        },
+        date: {
+          type: Date,
+        },
       },
     ],
   },

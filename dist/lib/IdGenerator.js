@@ -1,11 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateAssetId = exports.generateEmployeeId = void 0;
-const departmentShortName = {
+const departmentGenerator = {
     development: "DEV",
     marketing: "MKT",
     design: "DGN",
     admin: "ADM",
+};
+const assetTypeGenerator = {
+    laptop: "LPT",
+    desktop: "DPT",
+    mobile: "MBL",
+    monitor: "MON",
+    keyboard: "KBD",
+    mouse: "MUS",
 };
 const findYear = (date) => {
     const year = date.getFullYear();
@@ -17,7 +25,7 @@ const make3digit = (num) => {
 // employee id generator
 const generateEmployeeId = (department, joining_date, departmentSerial) => {
     const userId = "TF" +
-        departmentShortName[department] +
+        departmentGenerator[department] +
         findYear(joining_date) +
         make3digit(departmentSerial);
     return userId;
@@ -25,7 +33,7 @@ const generateEmployeeId = (department, joining_date, departmentSerial) => {
 exports.generateEmployeeId = generateEmployeeId;
 // asset id generator
 const generateAssetId = (assetType, assetSerial) => {
-    const assetId = "TF" + assetType + assetSerial;
+    const assetId = "TF_" + assetTypeGenerator[assetType] + "_" + assetSerial.toString();
     return assetId;
 };
 exports.generateAssetId = generateAssetId;
