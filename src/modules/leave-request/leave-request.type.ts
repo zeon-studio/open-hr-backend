@@ -1,6 +1,6 @@
 export type LeaveRequestType = {
   employee_id: string;
-  leave_type: string;
+  leave_type: "casual" | "sick" | "earned" | "without_pay";
   start_date: Date;
   end_date: Date;
   day_count: number;

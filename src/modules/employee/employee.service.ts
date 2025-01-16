@@ -5,7 +5,7 @@ import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import httpStatus from "http-status";
-import { PipelineStage } from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
 import { EmployeeOnboarding } from "../employee-onboarding/employee-onboarding.model";
 import { Leave } from "../leave/leave.model";
@@ -139,13 +139,14 @@ const getSingleEmployeeService = async (
 
 // insert employee
 const createEmployeeService = async (employeeData: EmployeeCreateType) => {
-  const session = await Employee.startSession();
+  const session = await mongoose.startSession();
   session.startTransaction();
   try {
     // count data by department
     const departmentSerial =
-      (await Employee.countDocuments({ department: employeeData.department })) +
-      1;
+      (await EmployeeJob.countDocuments({
+        department: employeeData.department,
+      })) + 1;
 
     const joiningDate = new Date(employeeData.joining_date);
 

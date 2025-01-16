@@ -1,18 +1,19 @@
-import { add, format, parseISO } from "date-fns";
+import { add, format } from "date-fns";
 
 export const dateFormat = (
   date: string | number | Date,
-  pattern = "EEEE, dd MMMM, yyyy"
+  pattern: string = "EEEE, dd MMMM, yyyy"
 ) => {
-  if (!date || typeof date !== "string") return;
+  if (!date) return;
   const dateObj = new Date(date);
   const output = format(dateObj, pattern);
   return output;
 };
 
-export const dateConvert = (date: any) => {
-  const utcDate = parseISO(date);
+export const dateConvert = (date: Date) => {
+  const removeTime = new Date(date).toISOString().split("T")[0];
+  const utcDate = new Date(removeTime);
   const dhakaTime = add(utcDate, { hours: 6 });
-  const formattedDate = format(dhakaTime, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-  return formattedDate;
+  console.log("dhakaTime", dhakaTime);
+  return dhakaTime;
 };

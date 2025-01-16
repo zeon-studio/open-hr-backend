@@ -34,10 +34,10 @@ const invitationRequest = (email, designation, joining_date) => __awaiter(void 0
     yield mailTransporter.sendMail(mailDetails);
 });
 // leave request
-const leaveRequest = (email, name, leaveType, dayCount, startDate, endDate, reason) => __awaiter(void 0, void 0, void 0, function* () {
+const leaveRequest = (emails, name, leaveType, dayCount, startDate, endDate, reason) => __awaiter(void 0, void 0, void 0, function* () {
     let mailDetails = {
         from: variables_1.default.sender_email,
-        to: email,
+        to: emails,
         subject: `Leave Request by ${name}`,
         html: (0, mailTemplate_1.leaveRequestTemplate)(name, leaveType, dayCount, startDate, endDate, reason),
     };

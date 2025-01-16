@@ -26,7 +26,7 @@ leaveRequestRouter.get(
 leaveRequestRouter.post(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   leaveRequestController.createLeaveRequestController
 );
 

@@ -54,7 +54,6 @@ const leaveSchema = new mongoose_1.default.Schema({
     },
     day_count: {
         type: Number,
-        required: true,
     },
     reason: {
         type: String,
@@ -63,6 +62,7 @@ const leaveSchema = new mongoose_1.default.Schema({
     status: {
         type: String,
         required: true,
+        default: "pending",
     },
     submit_date: {
         type: Date,
@@ -70,7 +70,6 @@ const leaveSchema = new mongoose_1.default.Schema({
     },
     response_date: {
         type: Date,
-        required: true,
     },
 }, {
     timestamps: true,

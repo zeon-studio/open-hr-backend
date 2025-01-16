@@ -14,7 +14,7 @@ leaveRequestRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1
 // get single data
 leaveRequestRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER), leave_request_controller_1.leaveRequestController.getLeaveRequestController);
 // create data
-leaveRequestRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), leave_request_controller_1.leaveRequestController.createLeaveRequestController);
+leaveRequestRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_request_controller_1.leaveRequestController.createLeaveRequestController);
 // update data
 leaveRequestRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), leave_request_controller_1.leaveRequestController.updateLeaveRequestController);
 // delete data

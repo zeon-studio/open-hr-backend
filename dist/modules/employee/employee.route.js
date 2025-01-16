@@ -14,7 +14,7 @@ employeeRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENU
 // get single employee
 employeeRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.getSingleEmployeeController);
 // insert employee
-employeeRouter.post("/", checkToken_1.checkToken, employee_controller_1.employeeController.createEmployeeController);
+employeeRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.createEmployeeController);
 // update employee data
 employeeRouter.patch("/update/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeeController);
 // update employee note

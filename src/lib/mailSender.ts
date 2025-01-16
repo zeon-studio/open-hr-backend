@@ -32,7 +32,7 @@ const invitationRequest = async (
 
 // leave request
 const leaveRequest = async (
-  email: string,
+  emails: string[],
   name: string,
   leaveType: string,
   dayCount: number,
@@ -42,7 +42,7 @@ const leaveRequest = async (
 ) => {
   let mailDetails = {
     from: config.sender_email,
-    to: email,
+    to: emails,
     subject: `Leave Request by ${name}`,
     html: leaveRequestTemplate(
       name,

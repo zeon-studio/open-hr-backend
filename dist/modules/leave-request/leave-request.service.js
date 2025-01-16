@@ -8,9 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.leaveRequestService = void 0;
+const variables_1 = __importDefault(require("../../config/variables"));
+const ApiError_1 = __importDefault(require("../../errors/ApiError"));
+const dateFormat_1 = require("../../lib/dateFormat");
+const leaveHelper_1 = require("../../lib/leaveHelper");
+const mailSender_1 = require("../../lib/mailSender");
+const mailTemplate_1 = require("../../lib/mailTemplate");
 const paginationHelper_1 = require("../../lib/paginationHelper");
+const axios_1 = __importDefault(require("axios"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const employee_job_model_1 = require("../employee-job/employee-job.model");
+const employee_model_1 = require("../employee/employee.model");
 const leave_request_model_1 = require("./leave-request.model");
 // get all data
 const getAllLeaveRequestService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -73,8 +86,60 @@ const getLeaveRequestService = (id) => __awaiter(void 0, void 0, void 0, functio
 });
 // create
 const createLeaveRequestService = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield leave_request_model_1.LeaveRequest.create(data);
-    return result;
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
+    try {
+        const startDate = (0, dateFormat_1.dateConvert)(data.start_date);
+        const endDate = (0, dateFormat_1.dateConvert)(data.end_date);
+        const dayCount = yield (0, leaveHelper_1.leaveDayCounter)(startDate, endDate);
+        data = Object.assign(Object.assign({}, data), { start_date: startDate, end_date: endDate, day_count: dayCount });
+        const leaveData = yield (0, leaveHelper_1.leaveDataFinder)(data);
+        const consumedDays = leaveData[data.leave_type].consumed;
+        const allottedDays = leaveData[data.leave_type].allotted;
+        if (consumedDays + dayCount > allottedDays) {
+            throw new Error(`You have exceeded the maximum number of ${data.leave_type} days for this year`);
+        }
+        else {
+            const postData = new leave_request_model_1.LeaveRequest(data);
+            yield postData.save({ session });
+            // find employee data
+            const employeeData = yield employee_model_1.Employee.findOne({
+                id: data.employee_id,
+            }).session(session);
+            // find employee manager
+            const employeeJobData = yield employee_job_model_1.EmployeeJob.findOne({
+                employee_id: data.employee_id,
+            }).session(session);
+            // find manager email
+            const managerData = yield employee_model_1.Employee.findOne({
+                id: employeeJobData === null || employeeJobData === void 0 ? void 0 : employeeJobData.manager_id,
+            }).session(session);
+            // find admin and moderator data
+            const adminAndModData = yield employee_model_1.Employee.find({
+                role: { $in: ["admin", "moderator"] },
+            }).session(session);
+            // find admin and moderator email
+            const adminAndModEmails = adminAndModData.map((data) => data.work_email);
+            // create an array of emails
+            const notifyEmailList = [...adminAndModEmails, managerData === null || managerData === void 0 ? void 0 : managerData.work_email];
+            // send mail
+            yield mailSender_1.mailSender.leaveRequest(notifyEmailList, employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, data.leave_type, dayCount, startDate, endDate, data.reason);
+            // send discord message
+            yield axios_1.default.post(variables_1.default.discord_webhook_url, {
+                content: (0, mailTemplate_1.leaveRequestDiscordTemplate)(employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, data.leave_type, dayCount, startDate, endDate, data.reason),
+            });
+            yield session.commitTransaction();
+            return postData;
+        }
+    }
+    catch (error) {
+        yield session.abortTransaction();
+        console.log(error);
+        throw new ApiError_1.default(error.message, 400, "");
+    }
+    finally {
+        session.endSession();
+    }
 });
 // update
 const updateLeaveRequestService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {

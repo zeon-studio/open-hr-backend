@@ -21,7 +21,6 @@ const leaveSchema = new mongoose.Schema<LeaveRequestType>(
     },
     day_count: {
       type: Number,
-      required: true,
     },
     reason: {
       type: String,
@@ -30,6 +29,7 @@ const leaveSchema = new mongoose.Schema<LeaveRequestType>(
     status: {
       type: String,
       required: true,
+      default: "pending",
     },
     submit_date: {
       type: Date,
@@ -37,7 +37,6 @@ const leaveSchema = new mongoose.Schema<LeaveRequestType>(
     },
     response_date: {
       type: Date,
-      required: true,
     },
   },
   {

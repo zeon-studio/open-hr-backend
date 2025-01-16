@@ -1,6 +1,15 @@
+import config from "@/config/variables";
+import ApiError from "@/errors/ApiError";
+import { dateConvert } from "@/lib/dateFormat";
+import { leaveDataFinder, leaveDayCounter } from "@/lib/leaveHelper";
+import { mailSender } from "@/lib/mailSender";
+import { leaveRequestDiscordTemplate } from "@/lib/mailTemplate";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
-import { PipelineStage } from "mongoose";
+import axios from "axios";
+import mongoose, { PipelineStage } from "mongoose";
+import { EmployeeJob } from "../employee-job/employee-job.model";
+import { Employee } from "../employee/employee.model";
 import { LeaveRequest } from "./leave-request.model";
 import {
   LeaveRequestFilterOptions,
@@ -85,8 +94,89 @@ const getLeaveRequestService = async (id: string) => {
 
 // create
 const createLeaveRequestService = async (data: LeaveRequestType) => {
-  const result = await LeaveRequest.create(data);
-  return result;
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const startDate = dateConvert(data.start_date);
+    const endDate = dateConvert(data.end_date);
+    const dayCount = await leaveDayCounter(startDate, endDate);
+    data = {
+      ...data,
+      start_date: startDate,
+      end_date: endDate,
+      day_count: dayCount,
+    };
+    const leaveData = await leaveDataFinder(data);
+    const consumedDays = leaveData[data.leave_type].consumed;
+    const allottedDays = leaveData[data.leave_type].allotted;
+
+    if (consumedDays + dayCount > allottedDays) {
+      throw new Error(
+        `You have exceeded the maximum number of ${data.leave_type} days for this year`
+      );
+    } else {
+      const postData = new LeaveRequest(data);
+      await postData.save({ session });
+
+      // find employee data
+      const employeeData = await Employee.findOne({
+        id: data.employee_id,
+      }).session(session);
+
+      // find employee manager
+      const employeeJobData = await EmployeeJob.findOne({
+        employee_id: data.employee_id,
+      }).session(session);
+
+      // find manager email
+      const managerData = await Employee.findOne({
+        id: employeeJobData?.manager_id,
+      }).session(session);
+
+      // find admin and moderator data
+      const adminAndModData = await Employee.find({
+        role: { $in: ["admin", "moderator"] },
+      }).session(session);
+
+      // find admin and moderator email
+      const adminAndModEmails = adminAndModData.map((data) => data.work_email);
+
+      // create an array of emails
+      const notifyEmailList = [...adminAndModEmails, managerData?.work_email!];
+
+      // send mail
+      await mailSender.leaveRequest(
+        notifyEmailList,
+        employeeData?.name!,
+        data.leave_type,
+        dayCount,
+        startDate,
+        endDate,
+        data.reason
+      );
+
+      // send discord message
+      await axios.post(config.discord_webhook_url!, {
+        content: leaveRequestDiscordTemplate(
+          employeeData?.name!,
+          data.leave_type,
+          dayCount,
+          startDate,
+          endDate,
+          data.reason
+        ),
+      });
+
+      await session.commitTransaction();
+      return postData;
+    }
+  } catch (error: any) {
+    await session.abortTransaction();
+    console.log(error);
+    throw new ApiError(error.message, 400, "");
+  } finally {
+    session.endSession();
+  }
 };
 
 // update

@@ -26,6 +26,7 @@ employeeRouter.get(
 employeeRouter.post(
   "/",
   checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeController.createEmployeeController
 );
 

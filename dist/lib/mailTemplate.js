@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.invitationTemplate = invitationTemplate;
 exports.leaveRequestTemplate = leaveRequestTemplate;
+exports.leaveRequestDiscordTemplate = leaveRequestDiscordTemplate;
 exports.leaveRequestApprovedTemplate = leaveRequestApprovedTemplate;
 exports.leaveRequestRejectedTemplate = leaveRequestRejectedTemplate;
-const dateFormat_1 = require("../lib/dateFormat");
 // invitation template
 function invitationTemplate(designation, joining_date) {
     return `<div style="text-align: center;">
@@ -13,7 +13,7 @@ function invitationTemplate(designation, joining_date) {
     <br>
     <br>
     <p>We are excited to welcome you to our team as a ${designation}! Your contributions will be invaluable to our success.</p>
-    <p>Your joining date is ${(0, dateFormat_1.dateFormat)(joining_date)}. You can start using your account from now.</p>
+    <p>Your joining date is ${joining_date}. You can start using your account from now.</p>
     <br>
     <br>
     <br>
@@ -29,12 +29,16 @@ function leaveRequestTemplate(name, leaveType, dayCount, startDate, endDate, rea
 
   <ul>
     <li style="text-transform: capitalize;">Type of Leave: ${leaveType}</li>
-    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${(0, dateFormat_1.dateFormat)(startDate)}` : `${dayCount} days starts from ${(0, dateFormat_1.dateFormat)(startDate)} to ${(0, dateFormat_1.dateFormat)(endDate)}`}</li>
+    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${startDate}` : `${dayCount} days starts from ${startDate} to ${endDate}`}</li>
     <li>Reason: ${reason}</li>
   </ul>
 
   <p>To accept or reject the request please visit <a href="https://erp.teamosis.com/request">Teamosis ERP</a></p>
   `;
+}
+// leave request discord template
+function leaveRequestDiscordTemplate(name, leaveType, dayCount, startDate, endDate, reason) {
+    return `**${name}** has requested **${leaveType}** leave for **${dayCount}** ${dayCount === 1 ? `**day** on **${startDate}**` : `**days** starts from **${startDate}** to **${endDate}**`} with the reason: **${reason}**`;
 }
 // leave Request Approved Template
 function leaveRequestApprovedTemplate(name, leaveType, dayCount, startDate, endDate, reason) {
@@ -45,7 +49,7 @@ function leaveRequestApprovedTemplate(name, leaveType, dayCount, startDate, endD
 
   <ul>
     <li>Type of Leave: ${leaveType}</li>
-    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${(0, dateFormat_1.dateFormat)(startDate)}` : `${dayCount} days starts from ${(0, dateFormat_1.dateFormat)(startDate)} to ${(0, dateFormat_1.dateFormat)(endDate)}`}</li>
+    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${startDate}` : `${dayCount} days starts from ${startDate} to ${endDate}`}</li>
     <li>Reason: ${reason}</li>
   </ul>
 
@@ -65,7 +69,7 @@ function leaveRequestRejectedTemplate(name, leaveType, dayCount, startDate, endD
 
   <ul>
     <li>Type of Leave: ${leaveType}</li>
-    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${(0, dateFormat_1.dateFormat)(startDate)}` : `${dayCount} days starts from ${(0, dateFormat_1.dateFormat)(startDate)} to ${(0, dateFormat_1.dateFormat)(endDate)}`}</li>
+    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${startDate}` : `${dayCount} days starts from ${startDate} to ${endDate}`}</li>
     <li>Reason: ${reason}</li>
   </ul>
 

@@ -19,6 +19,7 @@ const leaveCount_1 = require("../../lib/leaveCount");
 const mailSender_1 = require("../../lib/mailSender");
 const paginationHelper_1 = require("../../lib/paginationHelper");
 const http_status_1 = __importDefault(require("http-status"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const employee_job_model_1 = require("../employee-job/employee-job.model");
 const employee_onboarding_model_1 = require("../employee-onboarding/employee-onboarding.model");
 const leave_model_1 = require("../leave/leave.model");
@@ -127,12 +128,13 @@ const getSingleEmployeeService = (id) => __awaiter(void 0, void 0, void 0, funct
 });
 // insert employee
 const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0, function* () {
-    const session = yield employee_model_1.Employee.startSession();
+    const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
         // count data by department
-        const departmentSerial = (yield employee_model_1.Employee.countDocuments({ department: employeeData.department })) +
-            1;
+        const departmentSerial = (yield employee_job_model_1.EmployeeJob.countDocuments({
+            department: employeeData.department,
+        })) + 1;
         const joiningDate = new Date(employeeData.joining_date);
         const employeeId = (0, IdGenerator_1.generateEmployeeId)(employeeData.department, joiningDate, departmentSerial);
         const createEmployeeData = {
