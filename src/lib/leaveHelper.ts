@@ -1,5 +1,6 @@
 import ApiError from "@/errors/ApiError";
 import { Calendar } from "@/modules/calendar/calendar.model";
+import { LeaveRequest } from "@/modules/leave-request/leave-request.model";
 import { LeaveRequestType } from "@/modules/leave-request/leave-request.type";
 import { Leave } from "@/modules/leave/leave.model";
 import {
@@ -98,21 +99,21 @@ export const leaveDayCounter = async (startDate: Date, endDate: Date) => {
   return finalDays;
 };
 
-// leave data finder
-export const leaveDataFinder = async (data: LeaveRequestType) => {
-  const { leave_type, employee_id, start_date } = data;
+// leave data validator
+export const leaveValidator = async (data: LeaveRequestType) => {
+  const { leave_type, employee_id, start_date, end_date } = data;
   const year = start_date.getFullYear();
   const leaveTypes = ["casual", "earned", "sick", "without_pay"];
 
   if (!leaveTypes.includes(leave_type)) {
-    throw new ApiError("Invalid leave type", 400, "");
+    throw new ApiError("Invalid leave type", 400);
   }
 
-  const selectPath = `years.${leave_type}`;
+  const selectYear = `years.${leave_type}`;
 
   const leaveData = await Leave.findOne(
     { employee_id, "years.year": year },
-    { [selectPath]: 1, "years.year": 1, _id: 0 }
+    { [selectYear]: 1, "years.year": 1, _id: 0 }
   ).exec();
 
   if (!leaveData) {
@@ -126,6 +127,23 @@ export const leaveDataFinder = async (data: LeaveRequestType) => {
   const yearData = leaveData.years.find((y) => y.year === year);
   if (!yearData) {
     throw new Error(`Leave data for year ${year} not found`);
+  }
+
+  // Check for overlapping leave requests with status "approved" or "pending"
+  const overlappingLeave = await LeaveRequest.findOne({
+    employee_id,
+    status: { $in: ["approved", "pending"] },
+    $or: [
+      { start_date: { $lte: end_date }, end_date: { $gte: start_date } },
+      { start_date: { $lte: start_date }, end_date: { $gte: end_date } },
+    ],
+  });
+
+  if (overlappingLeave) {
+    throw new ApiError(
+      `Leave request overlaps with an existing leave from ${overlappingLeave.start_date} to ${overlappingLeave.end_date}`,
+      400
+    );
   }
 
   return yearData;

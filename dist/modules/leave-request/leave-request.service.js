@@ -24,6 +24,7 @@ const axios_1 = __importDefault(require("axios"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const employee_job_model_1 = require("../employee-job/employee-job.model");
 const employee_model_1 = require("../employee/employee.model");
+const leave_model_1 = require("../leave/leave.model");
 const leave_request_model_1 = require("./leave-request.model");
 // get all data
 const getAllLeaveRequestService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -93,15 +94,22 @@ const createLeaveRequestService = (data) => __awaiter(void 0, void 0, void 0, fu
         const endDate = (0, dateConverter_1.localDate)(data.end_date);
         const dayCount = yield (0, leaveHelper_1.leaveDayCounter)(startDate, endDate);
         data = Object.assign(Object.assign({}, data), { start_date: startDate, end_date: endDate, day_count: dayCount });
-        const leaveData = yield (0, leaveHelper_1.leaveDataFinder)(data);
+        const leaveData = yield (0, leaveHelper_1.leaveValidator)(data);
         const consumedDays = leaveData[data.leave_type].consumed;
         const allottedDays = leaveData[data.leave_type].allotted;
         if (consumedDays + dayCount > allottedDays) {
-            throw new Error(`You have exceeded the maximum number of ${data.leave_type} days for this year`);
+            throw new ApiError_1.default(`You have exceeded the maximum number of ${data.leave_type} days for this year`, 400);
         }
         else {
             const postData = new leave_request_model_1.LeaveRequest(data);
             yield postData.save({ session });
+            // deduct leave days
+            const currentYear = startDate.getFullYear();
+            yield leave_model_1.Leave.findOneAndUpdate({ employee_id: data.employee_id, "years.year": currentYear }, {
+                $inc: {
+                    [`years.$.${data.leave_type}.consumed`]: dayCount,
+                },
+            }, { session });
             // find employee data
             const employeeData = yield employee_model_1.Employee.findOne({
                 id: data.employee_id,
@@ -135,7 +143,7 @@ const createLeaveRequestService = (data) => __awaiter(void 0, void 0, void 0, fu
     catch (error) {
         yield session.abortTransaction();
         console.log(error);
-        throw new ApiError_1.default(error.message, 400, "");
+        throw new ApiError_1.default(error.message, 400);
     }
     finally {
         session.endSession();
@@ -143,14 +151,45 @@ const createLeaveRequestService = (data) => __awaiter(void 0, void 0, void 0, fu
 });
 // update
 const updateLeaveRequestService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield leave_request_model_1.LeaveRequest.findOneAndUpdate({ employee_id: id }, updateData, {
-        new: true,
+    const leaveReqData = yield leave_request_model_1.LeaveRequest.findOne({ _id: id });
+    const employeeData = yield employee_model_1.Employee.findOne({
+        id: leaveReqData === null || leaveReqData === void 0 ? void 0 : leaveReqData.employee_id,
     });
-    return result;
+    console.log(employeeData);
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
+    try {
+        // check status
+        const leaveStatus = updateData.status;
+        if (leaveStatus === "rejected") {
+            // deduct leave days
+            const currentYear = leaveReqData.start_date.getFullYear();
+            yield leave_model_1.Leave.findOneAndUpdate({ employee_id: leaveReqData.employee_id, "years.year": currentYear }, {
+                $inc: {
+                    [`years.$.${leaveReqData.leave_type}.consumed`]: -leaveReqData.day_count,
+                },
+            }, { session });
+        }
+        yield mailSender_1.mailSender.leaveRequestResponse(employeeData === null || employeeData === void 0 ? void 0 : employeeData.work_email, employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, leaveReqData === null || leaveReqData === void 0 ? void 0 : leaveReqData.leave_type, leaveReqData === null || leaveReqData === void 0 ? void 0 : leaveReqData.day_count, leaveReqData === null || leaveReqData === void 0 ? void 0 : leaveReqData.start_date, leaveReqData === null || leaveReqData === void 0 ? void 0 : leaveReqData.end_date, leaveReqData === null || leaveReqData === void 0 ? void 0 : leaveReqData.reason, leaveStatus);
+        const result = yield leave_request_model_1.LeaveRequest.findOneAndUpdate({ _id: id }, updateData, {
+            new: true,
+            session,
+        });
+        yield session.commitTransaction();
+        return result;
+    }
+    catch (error) {
+        yield session.abortTransaction();
+        console.log(error);
+        throw new ApiError_1.default(error.message, 400);
+    }
+    finally {
+        session.endSession();
+    }
 });
 // delete
 const deleteLeaveRequestService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield leave_request_model_1.LeaveRequest.findOneAndDelete({ employee_id: id });
+    yield leave_request_model_1.LeaveRequest.findOneAndDelete({ employee_id: id, status: "pending" });
 });
 exports.leaveRequestService = {
     getAllLeaveRequestService,

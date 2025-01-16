@@ -302,10 +302,10 @@ const deleteEmployeeService = async (id: string) => {
     );
 
     if (!deleteEmployee) {
-      throw new ApiError("employee is not delete", httpStatus.FORBIDDEN, "");
+      throw new ApiError("employee is not delete", httpStatus.FORBIDDEN);
     }
   } catch (error) {
-    throw new ApiError("employee is not delete", httpStatus.FORBIDDEN, "");
+    throw new ApiError("employee is not delete", httpStatus.FORBIDDEN);
   }
 };
 

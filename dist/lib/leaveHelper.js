@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.leaveDataFinder = exports.leaveDayCounter = void 0;
+exports.leaveValidator = exports.leaveDayCounter = void 0;
 exports.calculateRemainingLeave = calculateRemainingLeave;
 const ApiError_1 = __importDefault(require("../errors/ApiError"));
 const calendar_model_1 = require("../modules/calendar/calendar.model");
+const leave_request_model_1 = require("../modules/leave-request/leave-request.model");
 const leave_model_1 = require("../modules/leave/leave.model");
 const date_fns_1 = require("date-fns");
 // leave day counter
@@ -72,16 +73,16 @@ const leaveDayCounter = (startDate, endDate) => __awaiter(void 0, void 0, void 0
     return finalDays;
 });
 exports.leaveDayCounter = leaveDayCounter;
-// leave data finder
-const leaveDataFinder = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const { leave_type, employee_id, start_date } = data;
+// leave data validator
+const leaveValidator = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    const { leave_type, employee_id, start_date, end_date } = data;
     const year = start_date.getFullYear();
     const leaveTypes = ["casual", "earned", "sick", "without_pay"];
     if (!leaveTypes.includes(leave_type)) {
-        throw new ApiError_1.default("Invalid leave type", 400, "");
+        throw new ApiError_1.default("Invalid leave type", 400);
     }
-    const selectPath = `years.${leave_type}`;
-    const leaveData = yield leave_model_1.Leave.findOne({ employee_id, "years.year": year }, { [selectPath]: 1, "years.year": 1, _id: 0 }).exec();
+    const selectYear = `years.${leave_type}`;
+    const leaveData = yield leave_model_1.Leave.findOne({ employee_id, "years.year": year }, { [selectYear]: 1, "years.year": 1, _id: 0 }).exec();
     if (!leaveData) {
         throw new ApiError_1.default(`No leave data found for user ${employee_id} in year ${year}`, 400, "");
     }
@@ -89,9 +90,21 @@ const leaveDataFinder = (data) => __awaiter(void 0, void 0, void 0, function* ()
     if (!yearData) {
         throw new Error(`Leave data for year ${year} not found`);
     }
+    // Check for overlapping leave requests with status "approved" or "pending"
+    const overlappingLeave = yield leave_request_model_1.LeaveRequest.findOne({
+        employee_id,
+        status: { $in: ["approved", "pending"] },
+        $or: [
+            { start_date: { $lte: end_date }, end_date: { $gte: start_date } },
+            { start_date: { $lte: start_date }, end_date: { $gte: end_date } },
+        ],
+    });
+    if (overlappingLeave) {
+        throw new ApiError_1.default(`Leave request overlaps with an existing leave from ${overlappingLeave.start_date} to ${overlappingLeave.end_date}`, 400);
+    }
     return yearData;
 });
-exports.leaveDataFinder = leaveDataFinder;
+exports.leaveValidator = leaveValidator;
 // calculate leave based on join date
 function calculateRemainingLeave(joinDate, leaveAllottedPerYear) {
     // Convert joinDate to a Date object

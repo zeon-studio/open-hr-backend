@@ -19,14 +19,14 @@ const auth = (...requestRoles) => (req, res, next) => __awaiter(void 0, void 0, 
     try {
         const token = req.headers.authorization;
         if (!token) {
-            throw new ApiError_1.default("User is not Authenticated", 401, "");
+            throw new ApiError_1.default("User is not Authenticated", 401);
         }
         const verifyToken = `${token.split(" ")[1]}`;
         const verifiedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(verifyToken, variables_1.default.jwt_secret);
         req.user = verifiedToken;
         if ((requestRoles === null || requestRoles === void 0 ? void 0 : requestRoles.length) &&
             !(requestRoles === null || requestRoles === void 0 ? void 0 : requestRoles.includes(verifiedToken === null || verifiedToken === void 0 ? void 0 : verifiedToken.role))) {
-            throw new ApiError_1.default("User is not Authenticated", 401, "");
+            throw new ApiError_1.default("User is not Authenticated", 401);
         }
         next();
     }

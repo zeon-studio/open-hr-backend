@@ -16,8 +16,10 @@ leaveRequestRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(role
 // create data
 leaveRequestRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_request_controller_1.leaveRequestController.createLeaveRequestController);
 // update data
-leaveRequestRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), leave_request_controller_1.leaveRequestController.updateLeaveRequestController);
+leaveRequestRouter.patch("/:id", checkToken_1.checkToken, 
+// auth(ENUM_ROLE.ADMIN),
+leave_request_controller_1.leaveRequestController.updateLeaveRequestController);
 // delete data
-leaveRequestRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), leave_request_controller_1.leaveRequestController.deleteLeaveRequestController);
+leaveRequestRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_request_controller_1.leaveRequestController.deleteLeaveRequestController);
 exports.default = leaveRequestRouter;
 //# sourceMappingURL=leave-request.routes.js.map

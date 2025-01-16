@@ -257,11 +257,11 @@ const deleteEmployeeService = (id) => __awaiter(void 0, void 0, void 0, function
     try {
         const deleteEmployee = yield employee_model_1.Employee.findOneAndDelete({ id: id }, { new: true });
         if (!deleteEmployee) {
-            throw new ApiError_1.default("employee is not delete", http_status_1.default.FORBIDDEN, "");
+            throw new ApiError_1.default("employee is not delete", http_status_1.default.FORBIDDEN);
         }
     }
     catch (error) {
-        throw new ApiError_1.default("employee is not delete", http_status_1.default.FORBIDDEN, "");
+        throw new ApiError_1.default("employee is not delete", http_status_1.default.FORBIDDEN);
     }
 });
 exports.employeeService = {

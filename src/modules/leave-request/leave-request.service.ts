@@ -1,7 +1,7 @@
 import config from "@/config/variables";
 import ApiError from "@/errors/ApiError";
 import { localDate } from "@/lib/dateConverter";
-import { leaveDataFinder, leaveDayCounter } from "@/lib/leaveHelper";
+import { leaveDayCounter, leaveValidator } from "@/lib/leaveHelper";
 import { mailSender } from "@/lib/mailSender";
 import { leaveRequestDiscordTemplate } from "@/lib/mailTemplate";
 import { paginationHelpers } from "@/lib/paginationHelper";
@@ -10,6 +10,7 @@ import axios from "axios";
 import mongoose, { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
 import { Employee } from "../employee/employee.model";
+import { Leave } from "../leave/leave.model";
 import { LeaveRequest } from "./leave-request.model";
 import {
   LeaveRequestFilterOptions,
@@ -106,17 +107,30 @@ const createLeaveRequestService = async (data: LeaveRequestType) => {
       end_date: endDate,
       day_count: dayCount,
     };
-    const leaveData = await leaveDataFinder(data);
+    const leaveData = await leaveValidator(data);
     const consumedDays = leaveData[data.leave_type].consumed;
     const allottedDays = leaveData[data.leave_type].allotted;
 
     if (consumedDays + dayCount > allottedDays) {
-      throw new Error(
-        `You have exceeded the maximum number of ${data.leave_type} days for this year`
+      throw new ApiError(
+        `You have exceeded the maximum number of ${data.leave_type} days for this year`,
+        400
       );
     } else {
       const postData = new LeaveRequest(data);
       await postData.save({ session });
+
+      // deduct leave days
+      const currentYear = startDate.getFullYear();
+      await Leave.findOneAndUpdate(
+        { employee_id: data.employee_id, "years.year": currentYear },
+        {
+          $inc: {
+            [`years.$.${data.leave_type}.consumed`]: dayCount,
+          },
+        },
+        { session }
+      );
 
       // find employee data
       const employeeData = await Employee.findOne({
@@ -173,7 +187,7 @@ const createLeaveRequestService = async (data: LeaveRequestType) => {
   } catch (error: any) {
     await session.abortTransaction();
     console.log(error);
-    throw new ApiError(error.message, 400, "");
+    throw new ApiError(error.message, 400);
   } finally {
     session.endSession();
   }
@@ -184,19 +198,68 @@ const updateLeaveRequestService = async (
   id: string,
   updateData: LeaveRequestType
 ) => {
-  const result = await LeaveRequest.findOneAndUpdate(
-    { employee_id: id },
-    updateData,
-    {
-      new: true,
+  const leaveReqData = await LeaveRequest.findOne({ _id: id });
+  const employeeData = await Employee.findOne({
+    id: leaveReqData?.employee_id,
+  });
+
+  console.log(employeeData);
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // check status
+    const leaveStatus = updateData.status;
+    if (leaveStatus === "rejected") {
+      // deduct leave days
+      const currentYear = leaveReqData!.start_date.getFullYear();
+      await Leave.findOneAndUpdate(
+        { employee_id: leaveReqData!.employee_id, "years.year": currentYear },
+        {
+          $inc: {
+            [`years.$.${leaveReqData!.leave_type}.consumed`]:
+              -leaveReqData!.day_count,
+          },
+        },
+        { session }
+      );
     }
-  );
-  return result;
+
+    await mailSender.leaveRequestResponse(
+      employeeData?.work_email!,
+      employeeData?.name!,
+      leaveReqData?.leave_type!,
+      leaveReqData?.day_count!,
+      leaveReqData?.start_date!,
+      leaveReqData?.end_date!,
+      leaveReqData?.reason!,
+      leaveStatus!
+    );
+
+    const result = await LeaveRequest.findOneAndUpdate(
+      { _id: id },
+      updateData,
+      {
+        new: true,
+        session,
+      }
+    );
+
+    await session.commitTransaction();
+    return result;
+  } catch (error: any) {
+    await session.abortTransaction();
+    console.log(error);
+    throw new ApiError(error.message, 400);
+  } finally {
+    session.endSession();
+  }
 };
 
 // delete
 const deleteLeaveRequestService = async (id: string) => {
-  await LeaveRequest.findOneAndDelete({ employee_id: id });
+  await LeaveRequest.findOneAndDelete({ employee_id: id, status: "pending" });
 };
 
 export const leaveRequestService = {

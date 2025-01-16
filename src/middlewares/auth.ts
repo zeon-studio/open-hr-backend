@@ -10,7 +10,7 @@ const auth =
     try {
       const token = req.headers.authorization as string;
       if (!token) {
-        throw new ApiError("User is not Authenticated", 401, "");
+        throw new ApiError("User is not Authenticated", 401);
       }
       const verifyToken = `${token.split(" ")[1]}`;
       const verifiedToken = jwtHelpers.verifyToken(
@@ -22,7 +22,7 @@ const auth =
         requestRoles?.length &&
         !requestRoles?.includes(verifiedToken?.role)
       ) {
-        throw new ApiError("User is not Authenticated", 401, "");
+        throw new ApiError("User is not Authenticated", 401);
       }
       next();
     } catch (error) {

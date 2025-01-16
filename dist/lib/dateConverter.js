@@ -14,7 +14,6 @@ const localDate = (date) => {
     const removeTime = new Date(date).toISOString().split("T")[0];
     const utcDate = new Date(removeTime);
     const dhakaTime = (0, date_fns_1.add)(utcDate, { hours: 6 });
-    console.log("dhakaTime", dhakaTime);
     return dhakaTime;
 };
 exports.localDate = localDate;

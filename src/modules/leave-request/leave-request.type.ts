@@ -5,7 +5,7 @@ export type LeaveRequestType = {
   end_date: Date;
   day_count: number;
   reason: string;
-  status: string;
+  status: "pending" | "approved" | "rejected";
   submit_date: Date;
   response_date: Date;
 };
