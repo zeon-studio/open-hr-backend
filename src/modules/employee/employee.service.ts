@@ -1,6 +1,6 @@
 import ApiError from "@/errors/ApiError";
 import { generateEmployeeId } from "@/lib/IdGenerator";
-import { calculateRemainingLeave } from "@/lib/leaveCount";
+import { calculateRemainingLeave } from "@/lib/leaveHelper";
 import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";

@@ -1,3 +1,5 @@
+import { formatDate } from "./dateConverter";
+
 // invitation template
 export function invitationTemplate(
   designation: string,
@@ -9,9 +11,9 @@ export function invitationTemplate(
     <br>
     <br>
     <p>We are excited to welcome you to our team as a ${designation}! Your contributions will be invaluable to our success.</p>
-    <p>Your joining date is ${
+    <p>Your joining date is ${formatDate(
       joining_date
-    }. You can start using your account from now.</p>
+    )}. You can start using your account from now.</p>
     <br>
     <br>
     <br>
@@ -71,7 +73,7 @@ export function leaveRequestApprovedTemplate(
 
   <ul>
     <li>Type of Leave: ${leaveType}</li>
-    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${startDate}` : `${dayCount} days starts from ${startDate} to ${endDate}`}</li>
+    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${formatDate(startDate)}` : `${dayCount} days starts from ${formatDate(startDate)} to ${formatDate(endDate)}`}</li>
     <li>Reason: ${reason}</li>
   </ul>
 
@@ -99,7 +101,7 @@ export function leaveRequestRejectedTemplate(
 
   <ul>
     <li>Type of Leave: ${leaveType}</li>
-    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${startDate}` : `${dayCount} days starts from ${startDate} to ${endDate}`}</li>
+    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${formatDate(startDate)}` : `${dayCount} days starts from ${formatDate(startDate)} to ${formatDate(endDate)}`}</li>
     <li>Reason: ${reason}</li>
   </ul>
 

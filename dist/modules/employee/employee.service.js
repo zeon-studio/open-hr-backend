@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeService = void 0;
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const IdGenerator_1 = require("../../lib/IdGenerator");
-const leaveCount_1 = require("../../lib/leaveCount");
+const leaveHelper_1 = require("../../lib/leaveHelper");
 const mailSender_1 = require("../../lib/mailSender");
 const paginationHelper_1 = require("../../lib/paginationHelper");
 const http_status_1 = __importDefault(require("http-status"));
@@ -155,11 +155,11 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
                 {
                     year: joiningDate.getFullYear(),
                     casual: {
-                        allotted: (0, leaveCount_1.calculateRemainingLeave)(joiningDate, 10),
+                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, 10),
                         consumed: 0,
                     },
                     sick: {
-                        allotted: (0, leaveCount_1.calculateRemainingLeave)(joiningDate, 5),
+                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, 5),
                         consumed: 0,
                     },
                     earned: {
@@ -167,7 +167,7 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
                         consumed: 0,
                     },
                     without_pay: {
-                        allotted: (0, leaveCount_1.calculateRemainingLeave)(joiningDate, 30),
+                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, 30),
                         consumed: 0,
                     },
                 },

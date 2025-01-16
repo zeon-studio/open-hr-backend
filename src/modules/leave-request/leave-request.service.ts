@@ -1,6 +1,6 @@
 import config from "@/config/variables";
 import ApiError from "@/errors/ApiError";
-import { dateConvert } from "@/lib/dateFormat";
+import { localDate } from "@/lib/dateConverter";
 import { leaveDataFinder, leaveDayCounter } from "@/lib/leaveHelper";
 import { mailSender } from "@/lib/mailSender";
 import { leaveRequestDiscordTemplate } from "@/lib/mailTemplate";
@@ -97,8 +97,8 @@ const createLeaveRequestService = async (data: LeaveRequestType) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const startDate = dateConvert(data.start_date);
-    const endDate = dateConvert(data.end_date);
+    const startDate = localDate(data.start_date);
+    const endDate = localDate(data.end_date);
     const dayCount = await leaveDayCounter(startDate, endDate);
     data = {
       ...data,

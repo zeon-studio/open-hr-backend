@@ -13,10 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.leaveDataFinder = exports.leaveDayCounter = void 0;
+exports.calculateRemainingLeave = calculateRemainingLeave;
 const ApiError_1 = __importDefault(require("../errors/ApiError"));
 const calendar_model_1 = require("../modules/calendar/calendar.model");
 const leave_model_1 = require("../modules/leave/leave.model");
 const date_fns_1 = require("date-fns");
+// leave day counter
 const leaveDayCounter = (startDate, endDate) => __awaiter(void 0, void 0, void 0, function* () {
     const year = startDate.getFullYear();
     const holidayRecords = yield calendar_model_1.Calendar.find({ year });
@@ -70,7 +72,7 @@ const leaveDayCounter = (startDate, endDate) => __awaiter(void 0, void 0, void 0
     return finalDays;
 });
 exports.leaveDayCounter = leaveDayCounter;
-// get leave
+// leave data finder
 const leaveDataFinder = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const { leave_type, employee_id, start_date } = data;
     const year = start_date.getFullYear();
@@ -90,4 +92,20 @@ const leaveDataFinder = (data) => __awaiter(void 0, void 0, void 0, function* ()
     return yearData;
 });
 exports.leaveDataFinder = leaveDataFinder;
+// calculate leave based on join date
+function calculateRemainingLeave(joinDate, leaveAllottedPerYear) {
+    // Convert joinDate to a Date object
+    const joinDateObj = new Date(joinDate);
+    const currentYear = joinDateObj.getFullYear();
+    // Calculate the total number of days in the year
+    const startOfYear = new Date(currentYear, 0, 1);
+    const endOfYear = new Date(currentYear, 11, 31);
+    const totalDaysInYear = (endOfYear.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24) + 1;
+    // Calculate the number of days worked since join date till end of year
+    const daysWorked = (endOfYear.getTime() - joinDateObj.getTime()) / (1000 * 60 * 60 * 24) + 1;
+    // Calculate remaining leave based on proportional days worked
+    const remainingLeave = (daysWorked / totalDaysInYear) * leaveAllottedPerYear;
+    // Return remaining leave rounded to two decimal places
+    return Math.round((remainingLeave * 100) / 100);
+}
 //# sourceMappingURL=leaveHelper.js.map

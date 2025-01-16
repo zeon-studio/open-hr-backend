@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.leaveRequestService = void 0;
 const variables_1 = __importDefault(require("../../config/variables"));
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
-const dateFormat_1 = require("../../lib/dateFormat");
+const dateConverter_1 = require("../../lib/dateConverter");
 const leaveHelper_1 = require("../../lib/leaveHelper");
 const mailSender_1 = require("../../lib/mailSender");
 const mailTemplate_1 = require("../../lib/mailTemplate");
@@ -89,8 +89,8 @@ const createLeaveRequestService = (data) => __awaiter(void 0, void 0, void 0, fu
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
-        const startDate = (0, dateFormat_1.dateConvert)(data.start_date);
-        const endDate = (0, dateFormat_1.dateConvert)(data.end_date);
+        const startDate = (0, dateConverter_1.localDate)(data.start_date);
+        const endDate = (0, dateConverter_1.localDate)(data.end_date);
         const dayCount = yield (0, leaveHelper_1.leaveDayCounter)(startDate, endDate);
         data = Object.assign(Object.assign({}, data), { start_date: startDate, end_date: endDate, day_count: dayCount });
         const leaveData = yield (0, leaveHelper_1.leaveDataFinder)(data);

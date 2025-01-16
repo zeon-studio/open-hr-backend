@@ -5,6 +5,7 @@ exports.leaveRequestTemplate = leaveRequestTemplate;
 exports.leaveRequestDiscordTemplate = leaveRequestDiscordTemplate;
 exports.leaveRequestApprovedTemplate = leaveRequestApprovedTemplate;
 exports.leaveRequestRejectedTemplate = leaveRequestRejectedTemplate;
+const dateConverter_1 = require("./dateConverter");
 // invitation template
 function invitationTemplate(designation, joining_date) {
     return `<div style="text-align: center;">
@@ -13,7 +14,7 @@ function invitationTemplate(designation, joining_date) {
     <br>
     <br>
     <p>We are excited to welcome you to our team as a ${designation}! Your contributions will be invaluable to our success.</p>
-    <p>Your joining date is ${joining_date}. You can start using your account from now.</p>
+    <p>Your joining date is ${(0, dateConverter_1.formatDate)(joining_date)}. You can start using your account from now.</p>
     <br>
     <br>
     <br>
@@ -49,7 +50,7 @@ function leaveRequestApprovedTemplate(name, leaveType, dayCount, startDate, endD
 
   <ul>
     <li>Type of Leave: ${leaveType}</li>
-    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${startDate}` : `${dayCount} days starts from ${startDate} to ${endDate}`}</li>
+    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${(0, dateConverter_1.formatDate)(startDate)}` : `${dayCount} days starts from ${(0, dateConverter_1.formatDate)(startDate)} to ${(0, dateConverter_1.formatDate)(endDate)}`}</li>
     <li>Reason: ${reason}</li>
   </ul>
 
@@ -69,7 +70,7 @@ function leaveRequestRejectedTemplate(name, leaveType, dayCount, startDate, endD
 
   <ul>
     <li>Type of Leave: ${leaveType}</li>
-    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${startDate}` : `${dayCount} days starts from ${startDate} to ${endDate}`}</li>
+    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${(0, dateConverter_1.formatDate)(startDate)}` : `${dayCount} days starts from ${(0, dateConverter_1.formatDate)(startDate)} to ${(0, dateConverter_1.formatDate)(endDate)}`}</li>
     <li>Reason: ${reason}</li>
   </ul>
 
