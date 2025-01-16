@@ -10,13 +10,13 @@ const express_1 = __importDefault(require("express"));
 const course_controller_1 = require("./course.controller");
 const courseRouter = express_1.default.Router();
 // get all data
-courseRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), course_controller_1.courseController.getAllCourseController);
+courseRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), course_controller_1.courseController.getAllCourseController);
 // get single data
-courseRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER), course_controller_1.courseController.getCourseController);
+courseRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), course_controller_1.courseController.getCourseController);
 // create data
-courseRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), course_controller_1.courseController.createCourseController);
+courseRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), course_controller_1.courseController.createCourseController);
 // update data
-courseRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), course_controller_1.courseController.updateCourseController);
+courseRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), course_controller_1.courseController.updateCourseController);
 // delete data
 courseRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), course_controller_1.courseController.deleteCourseController);
 exports.default = courseRouter;

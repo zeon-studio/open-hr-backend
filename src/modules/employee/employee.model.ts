@@ -26,9 +26,6 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     personal_email: {
       type: String,
     },
-    role: {
-      type: String,
-    },
     nid: {
       type: String,
     },
@@ -59,12 +56,17 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     linkedin: {
       type: String,
     },
+    note: {
+      type: String,
+    },
     status: {
       type: String,
       default: "pending",
     },
-    note: {
+    role: {
       type: String,
+      required: true,
+      default: "user",
     },
   },
   {

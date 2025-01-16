@@ -10,7 +10,7 @@ const employeeRouter = express.Router();
 employeeRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeController.getAllEmployeeController
 );
 
@@ -34,7 +34,7 @@ employeeRouter.post(
 employeeRouter.patch(
   "/update/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.updateEmployeeController
 );
 
@@ -42,7 +42,7 @@ employeeRouter.patch(
 employeeRouter.patch(
   "/update-note/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeController.updateEmployeeNoteController
 );
 

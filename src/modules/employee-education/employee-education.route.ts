@@ -10,7 +10,7 @@ const employeeEducationRouter = express.Router();
 employeeEducationRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeEducationController.getAllEmployeeEducationController
 );
 
@@ -18,7 +18,7 @@ employeeEducationRouter.get(
 employeeEducationRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeEducationController.getEmployeeEducationController
 );
 
@@ -26,6 +26,7 @@ employeeEducationRouter.get(
 employeeEducationRouter.patch(
   "/:id",
   checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeEducationController.updateEmployeeEducationController
 );
 

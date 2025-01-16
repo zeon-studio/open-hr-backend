@@ -10,7 +10,7 @@ const toolRouter = express.Router();
 toolRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   toolController.getAllToolController
 );
 
@@ -18,7 +18,7 @@ toolRouter.get(
 toolRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   toolController.getToolController
 );
 
@@ -26,7 +26,7 @@ toolRouter.get(
 toolRouter.patch(
   "/:id",
   checkToken,
-  // auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   toolController.updateToolController
 );
 

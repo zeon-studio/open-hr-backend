@@ -10,7 +10,7 @@ const employeeContactRouter = express.Router();
 employeeContactRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeContactController.getAllEmployeeContactController
 );
 
@@ -18,7 +18,7 @@ employeeContactRouter.get(
 employeeContactRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeContactController.getEmployeeContactController
 );
 
@@ -26,6 +26,7 @@ employeeContactRouter.get(
 employeeContactRouter.patch(
   "/:id",
   checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeContactController.updateEmployeeContactController
 );
 

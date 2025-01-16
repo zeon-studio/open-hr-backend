@@ -10,7 +10,7 @@ const employeeBankRouter = express.Router();
 employeeBankRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeBankController.getAllEmployeeBankController
 );
 
@@ -18,7 +18,7 @@ employeeBankRouter.get(
 employeeBankRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeBankController.getEmployeeBankController
 );
 
@@ -26,6 +26,7 @@ employeeBankRouter.get(
 employeeBankRouter.patch(
   "/:id",
   checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeBankController.updateEmployeeBankController
 );
 

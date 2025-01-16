@@ -10,7 +10,7 @@ const calendarRouter = express.Router();
 calendarRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   calendarController.getAllCalendarController
 );
 
@@ -18,7 +18,7 @@ calendarRouter.get(
 calendarRouter.post(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   calendarController.createCalendarController
 );
 
@@ -26,7 +26,7 @@ calendarRouter.post(
 calendarRouter.patch(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   calendarController.updateCalendarController
 );
 

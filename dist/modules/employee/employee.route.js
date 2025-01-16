@@ -10,15 +10,15 @@ const express_1 = __importDefault(require("express"));
 const employee_controller_1 = require("./employee.controller");
 const employeeRouter = express_1.default.Router();
 // get all employee
-employeeRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_controller_1.employeeController.getAllEmployeeController);
+employeeRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.getAllEmployeeController);
 // get single employee
 employeeRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.getSingleEmployeeController);
 // insert employee
 employeeRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.createEmployeeController);
 // update employee data
-employeeRouter.patch("/update/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeeController);
+employeeRouter.patch("/update/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeeController);
 // update employee note
-employeeRouter.patch("/update-note/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_controller_1.employeeController.updateEmployeeNoteController);
+employeeRouter.patch("/update-note/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.updateEmployeeNoteController);
 // delete testimonial
 employeeRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_controller_1.employeeController.deleteEmployeeController);
 exports.default = employeeRouter;

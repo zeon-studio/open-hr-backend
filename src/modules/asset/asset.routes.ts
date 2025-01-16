@@ -10,7 +10,7 @@ const assetRouter = express.Router();
 assetRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   assetController.getAllAssetController
 );
 
@@ -18,7 +18,7 @@ assetRouter.get(
 assetRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   assetController.getAssetController
 );
 
@@ -26,7 +26,7 @@ assetRouter.get(
 assetRouter.post(
   "/",
   checkToken,
-  // auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   assetController.createAssetController
 );
 
@@ -34,7 +34,7 @@ assetRouter.post(
 assetRouter.patch(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   assetController.updateAssetController
 );
 

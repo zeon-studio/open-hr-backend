@@ -10,7 +10,7 @@ const employeeAchievementRouter = express.Router();
 employeeAchievementRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeAchievementController.getAllEmployeeAchievementController
 );
 
@@ -18,7 +18,7 @@ employeeAchievementRouter.get(
 employeeAchievementRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeAchievementController.getEmployeeAchievementController
 );
 
@@ -26,6 +26,7 @@ employeeAchievementRouter.get(
 employeeAchievementRouter.patch(
   "/:id",
   checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeAchievementController.updateEmployeeAchievementController
 );
 

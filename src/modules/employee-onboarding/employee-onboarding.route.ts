@@ -10,7 +10,7 @@ const employeeOnboardingRouter = express.Router();
 employeeOnboardingRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeOnboardingController.getAllEmployeeOnboardingController
 );
 
@@ -26,7 +26,7 @@ employeeOnboardingRouter.patch(
 employeeOnboardingRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeOnboardingController.getEmployeeOnboardingController
 );
 
@@ -34,6 +34,7 @@ employeeOnboardingRouter.get(
 employeeOnboardingRouter.patch(
   "/:id",
   checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeOnboardingController.updateEmployeeOnboardingController
 );
 

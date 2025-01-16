@@ -59,9 +59,6 @@ const employeeSchema = new mongoose_1.default.Schema({
     personal_email: {
         type: String,
     },
-    role: {
-        type: String,
-    },
     nid: {
         type: String,
     },
@@ -92,12 +89,17 @@ const employeeSchema = new mongoose_1.default.Schema({
     linkedin: {
         type: String,
     },
+    note: {
+        type: String,
+    },
     status: {
         type: String,
         default: "pending",
     },
-    note: {
+    role: {
         type: String,
+        required: true,
+        default: "user",
     },
 }, {
     timestamps: true,

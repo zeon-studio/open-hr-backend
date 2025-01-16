@@ -10,11 +10,11 @@ const express_1 = __importDefault(require("express"));
 const employee_achievement_controller_1 = require("./employee-achievement.controller");
 const employeeAchievementRouter = express_1.default.Router();
 // get all data
-employeeAchievementRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_achievement_controller_1.employeeAchievementController.getAllEmployeeAchievementController);
+employeeAchievementRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_achievement_controller_1.employeeAchievementController.getAllEmployeeAchievementController);
 // get single data
-employeeAchievementRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER), employee_achievement_controller_1.employeeAchievementController.getEmployeeAchievementController);
+employeeAchievementRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_achievement_controller_1.employeeAchievementController.getEmployeeAchievementController);
 // update data
-employeeAchievementRouter.patch("/:id", checkToken_1.checkToken, employee_achievement_controller_1.employeeAchievementController.updateEmployeeAchievementController);
+employeeAchievementRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_achievement_controller_1.employeeAchievementController.updateEmployeeAchievementController);
 // delete data
 employeeAchievementRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_achievement_controller_1.employeeAchievementController.deleteEmployeeAchievementController);
 exports.default = employeeAchievementRouter;

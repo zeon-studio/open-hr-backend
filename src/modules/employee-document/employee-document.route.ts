@@ -10,7 +10,7 @@ const employeeDocumentRouter = express.Router();
 employeeDocumentRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeDocumentController.getAllEmployeeDocumentController
 );
 
@@ -18,7 +18,7 @@ employeeDocumentRouter.get(
 employeeDocumentRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeDocumentController.getEmployeeDocumentController
 );
 
@@ -26,6 +26,7 @@ employeeDocumentRouter.get(
 employeeDocumentRouter.patch(
   "/:id",
   checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeDocumentController.updateEmployeeDocumentController
 );
 

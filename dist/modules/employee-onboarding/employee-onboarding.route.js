@@ -10,13 +10,13 @@ const express_1 = __importDefault(require("express"));
 const employee_onboarding_controller_1 = require("./employee-onboarding.controller");
 const employeeOnboardingRouter = express_1.default.Router();
 // get all data
-employeeOnboardingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_onboarding_controller_1.employeeOnboardingController.getAllEmployeeOnboardingController);
+employeeOnboardingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_onboarding_controller_1.employeeOnboardingController.getAllEmployeeOnboardingController);
 // update task status
 employeeOnboardingRouter.patch("/task/:id/:task", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_onboarding_controller_1.employeeOnboardingController.updateOnboardingTaskStatusController);
 // get single data
-employeeOnboardingRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER), employee_onboarding_controller_1.employeeOnboardingController.getEmployeeOnboardingController);
+employeeOnboardingRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_onboarding_controller_1.employeeOnboardingController.getEmployeeOnboardingController);
 // update data
-employeeOnboardingRouter.patch("/:id", checkToken_1.checkToken, employee_onboarding_controller_1.employeeOnboardingController.updateEmployeeOnboardingController);
+employeeOnboardingRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_onboarding_controller_1.employeeOnboardingController.updateEmployeeOnboardingController);
 // delete data
 employeeOnboardingRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_onboarding_controller_1.employeeOnboardingController.deleteEmployeeOnboardingController);
 exports.default = employeeOnboardingRouter;

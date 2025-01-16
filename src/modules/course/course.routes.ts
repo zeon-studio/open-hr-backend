@@ -10,7 +10,7 @@ const courseRouter = express.Router();
 courseRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   courseController.getAllCourseController
 );
 
@@ -18,7 +18,7 @@ courseRouter.get(
 courseRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   courseController.getCourseController
 );
 
@@ -26,7 +26,7 @@ courseRouter.get(
 courseRouter.post(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   courseController.createCourseController
 );
 
@@ -34,7 +34,7 @@ courseRouter.post(
 courseRouter.patch(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   courseController.updateCourseController
 );
 

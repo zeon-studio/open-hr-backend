@@ -10,7 +10,7 @@ const leaveRouter = express.Router();
 leaveRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   leaveController.getAllLeaveController
 );
 
@@ -18,7 +18,7 @@ leaveRouter.get(
 leaveRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   leaveController.getLeaveController
 );
 
@@ -26,7 +26,7 @@ leaveRouter.get(
 leaveRouter.post(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   leaveController.createLeaveController
 );
 
@@ -34,7 +34,7 @@ leaveRouter.post(
 leaveRouter.patch(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   leaveController.updateLeaveController
 );
 

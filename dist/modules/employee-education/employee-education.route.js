@@ -10,11 +10,11 @@ const express_1 = __importDefault(require("express"));
 const employee_education_controller_1 = require("./employee-education.controller");
 const employeeEducationRouter = express_1.default.Router();
 // get all data
-employeeEducationRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_education_controller_1.employeeEducationController.getAllEmployeeEducationController);
+employeeEducationRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_education_controller_1.employeeEducationController.getAllEmployeeEducationController);
 // get single data
-employeeEducationRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER), employee_education_controller_1.employeeEducationController.getEmployeeEducationController);
+employeeEducationRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_education_controller_1.employeeEducationController.getEmployeeEducationController);
 // update data
-employeeEducationRouter.patch("/:id", checkToken_1.checkToken, employee_education_controller_1.employeeEducationController.updateEmployeeEducationController);
+employeeEducationRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_education_controller_1.employeeEducationController.updateEmployeeEducationController);
 // delete data
 employeeEducationRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_education_controller_1.employeeEducationController.deleteEmployeeEducationController);
 exports.default = employeeEducationRouter;

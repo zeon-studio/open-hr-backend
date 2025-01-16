@@ -10,13 +10,13 @@ const express_1 = __importDefault(require("express"));
 const employee_offboarding_controller_1 = require("./employee-offboarding.controller");
 const employeeOffboardingRouter = express_1.default.Router();
 // get all data
-employeeOffboardingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_offboarding_controller_1.employeeOffboardingController.getAllEmployeeOffboardingController);
+employeeOffboardingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_offboarding_controller_1.employeeOffboardingController.getAllEmployeeOffboardingController);
 // update task status
 employeeOffboardingRouter.patch("/task/:id/:task", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.updateOffboardingTaskStatusController);
 // get single data
-employeeOffboardingRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER), employee_offboarding_controller_1.employeeOffboardingController.getEmployeeOffboardingController);
+employeeOffboardingRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.getEmployeeOffboardingController);
 // update data
-employeeOffboardingRouter.patch("/:id", checkToken_1.checkToken, employee_offboarding_controller_1.employeeOffboardingController.updateEmployeeOffboardingController);
+employeeOffboardingRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.updateEmployeeOffboardingController);
 // delete data
 employeeOffboardingRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_offboarding_controller_1.employeeOffboardingController.deleteEmployeeOffboardingController);
 exports.default = employeeOffboardingRouter;
