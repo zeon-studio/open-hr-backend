@@ -89,15 +89,37 @@ const updateEmployeeController = (0, catchAsync_1.default)((req, res) => __await
         result: updateData,
     });
 }));
-// update employee note
-const updateEmployeeNoteController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const note = req.body.note;
-    const updateNote = yield employee_service_1.employeeService.updateEmployeeNoteService(note, req.params.id);
+// update employee email
+const updateEmployeeEmailController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const email = req.body.email;
+    const updateEmail = yield employee_service_1.employeeService.updateEmployeeEmailService(email, req.params.id);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,
         message: "data updated successfully",
-        result: updateNote,
+        result: updateEmail,
+    });
+}));
+// update employee discord
+const updateEmployeeDiscordController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const discord = req.body.discord;
+    const updateDiscord = yield employee_service_1.employeeService.updateEmployeeDiscordService(discord, req.params.id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        message: "data updated successfully",
+        result: updateDiscord,
+    });
+}));
+// update employee personality
+const updateEmployeePersonalityController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const personality = req.body.personality;
+    const updatePersonality = yield employee_service_1.employeeService.updateEmployeePersonalityService(personality, req.params.id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        message: "data updated successfully",
+        result: updatePersonality,
     });
 }));
 // delete showcase
@@ -117,7 +139,9 @@ exports.employeeController = {
     getSingleEmployeeByInviteTokenController,
     createEmployeeController,
     updateEmployeeController,
-    updateEmployeeNoteController,
+    updateEmployeeEmailController,
+    updateEmployeeDiscordController,
+    updateEmployeePersonalityController,
     deleteEmployeeController,
 };
 //# sourceMappingURL=employee.controller.js.map

@@ -113,12 +113,12 @@ const updateEmployeeController = catchAsync(
   }
 );
 
-// update employee note
-const updateEmployeeNoteController = catchAsync(
+// update employee email
+const updateEmployeeEmailController = catchAsync(
   async (req: Request, res: Response) => {
-    const note = req.body.note;
-    const updateNote = await employeeService.updateEmployeeNoteService(
-      note,
+    const email = req.body.email;
+    const updateEmail = await employeeService.updateEmployeeEmailService(
+      email,
       req.params.id
     );
 
@@ -126,7 +126,42 @@ const updateEmployeeNoteController = catchAsync(
       success: true,
       statusCode: 200,
       message: "data updated successfully",
-      result: updateNote,
+      result: updateEmail,
+    });
+  }
+);
+
+// update employee discord
+const updateEmployeeDiscordController = catchAsync(
+  async (req: Request, res: Response) => {
+    const discord = req.body.discord;
+    const updateDiscord = await employeeService.updateEmployeeDiscordService(
+      discord,
+      req.params.id
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: "data updated successfully",
+      result: updateDiscord,
+    });
+  }
+);
+
+// update employee personality
+const updateEmployeePersonalityController = catchAsync(
+  async (req: Request, res: Response) => {
+    const personality = req.body.personality;
+    const updatePersonality =
+      await employeeService.updateEmployeePersonalityService(
+        personality,
+        req.params.id
+      );
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: "data updated successfully",
+      result: updatePersonality,
     });
   }
 );
@@ -152,6 +187,8 @@ export const employeeController = {
   getSingleEmployeeByInviteTokenController,
   createEmployeeController,
   updateEmployeeController,
-  updateEmployeeNoteController,
+  updateEmployeeEmailController,
+  updateEmployeeDiscordController,
+  updateEmployeePersonalityController,
   deleteEmployeeController,
 };

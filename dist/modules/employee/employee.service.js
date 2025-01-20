@@ -81,6 +81,8 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
             facebook: 1,
             twitter: 1,
             linkedin: 1,
+            discord: 1,
+            personality: 1,
             status: 1,
             note: 1,
             createdAt: 1,
@@ -260,9 +262,23 @@ const updateEmployeeService = (updatedData, id) => __awaiter(void 0, void 0, voi
     });
     return result;
 });
-// update employee note
-const updateEmployeeNoteService = (note, id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { note }, {
+// update employee work email
+const updateEmployeeEmailService = (work_email, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { work_email }, {
+        new: true,
+    });
+    return result;
+});
+// update employee discord
+const updateEmployeeDiscordService = (discord, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { discord }, {
+        new: true,
+    });
+    return result;
+});
+// update employee personality
+const updateEmployeePersonalityService = (personality, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { personality }, {
         new: true,
     });
     return result;
@@ -286,7 +302,9 @@ exports.employeeService = {
     getSingleEmployeeService,
     getSingleEmployeeByInviteTokenService,
     updateEmployeeService,
-    updateEmployeeNoteService,
+    updateEmployeeEmailService,
+    updateEmployeeDiscordService,
+    updateEmployeePersonalityService,
     deleteEmployeeService,
 };
 //# sourceMappingURL=employee.service.js.map

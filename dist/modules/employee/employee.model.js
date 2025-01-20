@@ -89,6 +89,12 @@ const employeeSchema = new mongoose_1.default.Schema({
     linkedin: {
         type: String,
     },
+    discord: {
+        type: String,
+    },
+    personality: {
+        type: String,
+    },
     note: {
         type: String,
     },

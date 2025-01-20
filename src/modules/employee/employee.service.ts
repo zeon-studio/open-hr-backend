@@ -85,6 +85,8 @@ const getAllEmployeeService = async (
       facebook: 1,
       twitter: 1,
       linkedin: 1,
+      discord: 1,
+      personality: 1,
       status: 1,
       note: 1,
       createdAt: 1,
@@ -310,11 +312,38 @@ const updateEmployeeService = async (updatedData: EmployeeType, id: string) => {
   return result;
 };
 
-// update employee note
-const updateEmployeeNoteService = async (note: string, id: string) => {
+// update employee work email
+const updateEmployeeEmailService = async (work_email: string, id: string) => {
   const result = await Employee.findOneAndUpdate(
     { id: id },
-    { note },
+    { work_email },
+    {
+      new: true,
+    }
+  );
+  return result;
+};
+
+// update employee discord
+const updateEmployeeDiscordService = async (discord: string, id: string) => {
+  const result = await Employee.findOneAndUpdate(
+    { id: id },
+    { discord },
+    {
+      new: true,
+    }
+  );
+  return result;
+};
+
+// update employee personality
+const updateEmployeePersonalityService = async (
+  personality: string,
+  id: string
+) => {
+  const result = await Employee.findOneAndUpdate(
+    { id: id },
+    { personality },
     {
       new: true,
     }
@@ -345,6 +374,8 @@ export const employeeService = {
   getSingleEmployeeService,
   getSingleEmployeeByInviteTokenService,
   updateEmployeeService,
-  updateEmployeeNoteService,
+  updateEmployeeEmailService,
+  updateEmployeeDiscordService,
+  updateEmployeePersonalityService,
   deleteEmployeeService,
 };

@@ -54,12 +54,20 @@ employeeRouter.patch(
   employeeController.updateEmployeeController
 );
 
-// update employee note
+// update employee email
 employeeRouter.patch(
-  "/update-note/:id",
+  "/email/:id",
   checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
-  employeeController.updateEmployeeNoteController
+  employeeController.updateEmployeeEmailController
+);
+
+// update employee discord
+employeeRouter.patch(
+  "/discord/:id",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  employeeController.updateEmployeeDiscordController
 );
 
 // delete testimonial
