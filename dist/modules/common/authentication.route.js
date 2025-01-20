@@ -20,15 +20,16 @@ const checkToken_1 = require("../../middlewares/checkToken");
 const express_1 = __importDefault(require("express"));
 const employee_model_1 = require("../employee/employee.model");
 const authenticationRouter = express_1.default.Router();
-const loginService = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    const loginUser = yield employee_model_1.Employee.findOne({ work_email: user.email });
+const loginService = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const loginUser = yield employee_model_1.Employee.findOne({ work_email: email });
     if (!loginUser) {
         throw new Error("User not found");
     }
     const userDetails = {
+        userId: loginUser.id,
         name: loginUser.name,
         email: loginUser.work_email,
-        userId: loginUser.id,
+        image: loginUser.image,
         role: loginUser.role || "user",
         accessToken: "",
     };
@@ -37,8 +38,8 @@ const loginService = (user) => __awaiter(void 0, void 0, void 0, function* () {
     return userDetails;
 });
 const loginController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user } = req.body;
-    const userDetails = yield loginService(user);
+    const { email } = req.body;
+    const userDetails = yield loginService(email);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,

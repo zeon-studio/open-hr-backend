@@ -16,17 +16,18 @@ export type EmployeeLoginType = {
   role: string;
 };
 
-const loginService = async (user: EmployeeLoginType) => {
-  const loginUser = await Employee.findOne({ work_email: user.email });
+const loginService = async (email: string) => {
+  const loginUser = await Employee.findOne({ work_email: email });
 
   if (!loginUser) {
     throw new Error("User not found");
   }
 
   const userDetails = {
+    userId: loginUser.id,
     name: loginUser.name,
     email: loginUser.work_email,
-    userId: loginUser.id,
+    image: loginUser.image,
     role: loginUser.role || "user",
     accessToken: "",
   };
@@ -42,8 +43,8 @@ const loginService = async (user: EmployeeLoginType) => {
 };
 
 const loginController = catchAsync(async (req: Request, res: Response) => {
-  const { user } = req.body;
-  const userDetails = await loginService(user);
+  const { email } = req.body;
+  const userDetails = await loginService(email);
 
   sendResponse(res, {
     success: true,
