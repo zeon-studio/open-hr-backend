@@ -74,11 +74,23 @@ const deleteAssetController = (0, catchAsync_1.default)((req, res) => __awaiter(
         message: "data deleted successfully",
     });
 }));
+// get asset by user
+const getAssetsByUserController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const asset = yield asset_service_1.assetService.getAssetsByUserService(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: asset,
+        message: "data get successfully",
+    });
+}));
 exports.assetController = {
     getAllAssetController,
     getAssetController,
     createAssetController,
     updateAssetController,
     deleteAssetController,
+    getAssetsByUserController,
 };
 //# sourceMappingURL=asset.controller.js.map

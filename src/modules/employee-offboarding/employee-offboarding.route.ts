@@ -14,6 +14,14 @@ employeeOffboardingRouter.get(
   employeeOffboardingController.getAllEmployeeOffboardingController
 );
 
+// get pending onboarding task
+employeeOffboardingRouter.get(
+  "/pending-task",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  employeeOffboardingController.getPendingOffboardingTaskController
+);
+
 // update task status
 employeeOffboardingRouter.patch(
   "/task/:id/:task",

@@ -1,4 +1,5 @@
 export type Course = {
+  _id: string;
   name: string;
   price: number;
   currency: string;

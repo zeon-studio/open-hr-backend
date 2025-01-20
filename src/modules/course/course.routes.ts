@@ -14,6 +14,14 @@ courseRouter.get(
   courseController.getAllCourseController
 );
 
+// get course by user
+courseRouter.get(
+  "/user/:id",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  courseController.getCoursesByUserController
+);
+
 // get single data
 courseRouter.get(
   "/:id",

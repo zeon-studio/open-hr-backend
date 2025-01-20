@@ -89,10 +89,26 @@ const deleteEmployeeOnboardingController = catchAsync(
   }
 );
 
+// get all pending onboarding task
+const getPendingOnboardingTaskController = catchAsync(
+  async (req: Request, res: Response) => {
+    const pendingTask =
+      await employeeOnboardingService.getPendingOnboardingTaskService();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: pendingTask,
+      message: "data get successfully",
+    });
+  }
+);
+
 export const employeeOnboardingController = {
   getAllEmployeeOnboardingController,
   getEmployeeOnboardingController,
   updateEmployeeOnboardingController,
   updateOnboardingTaskStatusController,
   deleteEmployeeOnboardingController,
+  getPendingOnboardingTaskController,
 };

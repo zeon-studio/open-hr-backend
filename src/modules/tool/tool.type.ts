@@ -1,9 +1,11 @@
 export type Organization = {
+  _id: string;
   name: string;
   login_id: string;
   password: string;
   price: number;
   currency: string;
+  billing: "monthly" | "yearly" | "one-time";
   users: string[];
   purchase_date: Date;
   expire_date: Date;

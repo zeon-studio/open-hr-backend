@@ -58,7 +58,7 @@ const getAllAssetService = async (
       $project: {
         _id: 0,
         asset_id: 1,
-        user_id: 1,
+        user: 1,
         name: 1,
         type: 1,
         serial_number: 1,
@@ -98,7 +98,7 @@ const createAssetService = async (data: AssetType) => {
 
   const createAssetData = {
     asset_id: assetId,
-    user_id: data.user_id,
+    user: data.user,
     name: data.name,
     type: data.type,
     serial_number: data.serial_number,
@@ -128,10 +128,17 @@ const deleteAssetService = async (id: string) => {
   await Asset.findOneAndDelete({ asset_id: id });
 };
 
+// get asset by user
+const getAssetsByUserService = async (id: string) => {
+  const result = await Asset.find({ user: id });
+  return result;
+};
+
 export const assetService = {
   getAllAssetService,
   getAssetService,
   createAssetService,
   updateAssetService,
   deleteAssetService,
+  getAssetsByUserService,
 };

@@ -63,10 +63,22 @@ const deleteToolController = (0, catchAsync_1.default)((req, res) => __awaiter(v
         message: "data deleted successfully",
     });
 }));
+// get tool by user
+const getToolByUserController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const tool = yield tool_service_1.toolService.getToolByUserService(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: tool,
+        message: "data get successfully",
+    });
+}));
 exports.toolController = {
     getAllToolController,
     getToolController,
     updateToolController,
     deleteToolController,
+    getToolByUserController,
 };
 //# sourceMappingURL=tool.controller.js.map

@@ -64,7 +64,7 @@ const getAllLeaveRequestService = (paginationOptions, filterOptions) => __awaite
         },
     }, {
         $project: {
-            _id: 0,
+            _id: 1,
             employee_id: 1,
             years: 1,
             "employee.name": 1,
@@ -191,11 +191,20 @@ const updateLeaveRequestService = (id, updateData) => __awaiter(void 0, void 0, 
 const deleteLeaveRequestService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield leave_request_model_1.LeaveRequest.findOneAndDelete({ employee_id: id, status: "pending" });
 });
+// get upcoming leave request
+const getUpcomingLeaveRequestService = (current_date) => __awaiter(void 0, void 0, void 0, function* () {
+    const leaveRequest = yield leave_request_model_1.LeaveRequest.find({
+        status: "approved",
+        start_date: { $gte: current_date },
+    });
+    return leaveRequest;
+});
 exports.leaveRequestService = {
     getAllLeaveRequestService,
     getLeaveRequestService,
     createLeaveRequestService,
     updateLeaveRequestService,
     deleteLeaveRequestService,
+    getUpcomingLeaveRequestService,
 };
 //# sourceMappingURL=leave-request.service.js.map

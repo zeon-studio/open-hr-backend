@@ -74,11 +74,22 @@ const deleteEmployeeOffboardingController = (0, catchAsync_1.default)((req, res)
         message: "data deleted successfully",
     });
 }));
+// get all pending onboarding task
+const getPendingOffboardingTaskController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const pendingTask = yield employee_offboarding_service_1.employeeOffboardingService.getPendingOffboardingTaskService();
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: pendingTask,
+        message: "data get successfully",
+    });
+}));
 exports.employeeOffboardingController = {
     getAllEmployeeOffboardingController,
     getEmployeeOffboardingController,
     updateEmployeeOffboardingController,
     updateOffboardingTaskStatusController,
     deleteEmployeeOffboardingController,
+    getPendingOffboardingTaskController,
 };
 //# sourceMappingURL=employee-offboarding.controller.js.map

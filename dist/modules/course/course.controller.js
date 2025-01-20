@@ -74,11 +74,23 @@ const deleteCourseController = (0, catchAsync_1.default)((req, res) => __awaiter
         message: "data deleted successfully",
     });
 }));
+// get course by user
+const getCoursesByUserController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const course = yield course_service_1.courseService.getCoursesByUserService(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: course,
+        message: "data get successfully",
+    });
+}));
 exports.courseController = {
     getAllCourseController,
     getCourseController,
     createCourseController,
     updateCourseController,
     deleteCourseController,
+    getCoursesByUserController,
 };
 //# sourceMappingURL=course.controller.js.map

@@ -11,6 +11,8 @@ const employee_onboarding_controller_1 = require("./employee-onboarding.controll
 const employeeOnboardingRouter = express_1.default.Router();
 // get all data
 employeeOnboardingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_onboarding_controller_1.employeeOnboardingController.getAllEmployeeOnboardingController);
+// get pending onboarding task
+employeeOnboardingRouter.get("/pending-task", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_onboarding_controller_1.employeeOnboardingController.getPendingOnboardingTaskController);
 // update task status
 employeeOnboardingRouter.patch("/task/:id/:task", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_onboarding_controller_1.employeeOnboardingController.updateOnboardingTaskStatusController);
 // get single data

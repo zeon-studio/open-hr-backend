@@ -11,6 +11,8 @@ const course_controller_1 = require("./course.controller");
 const courseRouter = express_1.default.Router();
 // get all data
 courseRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), course_controller_1.courseController.getAllCourseController);
+// get course by user
+courseRouter.get("/user/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), course_controller_1.courseController.getCoursesByUserController);
 // get single data
 courseRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), course_controller_1.courseController.getCourseController);
 // create data

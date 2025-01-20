@@ -102,10 +102,28 @@ const updateToolService = (id, updateData) => __awaiter(void 0, void 0, void 0, 
 const deleteToolService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield tool_model_1.Tool.findOneAndDelete({ tool_id: id });
 });
+// get tool by user
+const getToolByUserService = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const tools = yield tool_model_1.Tool.find({ "organizations.users": { $in: [id] } });
+    const result = tools.flatMap((tool) => tool.organizations
+        .filter((org) => org.users.includes(id))
+        .map((org) => ({
+        name: org.name,
+        login_id: org.login_id,
+        password: org.password,
+        purchase_date: org.purchase_date,
+        expire_date: org.expire_date,
+        platform: tool.platform,
+        website: tool.website,
+        _id: org._id,
+    })));
+    return result;
+});
 exports.toolService = {
     getAllToolService,
     getToolService,
     updateToolService,
     deleteToolService,
+    getToolByUserService,
 };
 //# sourceMappingURL=tool.service.js.map

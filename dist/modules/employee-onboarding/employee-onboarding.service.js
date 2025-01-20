@@ -92,11 +92,62 @@ const updateOnboardingTaskStatusService = (id, task) => __awaiter(void 0, void 0
 const deleteEmployeeOnboardingService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield employee_onboarding_model_1.EmployeeOnboarding.findOneAndDelete({ employee_id: id });
 });
+// get all pending onboarding task
+const getPendingOnboardingTaskService = () => __awaiter(void 0, void 0, void 0, function* () {
+    const pendingTasks = [
+        "add_fingerprint",
+        "provide_id_card",
+        "provide_appointment_letter",
+        "provide_employment_contract",
+        "provide_welcome_kit",
+        "provide_devices",
+        "provide_office_intro",
+    ];
+    const matchConditions = pendingTasks.map((task) => ({
+        [`${task}.status`]: "pending",
+    }));
+    const projectFields = pendingTasks.reduce((acc, task) => {
+        acc[task] = {
+            $cond: {
+                if: { $eq: [`$${task}.status`, "pending"] },
+                then: {
+                    $mergeObjects: [
+                        `$${task}`,
+                        { employee_id: "$employee_id", createdAt: "$createdAt" },
+                    ],
+                },
+                else: "$$REMOVE",
+            },
+        };
+        return acc;
+    }, {});
+    const result = yield employee_onboarding_model_1.EmployeeOnboarding.aggregate([
+        {
+            $match: {
+                $or: matchConditions,
+            },
+        },
+        {
+            $project: Object.assign({ _id: 0 }, projectFields),
+        },
+    ]);
+    // Flatten the result array
+    const flattenedResult = result.reduce((acc, item) => {
+        pendingTasks.forEach((task) => {
+            if (item[task]) {
+                acc.push(item[task]);
+            }
+        });
+        return acc;
+    }, []);
+    return flattenedResult;
+});
 exports.employeeOnboardingService = {
     getAllEmployeeOnboardingService,
     getEmployeeOnboardingService,
     updateEmployeeOnboardingService,
     updateOnboardingTaskStatusService,
     deleteEmployeeOnboardingService,
+    getPendingOnboardingTaskService,
 };
 //# sourceMappingURL=employee-onboarding.service.js.map

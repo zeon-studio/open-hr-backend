@@ -125,10 +125,31 @@ const deleteCourseService = async (id: string) => {
   await Course.findOneAndDelete({ platform: id });
 };
 
+// get course by user
+const getCoursesByUserService = async (id: string) => {
+  const courses = await Course.find({ "courses.users": { $in: [id] } });
+
+  const result = courses.flatMap((course) =>
+    course.courses
+      .filter((c) => c.users.includes(id))
+      .map((c) => ({
+        _id: c._id,
+        name: c.name,
+        platform: course.platform,
+        website: course.website,
+        email: course.email,
+        password: course.password,
+      }))
+  );
+
+  return result;
+};
+
 export const courseService = {
   getAllCourseService,
   getCourseService,
   createCourseService,
   updateCourseService,
   deleteCourseService,
+  getCoursesByUserService,
 };

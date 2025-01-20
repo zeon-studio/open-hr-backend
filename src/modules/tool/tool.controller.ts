@@ -62,9 +62,25 @@ const deleteToolController = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get tool by user
+const getToolByUserController = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const tool = await toolService.getToolByUserService(id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: tool,
+      message: "data get successfully",
+    });
+  }
+);
+
 export const toolController = {
   getAllToolController,
   getToolController,
   updateToolController,
   deleteToolController,
+  getToolByUserController,
 };

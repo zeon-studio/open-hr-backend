@@ -5,7 +5,7 @@ export type Log = {
 
 export type AssetType = {
   asset_id: string;
-  user_id: string;
+  user: string;
   name: string;
   type: "laptop" | "desktop" | "mobile" | "keyboard" | "mouse" | "monitor";
   serial_number: string;

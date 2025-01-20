@@ -74,11 +74,25 @@ const deleteLeaveRequestController = (0, catchAsync_1.default)((req, res) => __a
         message: "data deleted successfully",
     });
 }));
+// get upcoming leave request
+const getUpcomingLeaveRequestController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const current_date = req.query.current_date
+        ? new Date(req.query.current_date)
+        : new Date();
+    const leave = yield leave_request_service_1.leaveRequestService.getUpcomingLeaveRequestService(current_date);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: leave,
+        message: "data get successfully",
+    });
+}));
 exports.leaveRequestController = {
     getAllLeaveRequestController,
     getLeaveRequestController,
     createLeaveRequestController,
     updateLeaveRequestController,
     deleteLeaveRequestController,
+    getUpcomingLeaveRequestController,
 };
 //# sourceMappingURL=leave-request.controller.js.map

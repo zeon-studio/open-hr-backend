@@ -82,10 +82,25 @@ const deleteAssetController = catchAsync(
   }
 );
 
+// get asset by user
+const getAssetsByUserController = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const asset = await assetService.getAssetsByUserService(id);
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: asset,
+      message: "data get successfully",
+    });
+  }
+);
+
 export const assetController = {
   getAllAssetController,
   getAssetController,
   createAssetController,
   updateAssetController,
   deleteAssetController,
+  getAssetsByUserController,
 };

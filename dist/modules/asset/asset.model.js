@@ -40,7 +40,7 @@ const assetSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
-    user_id: {
+    user: {
         type: String,
         required: true,
     },

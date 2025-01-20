@@ -118,10 +118,71 @@ const deleteEmployeeOffboardingService = async (id: string) => {
   await EmployeeOffboarding.findOneAndDelete({ employee_id: id });
 };
 
+// get all pending offboarding task
+const getPendingOffboardingTaskService = async () => {
+  const pendingTasks = [
+    "remove_fingerprint",
+    "task_handover",
+    "collect_id_card",
+    "collect_email",
+    "collect_devices",
+    "nda_agreement",
+    "provide_certificate",
+    "farewell",
+  ];
+
+  const matchConditions = pendingTasks.map((task) => ({
+    [`${task}.status`]: "pending",
+  }));
+
+  const projectFields = pendingTasks.reduce((acc, task) => {
+    acc[task] = {
+      $cond: {
+        if: { $eq: [`$${task}.status`, "pending"] },
+        then: {
+          $mergeObjects: [
+            `$${task}`,
+            { employee_id: "$employee_id", createdAt: "$createdAt" },
+          ],
+        },
+        else: "$$REMOVE",
+      },
+    };
+    return acc;
+  }, {});
+
+  const result = await EmployeeOffboarding.aggregate([
+    {
+      $match: {
+        $or: matchConditions,
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        ...projectFields,
+      },
+    },
+  ]);
+
+  // Flatten the result array
+  const flattenedResult = result.reduce((acc, item) => {
+    pendingTasks.forEach((task) => {
+      if (item[task]) {
+        acc.push(item[task]);
+      }
+    });
+    return acc;
+  }, []);
+
+  return flattenedResult;
+};
+
 export const employeeOffboardingService = {
   getAllEmployeeOffboardingService,
   getEmployeeOffboardingService,
   updateEmployeeOffboardingService,
   updateOffboardingTaskStatusService,
   deleteEmployeeOffboardingService,
+  getPendingOffboardingTaskService,
 };

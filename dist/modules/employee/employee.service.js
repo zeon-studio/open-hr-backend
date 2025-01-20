@@ -106,7 +106,24 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
 });
 // get all employees id
 const getAllEmployeeIdService = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_model_1.Employee.find({}, { _id: 0, id: 1, name: 1 });
+    const result = yield employee_model_1.Employee.aggregate([
+        {
+            $lookup: {
+                from: "employee_jobs",
+                localField: "id",
+                foreignField: "employee_id",
+                as: "job",
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                id: 1,
+                name: 1,
+                department: { $arrayElemAt: ["$job.department", 0] },
+            },
+        },
+    ]);
     return result;
 });
 // get single employee

@@ -14,6 +14,14 @@ toolRouter.get(
   toolController.getAllToolController
 );
 
+// get data by user
+toolRouter.get(
+  "/user/:id",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  toolController.getToolByUserController
+);
+
 // get single data
 toolRouter.get(
   "/:id",

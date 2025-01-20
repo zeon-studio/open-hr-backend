@@ -14,6 +14,14 @@ assetRouter.get(
   assetController.getAllAssetController
 );
 
+// get asset by user
+assetRouter.get(
+  "/user/:id",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  assetController.getAssetsByUserController
+);
+
 // get single data
 assetRouter.get(
   "/:id",

@@ -53,7 +53,7 @@ const getAllAssetService = (paginationOptions, filterOptions) => __awaiter(void 
         $project: {
             _id: 0,
             asset_id: 1,
-            user_id: 1,
+            user: 1,
             name: 1,
             type: 1,
             serial_number: 1,
@@ -88,7 +88,7 @@ const createAssetService = (data) => __awaiter(void 0, void 0, void 0, function*
     const assetId = (0, IdGenerator_1.generateAssetId)(data.type, assetSerial);
     const createAssetData = {
         asset_id: assetId,
-        user_id: data.user_id,
+        user: data.user,
         name: data.name,
         type: data.type,
         serial_number: data.serial_number,
@@ -113,11 +113,17 @@ const updateAssetService = (id, updateData) => __awaiter(void 0, void 0, void 0,
 const deleteAssetService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield asset_model_1.Asset.findOneAndDelete({ asset_id: id });
 });
+// get asset by user
+const getAssetsByUserService = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield asset_model_1.Asset.find({ user: id });
+    return result;
+});
 exports.assetService = {
     getAllAssetService,
     getAssetService,
     createAssetService,
     updateAssetService,
     deleteAssetService,
+    getAssetsByUserService,
 };
 //# sourceMappingURL=asset.service.js.map

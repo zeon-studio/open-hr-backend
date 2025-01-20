@@ -11,6 +11,8 @@ const asset_controller_1 = require("./asset.controller");
 const assetRouter = express_1.default.Router();
 // get all data
 assetRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), asset_controller_1.assetController.getAllAssetController);
+// get asset by user
+assetRouter.get("/user/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), asset_controller_1.assetController.getAssetsByUserController);
 // get single data
 assetRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), asset_controller_1.assetController.getAssetController);
 // create data

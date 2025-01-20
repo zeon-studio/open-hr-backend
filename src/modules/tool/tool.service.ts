@@ -117,9 +117,32 @@ const deleteToolService = async (id: string) => {
   await Tool.findOneAndDelete({ tool_id: id });
 };
 
+// get tool by user
+const getToolByUserService = async (id: string) => {
+  const tools = await Tool.find({ "organizations.users": { $in: [id] } });
+
+  const result = tools.flatMap((tool) =>
+    tool.organizations
+      .filter((org) => org.users.includes(id))
+      .map((org) => ({
+        name: org.name,
+        login_id: org.login_id,
+        password: org.password,
+        purchase_date: org.purchase_date,
+        expire_date: org.expire_date,
+        platform: tool.platform,
+        website: tool.website,
+        _id: org._id,
+      }))
+  );
+
+  return result;
+};
+
 export const toolService = {
   getAllToolService,
   getToolService,
   updateToolService,
   deleteToolService,
+  getToolByUserService,
 };

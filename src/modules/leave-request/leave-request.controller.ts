@@ -85,10 +85,29 @@ const deleteLeaveRequestController = catchAsync(
   }
 );
 
+// get upcoming leave request
+const getUpcomingLeaveRequestController = catchAsync(
+  async (req: Request, res: Response) => {
+    const current_date = req.query.current_date
+      ? new Date(req.query.current_date as string)
+      : new Date();
+    const leave =
+      await leaveRequestService.getUpcomingLeaveRequestService(current_date);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: leave,
+      message: "data get successfully",
+    });
+  }
+);
+
 export const leaveRequestController = {
   getAllLeaveRequestController,
   getLeaveRequestController,
   createLeaveRequestController,
   updateLeaveRequestController,
   deleteLeaveRequestController,
+  getUpcomingLeaveRequestController,
 };

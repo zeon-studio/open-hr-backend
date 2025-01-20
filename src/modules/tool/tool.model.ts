@@ -32,6 +32,9 @@ const toolSchema = new mongoose.Schema<ToolType>(
         currency: {
           type: String,
         },
+        billing: {
+          type: String,
+        },
         users: [
           {
             type: String,

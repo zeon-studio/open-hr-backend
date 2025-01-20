@@ -114,7 +114,24 @@ const getAllEmployeeService = async (
 
 // get all employees id
 const getAllEmployeeIdService = async () => {
-  const result = await Employee.find({}, { _id: 0, id: 1, name: 1 });
+  const result = await Employee.aggregate([
+    {
+      $lookup: {
+        from: "employee_jobs",
+        localField: "id",
+        foreignField: "employee_id",
+        as: "job",
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        id: 1,
+        name: 1,
+        department: { $arrayElemAt: ["$job.department", 0] },
+      },
+    },
+  ]);
   return result;
 };
 

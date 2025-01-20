@@ -7,7 +7,7 @@ const assetSchema = new mongoose.Schema<AssetType>(
       type: String,
       required: true,
     },
-    user_id: {
+    user: {
       type: String,
       required: true,
     },

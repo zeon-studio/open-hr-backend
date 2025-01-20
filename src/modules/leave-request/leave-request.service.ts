@@ -68,7 +68,7 @@ const getAllLeaveRequestService = async (
     },
     {
       $project: {
-        _id: 0,
+        _id: 1,
         employee_id: 1,
         years: 1,
         "employee.name": 1,
@@ -262,10 +262,20 @@ const deleteLeaveRequestService = async (id: string) => {
   await LeaveRequest.findOneAndDelete({ employee_id: id, status: "pending" });
 };
 
+// get upcoming leave request
+const getUpcomingLeaveRequestService = async (current_date: Date) => {
+  const leaveRequest = await LeaveRequest.find({
+    status: "approved",
+    start_date: { $gte: current_date },
+  });
+  return leaveRequest;
+};
+
 export const leaveRequestService = {
   getAllLeaveRequestService,
   getLeaveRequestService,
   createLeaveRequestService,
   updateLeaveRequestService,
   deleteLeaveRequestService,
+  getUpcomingLeaveRequestService,
 };

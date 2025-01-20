@@ -82,10 +82,25 @@ const deleteCourseController = catchAsync(
   }
 );
 
+// get course by user
+const getCoursesByUserController = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const course = await courseService.getCoursesByUserService(id);
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: course,
+      message: "data get successfully",
+    });
+  }
+);
+
 export const courseController = {
   getAllCourseController,
   getCourseController,
   createCourseController,
   updateCourseController,
   deleteCourseController,
+  getCoursesByUserController,
 };
