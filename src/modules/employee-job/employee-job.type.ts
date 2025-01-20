@@ -4,7 +4,7 @@ export type PrevJob = {
   designation: string;
   start_date: Date;
   end_date: Date;
-  job_type: string;
+  job_type: "full_time" | "part_time" | "remote" | "contractual" | "internship";
 };
 
 export type Promotion = {
@@ -14,7 +14,7 @@ export type Promotion = {
 
 export type EmployeeJobType = {
   employee_id: string;
-  job_type: string;
+  job_type: "full_time" | "part_time" | "remote" | "contractual" | "internship";
   joining_date: Date;
   designation: string;
   manager_id: string;

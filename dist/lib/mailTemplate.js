@@ -7,7 +7,7 @@ exports.leaveRequestApprovedTemplate = leaveRequestApprovedTemplate;
 exports.leaveRequestRejectedTemplate = leaveRequestRejectedTemplate;
 const dateConverter_1 = require("./dateConverter");
 // invitation template
-function invitationTemplate(designation, joining_date) {
+function invitationTemplate(designation, joining_date, invite_token) {
     return `<div style="text-align: center;">
     <h1>Welcome to Themefisher!</h1>
     <br>
@@ -19,7 +19,7 @@ function invitationTemplate(designation, joining_date) {
     <br>
     <br>
     
-    <a href="https://erp.teamosis.com" style="color: #007bff;">Click here</a> to join the team.
+    <a href="https://erp.teamosis.com/onboard?${invite_token}" style="color: #007bff;">Click here</a> to join the team.
     </div>
     `;
 }

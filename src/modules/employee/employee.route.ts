@@ -14,6 +14,22 @@ employeeRouter.get(
   employeeController.getAllEmployeeController
 );
 
+// get all employee id
+employeeRouter.get(
+  "/id",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  employeeController.getAllEmployeeIdController
+);
+
+// get single employee by invite token
+employeeRouter.get(
+  "/invite-token/:inviteToken",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  employeeController.getSingleEmployeeByInviteTokenController
+);
+
 // get single employee
 employeeRouter.get(
   "/:id",

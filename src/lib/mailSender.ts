@@ -19,13 +19,14 @@ let mailTransporter = nodemailer.createTransport({
 const invitationRequest = async (
   email: string,
   designation: string,
+  invite_token: string,
   joining_date: Date
 ) => {
   let mailDetails = {
     from: config.sender_email,
     to: email,
     subject: "Invitation from Themefisher",
-    html: invitationTemplate(designation, joining_date),
+    html: invitationTemplate(designation, joining_date, invite_token),
   };
   await mailTransporter.sendMail(mailDetails);
 };

@@ -3,7 +3,8 @@ import { formatDate } from "./dateConverter";
 // invitation template
 export function invitationTemplate(
   designation: string,
-  joining_date: Date
+  joining_date: Date,
+  invite_token: string
 ): string {
   return `<div style="text-align: center;">
     <h1>Welcome to Themefisher!</h1>
@@ -18,7 +19,7 @@ export function invitationTemplate(
     <br>
     <br>
     
-    <a href="https://erp.teamosis.com" style="color: #007bff;">Click here</a> to join the team.
+    <a href="https://erp.teamosis.com/onboard?${invite_token}" style="color: #007bff;">Click here</a> to join the team.
     </div>
     `;
 }

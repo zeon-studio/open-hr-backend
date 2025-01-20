@@ -23,8 +23,8 @@ export type EmployeeType = {
 
 export type EmployeeCreateType = {
   personal_email: string;
-  department: string;
-  job_type: "full_time" | "part_time" | "remote" | "contractual";
+  department: "development" | "design" | "marketing" | "admin";
+  job_type: "full_time" | "part_time" | "remote" | "contractual" | "internship";
   joining_date: Date;
   designation: string;
   manager_id: string;

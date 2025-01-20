@@ -13,8 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeService = void 0;
+const variables_1 = __importDefault(require("../../config/variables"));
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const IdGenerator_1 = require("../../lib/IdGenerator");
+const jwtTokenHelper_1 = require("../../lib/jwtTokenHelper");
 const leaveHelper_1 = require("../../lib/leaveHelper");
 const mailSender_1 = require("../../lib/mailSender");
 const paginationHelper_1 = require("../../lib/paginationHelper");
@@ -100,6 +102,11 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
         },
     };
 });
+// get all employees id
+const getAllEmployeeIdService = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield employee_model_1.Employee.find({}, { _id: 0, id: 1, name: 1 });
+    return result;
+});
 // get single employee
 const getSingleEmployeeService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const employee = yield employee_model_1.Employee.aggregate([
@@ -125,6 +132,13 @@ const getSingleEmployeeService = (id) => __awaiter(void 0, void 0, void 0, funct
         },
     ]);
     return employee[0];
+});
+// get single employee by invite token
+const getSingleEmployeeByInviteTokenService = (inviteToken) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(inviteToken, variables_1.default.jwt_secret);
+    const userId = decodedToken.user_id;
+    const employee = yield employee_model_1.Employee.findOne({ id: userId });
+    return employee;
 });
 // insert employee
 const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0, function* () {
@@ -219,7 +233,8 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
         yield newEmployeeLeaveData.save({ session });
         const newEmployeeOnboardingData = new employee_onboarding_model_1.EmployeeOnboarding(createEmployeeOnboardingData);
         yield newEmployeeOnboardingData.save({ session });
-        yield mailSender_1.mailSender.invitationRequest(employeeData.personal_email, employeeData.designation, joiningDate);
+        const invite_token = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employeeId, role: "user" }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+        yield mailSender_1.mailSender.invitationRequest(employeeData.personal_email, employeeData.designation, invite_token, joiningDate);
         yield session.commitTransaction();
         session.endSession();
         return insertedEmployee;
@@ -266,8 +281,10 @@ const deleteEmployeeService = (id) => __awaiter(void 0, void 0, void 0, function
 });
 exports.employeeService = {
     getAllEmployeeService,
+    getAllEmployeeIdService,
     createEmployeeService,
     getSingleEmployeeService,
+    getSingleEmployeeByInviteTokenService,
     updateEmployeeService,
     updateEmployeeNoteService,
     deleteEmployeeService,

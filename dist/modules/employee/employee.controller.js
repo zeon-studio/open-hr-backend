@@ -37,9 +37,29 @@ const getAllEmployeeController = (0, catchAsync_1.default)((req, res) => __await
         message: "data get successfully",
     });
 }));
+// get all employees id
+const getAllEmployeeIdController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const employee = yield employee_service_1.employeeService.getAllEmployeeIdService();
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: employee,
+        message: "data get successfully",
+    });
+}));
 // get single employee
 const getSingleEmployeeController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const employee = yield employee_service_1.employeeService.getSingleEmployeeService(req.params.id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: employee,
+        message: "employee get successfully",
+    });
+}));
+// get single employee by invite token
+const getSingleEmployeeByInviteTokenController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const employee = yield employee_service_1.employeeService.getSingleEmployeeByInviteTokenService(req.params.token);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,
@@ -92,10 +112,12 @@ const deleteEmployeeController = (0, catchAsync_1.default)((req, res) => __await
 }));
 exports.employeeController = {
     getAllEmployeeController,
+    getAllEmployeeIdController,
     getSingleEmployeeController,
-    deleteEmployeeController,
+    getSingleEmployeeByInviteTokenController,
+    createEmployeeController,
     updateEmployeeController,
     updateEmployeeNoteController,
-    createEmployeeController,
+    deleteEmployeeController,
 };
 //# sourceMappingURL=employee.controller.js.map

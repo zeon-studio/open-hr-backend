@@ -1,10 +1,13 @@
+import config from "@/config/variables";
 import ApiError from "@/errors/ApiError";
 import { generateEmployeeId } from "@/lib/IdGenerator";
+import { jwtHelpers } from "@/lib/jwtTokenHelper";
 import { calculateRemainingLeave } from "@/lib/leaveHelper";
 import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import httpStatus from "http-status";
+import { Secret } from "jsonwebtoken";
 import mongoose, { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
 import { EmployeeOnboarding } from "../employee-onboarding/employee-onboarding.model";
@@ -107,6 +110,12 @@ const getAllEmployeeService = async (
   };
 };
 
+// get all employees id
+const getAllEmployeeIdService = async () => {
+  const result = await Employee.find({}, { _id: 0, id: 1, name: 1 });
+  return result;
+};
+
 // get single employee
 const getSingleEmployeeService = async (
   id: string
@@ -135,6 +144,19 @@ const getSingleEmployeeService = async (
   ]);
 
   return employee[0];
+};
+
+// get single employee by invite token
+const getSingleEmployeeByInviteTokenService = async (
+  inviteToken: string
+): Promise<EmployeeType | null> => {
+  const decodedToken = jwtHelpers.verifyToken(
+    inviteToken,
+    config.jwt_secret as Secret
+  );
+  const userId = decodedToken.user_id;
+  const employee = await Employee.findOne({ id: userId });
+  return employee;
 };
 
 // insert employee
@@ -248,9 +270,16 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
     );
     await newEmployeeOnboardingData.save({ session });
 
+    const invite_token = jwtHelpers.createToken(
+      { user_id: employeeId, role: "user" },
+      config.jwt_secret as Secret,
+      config.jwt_expire as string
+    );
+
     await mailSender.invitationRequest(
       employeeData.personal_email,
       employeeData.designation,
+      invite_token,
       joiningDate
     );
 
@@ -311,8 +340,10 @@ const deleteEmployeeService = async (id: string) => {
 
 export const employeeService = {
   getAllEmployeeService,
+  getAllEmployeeIdService,
   createEmployeeService,
   getSingleEmployeeService,
+  getSingleEmployeeByInviteTokenService,
   updateEmployeeService,
   updateEmployeeNoteService,
   deleteEmployeeService,

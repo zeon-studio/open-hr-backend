@@ -34,12 +34,42 @@ const getAllEmployeeController = catchAsync(
   }
 );
 
+// get all employees id
+const getAllEmployeeIdController = catchAsync(
+  async (req: Request, res: Response) => {
+    const employee = await employeeService.getAllEmployeeIdService();
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: employee,
+      message: "data get successfully",
+    });
+  }
+);
+
 // get single employee
 const getSingleEmployeeController = catchAsync(
   async (req: Request, res: Response) => {
     const employee = await employeeService.getSingleEmployeeService(
       req.params.id
     );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: employee,
+      message: "employee get successfully",
+    });
+  }
+);
+
+// get single employee by invite token
+const getSingleEmployeeByInviteTokenController = catchAsync(
+  async (req: Request, res: Response) => {
+    const employee =
+      await employeeService.getSingleEmployeeByInviteTokenService(
+        req.params.token
+      );
 
     sendResponse(res, {
       success: true,
@@ -117,9 +147,11 @@ const deleteEmployeeController = catchAsync(
 
 export const employeeController = {
   getAllEmployeeController,
+  getAllEmployeeIdController,
   getSingleEmployeeController,
-  deleteEmployeeController,
+  getSingleEmployeeByInviteTokenController,
+  createEmployeeController,
   updateEmployeeController,
   updateEmployeeNoteController,
-  createEmployeeController,
+  deleteEmployeeController,
 };

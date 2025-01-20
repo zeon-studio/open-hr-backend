@@ -24,12 +24,12 @@ let mailTransporter = nodemailer_1.default.createTransport({
     },
 });
 // invitation
-const invitationRequest = (email, designation, joining_date) => __awaiter(void 0, void 0, void 0, function* () {
+const invitationRequest = (email, designation, invite_token, joining_date) => __awaiter(void 0, void 0, void 0, function* () {
     let mailDetails = {
         from: variables_1.default.sender_email,
         to: email,
         subject: "Invitation from Themefisher",
-        html: (0, mailTemplate_1.invitationTemplate)(designation, joining_date),
+        html: (0, mailTemplate_1.invitationTemplate)(designation, joining_date, invite_token),
     };
     yield mailTransporter.sendMail(mailDetails);
 });
