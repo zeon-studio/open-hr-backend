@@ -61,10 +61,24 @@ const deleteCalendarController = (0, catchAsync_1.default)((req, res) => __await
         message: "data deleted successfully",
     });
 }));
+// get upcoming events and holidays
+const getUpcomingEventsAndHolidaysController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const current_date = req.query.current_date
+        ? new Date(req.query.current_date)
+        : new Date();
+    const calendar = yield calendar_service_1.calendarService.getUpcomingEventsAndHolidaysService(current_date);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: calendar,
+        message: "data get successfully",
+    });
+}));
 exports.calendarController = {
     getAllCalendarController,
     createCalendarController,
     updateCalendarController,
     deleteCalendarController,
+    getUpcomingEventsAndHolidaysController,
 };
 //# sourceMappingURL=calendar.controller.js.map

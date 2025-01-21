@@ -63,9 +63,28 @@ const deleteCalendarController = catchAsync(
   }
 );
 
+// get upcoming events and holidays
+const getUpcomingEventsAndHolidaysController = catchAsync(
+  async (req: Request, res: Response) => {
+    const current_date = req.query.current_date
+      ? new Date(req.query.current_date as string)
+      : new Date();
+    const calendar =
+      await calendarService.getUpcomingEventsAndHolidaysService(current_date);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: calendar,
+      message: "data get successfully",
+    });
+  }
+);
+
 export const calendarController = {
   getAllCalendarController,
   createCalendarController,
   updateCalendarController,
   deleteCalendarController,
+  getUpcomingEventsAndHolidaysController,
 };

@@ -22,6 +22,14 @@ calendarRouter.post(
   calendarController.createCalendarController
 );
 
+// get upcoming events and holidays
+calendarRouter.get(
+  "/upcoming",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  calendarController.getUpcomingEventsAndHolidaysController
+);
+
 // update data
 calendarRouter.patch(
   "/:id",

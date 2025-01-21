@@ -30,9 +30,41 @@ const deleteCalendarService = async (calendarId: string) => {
   return calendar;
 };
 
+// get upcoming events and holidays
+const getUpcomingEventsAndHolidaysService = async (currentDate: Date) => {
+  const year = currentDate.getFullYear();
+  const nextMonth = new Date(currentDate);
+  nextMonth.setDate(currentDate.getDate() + 30);
+
+  const calendar = await Calendar.findOne({ year });
+
+  if (!calendar) {
+    return { holidays: [], events: [] };
+  }
+
+  const upcomingHolidays = calendar.holidays.filter(
+    (holiday) =>
+      (new Date(holiday.start_date) >= currentDate &&
+        new Date(holiday.start_date) <= nextMonth) ||
+      (new Date(holiday.end_date) >= currentDate &&
+        new Date(holiday.end_date) <= nextMonth)
+  );
+
+  const upcomingEvents = calendar.events.filter(
+    (event) =>
+      (new Date(event.start_date) >= currentDate &&
+        new Date(event.start_date) <= nextMonth) ||
+      (new Date(event.end_date) >= currentDate &&
+        new Date(event.end_date) <= nextMonth)
+  );
+
+  return { holidays: upcomingHolidays, events: upcomingEvents };
+};
+
 export const calendarService = {
   getAllCalendarService,
   createCalendarService,
   updateCalendarService,
   deleteCalendarService,
+  getUpcomingEventsAndHolidaysService,
 };

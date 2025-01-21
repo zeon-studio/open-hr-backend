@@ -33,10 +33,30 @@ const deleteCalendarService = (calendarId) => __awaiter(void 0, void 0, void 0, 
     const calendar = yield calendar_model_1.Calendar.findByIdAndDelete(calendarId);
     return calendar;
 });
+// get upcoming events and holidays
+const getUpcomingEventsAndHolidaysService = (currentDate) => __awaiter(void 0, void 0, void 0, function* () {
+    const year = currentDate.getFullYear();
+    const nextMonth = new Date(currentDate);
+    nextMonth.setDate(currentDate.getDate() + 30);
+    const calendar = yield calendar_model_1.Calendar.findOne({ year });
+    if (!calendar) {
+        return { holidays: [], events: [] };
+    }
+    const upcomingHolidays = calendar.holidays.filter((holiday) => (new Date(holiday.start_date) >= currentDate &&
+        new Date(holiday.start_date) <= nextMonth) ||
+        (new Date(holiday.end_date) >= currentDate &&
+            new Date(holiday.end_date) <= nextMonth));
+    const upcomingEvents = calendar.events.filter((event) => (new Date(event.start_date) >= currentDate &&
+        new Date(event.start_date) <= nextMonth) ||
+        (new Date(event.end_date) >= currentDate &&
+            new Date(event.end_date) <= nextMonth));
+    return { holidays: upcomingHolidays, events: upcomingEvents };
+});
 exports.calendarService = {
     getAllCalendarService,
     createCalendarService,
     updateCalendarService,
     deleteCalendarService,
+    getUpcomingEventsAndHolidaysService,
 };
 //# sourceMappingURL=calendar.service.js.map
