@@ -128,29 +128,8 @@ const getAllEmployeeIdService = () => __awaiter(void 0, void 0, void 0, function
 });
 // get single employee
 const getSingleEmployeeService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const employee = yield employee_model_1.Employee.aggregate([
-        {
-            $match: { id: id },
-        },
-        {
-            $lookup: {
-                from: "employee_personas",
-                localField: "id",
-                foreignField: "id",
-                as: "persona",
-            },
-        },
-        {
-            $project: {
-                id: 1,
-                name: 1,
-                image: 1,
-                createdAt: 1,
-                "persona.image": 1,
-            },
-        },
-    ]);
-    return employee[0];
+    const employee = yield employee_model_1.Employee.findOne({ id: id });
+    return employee;
 });
 // get single employee by invite token
 const getSingleEmployeeByInviteTokenService = (inviteToken) => __awaiter(void 0, void 0, void 0, function* () {

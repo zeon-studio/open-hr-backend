@@ -139,30 +139,8 @@ const getAllEmployeeIdService = async () => {
 const getSingleEmployeeService = async (
   id: string
 ): Promise<EmployeeType | null> => {
-  const employee = await Employee.aggregate([
-    {
-      $match: { id: id },
-    },
-    {
-      $lookup: {
-        from: "employee_personas",
-        localField: "id",
-        foreignField: "id",
-        as: "persona",
-      },
-    },
-    {
-      $project: {
-        id: 1,
-        name: 1,
-        image: 1,
-        createdAt: 1,
-        "persona.image": 1,
-      },
-    },
-  ]);
-
-  return employee[0];
+  const employee = await Employee.findOne({ id: id });
+  return employee;
 };
 
 // get single employee by invite token
