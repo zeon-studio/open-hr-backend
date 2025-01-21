@@ -128,7 +128,9 @@ const getAllEmployeeIdService = async () => {
         _id: 0,
         id: 1,
         name: 1,
+        work_email: 1,
         department: { $arrayElemAt: ["$job.department", 0] },
+        designation: { $arrayElemAt: ["$job.designation", 0] },
       },
     },
   ]);
