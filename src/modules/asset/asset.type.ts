@@ -1,5 +1,6 @@
 export type Log = {
-  log: string;
+  type: "handover" | "return" | "repair" | "lost" | "damaged";
+  description: string;
   date: Date;
 };
 

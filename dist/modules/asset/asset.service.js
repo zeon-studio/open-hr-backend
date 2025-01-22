@@ -115,7 +115,38 @@ const deleteAssetService = (id) => __awaiter(void 0, void 0, void 0, function* (
 });
 // get asset by user
 const getAssetsByUserService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield asset_model_1.Asset.find({ user: id });
+    const pipeline = [
+        { $match: { user: id } },
+        {
+            $addFields: {
+                handover: {
+                    $last: {
+                        $filter: {
+                            input: "$logs",
+                            as: "log",
+                            cond: { $eq: ["$$log.type", "handover"] },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            $project: {
+                asset_id: 1,
+                user: 1,
+                name: 1,
+                type: 1,
+                serial_number: 1,
+                price: 1,
+                currency: 1,
+                purchase_date: 1,
+                archive: 1,
+                note: 1,
+                handover: 1,
+            },
+        },
+    ];
+    const result = yield asset_model_1.Asset.aggregate(pipeline);
     return result;
 });
 exports.assetService = {

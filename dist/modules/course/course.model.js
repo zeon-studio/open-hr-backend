@@ -61,10 +61,12 @@ const courseSchema = new mongoose_1.default.Schema({
             price: {
                 type: Number,
                 required: true,
+                default: 0,
             },
             currency: {
                 type: String,
                 required: true,
+                default: "bdt",
             },
             users: [
                 {

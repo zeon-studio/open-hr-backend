@@ -26,10 +26,12 @@ const assetSchema = new mongoose.Schema<AssetType>(
     price: {
       type: Number,
       required: true,
+      default: 0,
     },
     currency: {
       type: String,
       required: true,
+      default: "bdt",
     },
     purchase_date: {
       type: Date,
@@ -44,7 +46,10 @@ const assetSchema = new mongoose.Schema<AssetType>(
     },
     logs: [
       {
-        log: {
+        type: {
+          type: String,
+        },
+        description: {
           type: String,
         },
         date: {

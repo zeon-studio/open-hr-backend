@@ -130,7 +130,39 @@ const deleteAssetService = async (id: string) => {
 
 // get asset by user
 const getAssetsByUserService = async (id: string) => {
-  const result = await Asset.find({ user: id });
+  const pipeline: PipelineStage[] = [
+    { $match: { user: id } },
+    {
+      $addFields: {
+        handover: {
+          $last: {
+            $filter: {
+              input: "$logs",
+              as: "log",
+              cond: { $eq: ["$$log.type", "handover"] },
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        asset_id: 1,
+        user: 1,
+        name: 1,
+        type: 1,
+        serial_number: 1,
+        price: 1,
+        currency: 1,
+        purchase_date: 1,
+        archive: 1,
+        note: 1,
+        handover: 1,
+      },
+    },
+  ];
+
+  const result = await Asset.aggregate(pipeline);
   return result;
 };
 
