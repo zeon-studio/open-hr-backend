@@ -73,6 +73,12 @@ const courseSchema = new mongoose_1.default.Schema({
                     type: String,
                 },
             ],
+            purchase_date: {
+                type: Date,
+            },
+            expire_date: {
+                type: Date,
+            },
         },
     ],
 }, {
