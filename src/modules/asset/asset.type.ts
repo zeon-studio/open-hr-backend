@@ -8,7 +8,20 @@ export type AssetType = {
   asset_id: string;
   user: string;
   name: string;
-  type: "laptop" | "desktop" | "mobile" | "keyboard" | "mouse" | "monitor";
+  type:
+    | "macbook"
+    | "macmini"
+    | "imac"
+    | "laptop"
+    | "desktop"
+    | "mobile"
+    | "keyboard"
+    | "mouse"
+    | "monitor"
+    | "headset"
+    | "printer"
+    | "router"
+    | "other";
   serial_number: string;
   price: number;
   currency: "bdt" | "usd";
