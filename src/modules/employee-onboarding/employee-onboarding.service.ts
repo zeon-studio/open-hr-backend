@@ -42,31 +42,19 @@ const getAllEmployeeOnboardingService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "employees",
-        localField: "employee_id",
-        foreignField: "id",
-        as: "employee",
-      },
+  pipeline.push({
+    $project: {
+      _id: 0,
+      employee_id: 1,
+      add_fingerprint: 1,
+      provide_id_card: 1,
+      provide_appointment_letter: 1,
+      provide_employment_contract: 1,
+      provide_welcome_kit: 1,
+      provide_devices: 1,
+      provide_office_intro: 1,
     },
-    {
-      $project: {
-        _id: 0,
-        employee_id: 1,
-        add_fingerprint: 1,
-        provide_id_card: 1,
-        provide_appointment_letter: 1,
-        provide_employment_contract: 1,
-        provide_welcome_kit: 1,
-        provide_devices: 1,
-        provide_office_intro: 1,
-        "employee.name": 1,
-        "employee.image": 1,
-      },
-    }
-  );
+  });
 
   const result = await EmployeeOnboarding.aggregate(pipeline);
   const total = await EmployeeOnboarding.countDocuments();

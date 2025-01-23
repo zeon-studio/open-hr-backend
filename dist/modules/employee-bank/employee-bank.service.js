@@ -38,19 +38,10 @@ const getAllEmployeeBankService = (paginationOptions, filterOptions) => __awaite
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "employee_id",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 0,
             employee_id: 1,
             banks: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield employee_bank_model_1.EmployeeBank.aggregate(pipeline);

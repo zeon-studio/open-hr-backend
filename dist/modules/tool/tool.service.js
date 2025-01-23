@@ -42,20 +42,11 @@ const getAllToolService = (paginationOptions, filterOptions) => __awaiter(void 0
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "organizations.users",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 0,
             platform: 1,
             website: 1,
             organizations: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield tool_model_1.Tool.aggregate(pipeline);

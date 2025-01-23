@@ -23,7 +23,7 @@ const getAllCourseService = async (
     const searchKeyword = String(search).replace(/\+/g, " ");
     const keywords = searchKeyword.split("|");
     const searchConditions = keywords.map((keyword) => ({
-      $or: [{ name: { $regex: keyword, $options: "i" } }],
+      $or: [{ platform: { $regex: keyword, $options: "i" } }],
     }));
     matchStage.$match.$or = searchConditions;
   }
@@ -44,28 +44,16 @@ const getAllCourseService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "employees",
-        localField: "courses.user",
-        foreignField: "id",
-        as: "employee",
-      },
+  pipeline.push({
+    $project: {
+      _id: 1,
+      platform: 1,
+      website: 1,
+      email: 1,
+      password: 1,
+      courses: 1,
     },
-    {
-      $project: {
-        _id: 1,
-        platform: 1,
-        website: 1,
-        email: 1,
-        password: 1,
-        courses: 1,
-        "employee.name": 1,
-        "employee.image": 1,
-      },
-    }
-  );
+  });
 
   const result = await Course.aggregate(pipeline);
   const total = await Course.countDocuments();

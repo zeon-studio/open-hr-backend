@@ -38,13 +38,6 @@ const getAllEmployeeOffboardingService = (paginationOptions, filterOptions) => _
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "employee_id",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 0,
             employee_id: 1,
@@ -56,8 +49,6 @@ const getAllEmployeeOffboardingService = (paginationOptions, filterOptions) => _
             nda_agreement: 1,
             provide_certificate: 1,
             farewell: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield employee_offboarding_model_1.EmployeeOffboarding.aggregate(pipeline);

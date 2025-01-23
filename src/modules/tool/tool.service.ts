@@ -44,26 +44,14 @@ const getAllToolService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "employees",
-        localField: "organizations.users",
-        foreignField: "id",
-        as: "employee",
-      },
+  pipeline.push({
+    $project: {
+      _id: 0,
+      platform: 1,
+      website: 1,
+      organizations: 1,
     },
-    {
-      $project: {
-        _id: 0,
-        platform: 1,
-        website: 1,
-        organizations: 1,
-        "employee.name": 1,
-        "employee.image": 1,
-      },
-    }
-  );
+  });
 
   const result = await Tool.aggregate(pipeline);
   const total = await Tool.countDocuments();

@@ -44,36 +44,24 @@ const getAllEmployeeJobService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "employees",
-        localField: "employee_id",
-        foreignField: "id",
-        as: "employee",
-      },
+  pipeline.push({
+    $project: {
+      _id: 0,
+      employee_id: 1,
+      job_type: 1,
+      joining_date: 1,
+      designation: 1,
+      department: 1,
+      manager_id: 1,
+      permanent_date: 1,
+      company_name: 1,
+      company_website: 1,
+      resignation_date: 1,
+      prev_jobs: 1,
+      promotions: 1,
+      note: 1,
     },
-    {
-      $project: {
-        _id: 0,
-        employee_id: 1,
-        job_type: 1,
-        joining_date: 1,
-        designation: 1,
-        department: 1,
-        manager_id: 1,
-        permanent_date: 1,
-        company_name: 1,
-        company_website: 1,
-        resignation_date: 1,
-        prev_jobs: 1,
-        promotions: 1,
-        note: 1,
-        "employee.name": 1,
-        "employee.image": 1,
-      },
-    }
-  );
+  });
 
   const result = await EmployeeJob.aggregate(pipeline);
   const total = await EmployeeJob.countDocuments();

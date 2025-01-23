@@ -25,7 +25,7 @@ const getAllCourseService = (paginationOptions, filterOptions) => __awaiter(void
         const searchKeyword = String(search).replace(/\+/g, " ");
         const keywords = searchKeyword.split("|");
         const searchConditions = keywords.map((keyword) => ({
-            $or: [{ name: { $regex: keyword, $options: "i" } }],
+            $or: [{ platform: { $regex: keyword, $options: "i" } }],
         }));
         matchStage.$match.$or = searchConditions;
     }
@@ -42,13 +42,6 @@ const getAllCourseService = (paginationOptions, filterOptions) => __awaiter(void
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "courses.user",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 1,
             platform: 1,
@@ -56,8 +49,6 @@ const getAllCourseService = (paginationOptions, filterOptions) => __awaiter(void
             email: 1,
             password: 1,
             courses: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield course_model_1.Course.aggregate(pipeline);

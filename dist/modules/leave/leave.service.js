@@ -42,19 +42,10 @@ const getAllLeaveService = (paginationOptions, filterOptions) => __awaiter(void 
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "user",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 0,
             employee_id: 1,
             years: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield leave_model_1.Leave.aggregate(pipeline);
