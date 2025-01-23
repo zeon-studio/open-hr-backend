@@ -99,7 +99,7 @@ const updateCourseService = async (id: string, updateData: CourseType) => {
 
 // delete
 const deleteCourseService = async (id: string) => {
-  await Course.findOneAndDelete({ platform: id });
+  await Course.findOneAndDelete({ _id: id });
 };
 
 // get course by user

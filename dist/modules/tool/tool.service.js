@@ -88,7 +88,7 @@ const updateToolService = (id, updateData) => __awaiter(void 0, void 0, void 0, 
 });
 // delete
 const deleteToolService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield tool_model_1.Tool.findOneAndDelete({ tool_id: id });
+    yield tool_model_1.Tool.findOneAndDelete({ _id: id });
 });
 // get tool by user
 const getToolByUserService = (id) => __awaiter(void 0, void 0, void 0, function* () {

@@ -96,7 +96,7 @@ const updateToolService = async (id: string, updateData: ToolType) => {
 
 // delete
 const deleteToolService = async (id: string) => {
-  await Tool.findOneAndDelete({ tool_id: id });
+  await Tool.findOneAndDelete({ _id: id });
 };
 
 // get tool by user

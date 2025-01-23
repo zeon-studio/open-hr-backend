@@ -87,7 +87,7 @@ const updateCourseService = (id, updateData) => __awaiter(void 0, void 0, void 0
 });
 // delete
 const deleteCourseService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield course_model_1.Course.findOneAndDelete({ platform: id });
+    yield course_model_1.Course.findOneAndDelete({ _id: id });
 });
 // get course by user
 const getCoursesByUserService = (id) => __awaiter(void 0, void 0, void 0, function* () {
