@@ -38,10 +38,19 @@ const getAllEmployeeDocumentService = (paginationOptions, filterOptions) => __aw
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
+        $lookup: {
+            from: "employees",
+            localField: "employee_id",
+            foreignField: "id",
+            as: "employee",
+        },
+    }, {
         $project: {
             _id: 0,
             employee_id: 1,
             banks: 1,
+            "employee.name": 1,
+            "employee.image": 1,
         },
     });
     const result = yield employee_document_model_1.EmployeeDocument.aggregate(pipeline);
@@ -60,7 +69,7 @@ const getEmployeeDocumentService = (id) => __awaiter(void 0, void 0, void 0, fun
 });
 // add or update
 const updateEmployeeDocumentService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const document = yield employee_document_model_1.EmployeeDocument.findOne({ platform: id });
+    const document = yield employee_document_model_1.EmployeeDocument.findOne({ employee_id: id });
     if (document) {
         // Update existing documents or add new ones
         updateData.documents.forEach((newDocument) => {

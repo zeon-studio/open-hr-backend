@@ -106,7 +106,11 @@ const getPendingOffboardingTaskService = () => __awaiter(void 0, void 0, void 0,
                 then: {
                     $mergeObjects: [
                         `$${task}`,
-                        { employee_id: "$employee_id", createdAt: "$createdAt" },
+                        {
+                            employee_id: "$employee_id",
+                            createdAt: "$createdAt",
+                            task_id: task,
+                        },
                     ],
                 },
                 else: "$$REMOVE",

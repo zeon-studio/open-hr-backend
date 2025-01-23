@@ -117,13 +117,13 @@ const getCoursesByUserService = async (id: string) => {
       .map((c) => ({
         _id: c._id,
         name: c.name,
+        price: c.price,
+        purchase_date: c.purchase_date,
+        expire_date: c.expire_date,
         platform: course.platform,
         website: course.website,
         email: course.email,
         password: course.password,
-        purchase_date: c.purchase_date,
-        price: c.price,
-        expire_date: c.expire_date,
       }))
   );
 

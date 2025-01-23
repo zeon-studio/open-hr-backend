@@ -42,13 +42,25 @@ const getAllEmployeeDocumentService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push({
-    $project: {
-      _id: 0,
-      employee_id: 1,
-      banks: 1,
+  pipeline.push(
+    {
+      $lookup: {
+        from: "employees",
+        localField: "employee_id",
+        foreignField: "id",
+        as: "employee",
+      },
     },
-  });
+    {
+      $project: {
+        _id: 0,
+        employee_id: 1,
+        banks: 1,
+        "employee.name": 1,
+        "employee.image": 1,
+      },
+    }
+  );
 
   const result = await EmployeeDocument.aggregate(pipeline);
   const total = await EmployeeDocument.countDocuments();
@@ -71,7 +83,7 @@ const updateEmployeeDocumentService = async (
   id: string,
   updateData: EmployeeDocumentType
 ) => {
-  const document = await EmployeeDocument.findOne({ platform: id });
+  const document = await EmployeeDocument.findOne({ employee_id: id });
 
   if (document) {
     // Update existing documents or add new ones

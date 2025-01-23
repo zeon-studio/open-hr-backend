@@ -128,7 +128,11 @@ const getPendingOnboardingTaskService = async () => {
         then: {
           $mergeObjects: [
             `$${task}`,
-            { employee_id: "$employee_id", createdAt: "$createdAt" },
+            {
+              employee_id: "$employee_id",
+              createdAt: "$createdAt",
+              task_id: task,
+            },
           ],
         },
         else: "$$REMOVE",
