@@ -139,6 +139,9 @@ const getCoursesByUserService = async (id: string) => {
         website: course.website,
         email: course.email,
         password: course.password,
+        purchase_date: c.purchase_date,
+        price: c.price,
+        expire_date: c.expire_date,
       }))
   );
 
