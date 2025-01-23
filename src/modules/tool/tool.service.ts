@@ -81,7 +81,14 @@ const getToolService = async (id: string) => {
   return result;
 };
 
-// add or update
+// create
+const createToolService = async (toolData: ToolType) => {
+  const tool = new Tool(toolData);
+  await tool.save();
+  return tool;
+};
+
+// update
 const updateToolService = async (id: string, updateData: ToolType) => {
   const tool = await Tool.findOne({ _id: id });
 
@@ -106,7 +113,12 @@ const deleteToolService = async (id: string) => {
 
 // get tool by user
 const getToolByUserService = async (id: string) => {
-  const tools = await Tool.find({ "organizations.users": { $in: [id] } });
+  const tools = await Tool.find({
+    $or: [
+      { "organizations.users": { $in: [id] } },
+      { "organizations.users": { $in: ["everyone"] } },
+    ],
+  });
 
   const result = tools.flatMap((tool) =>
     tool.organizations
@@ -129,6 +141,7 @@ const getToolByUserService = async (id: string) => {
 export const toolService = {
   getAllToolService,
   getToolService,
+  createToolService,
   updateToolService,
   deleteToolService,
   getToolByUserService,

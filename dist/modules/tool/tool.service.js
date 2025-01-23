@@ -72,7 +72,13 @@ const getToolService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield tool_model_1.Tool.findOne({ tool_id: id });
     return result;
 });
-// add or update
+// create
+const createToolService = (toolData) => __awaiter(void 0, void 0, void 0, function* () {
+    const tool = new tool_model_1.Tool(toolData);
+    yield tool.save();
+    return tool;
+});
+// update
 const updateToolService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
     const tool = yield tool_model_1.Tool.findOne({ _id: id });
     if (tool) {
@@ -95,7 +101,12 @@ const deleteToolService = (id) => __awaiter(void 0, void 0, void 0, function* ()
 });
 // get tool by user
 const getToolByUserService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const tools = yield tool_model_1.Tool.find({ "organizations.users": { $in: [id] } });
+    const tools = yield tool_model_1.Tool.find({
+        $or: [
+            { "organizations.users": { $in: [id] } },
+            { "organizations.users": { $in: ["everyone"] } },
+        ],
+    });
     const result = tools.flatMap((tool) => tool.organizations
         .filter((org) => org.users.includes(id))
         .map((org) => ({
@@ -113,6 +124,7 @@ const getToolByUserService = (id) => __awaiter(void 0, void 0, void 0, function*
 exports.toolService = {
     getAllToolService,
     getToolService,
+    createToolService,
     updateToolService,
     deleteToolService,
     getToolByUserService,

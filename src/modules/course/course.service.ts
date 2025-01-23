@@ -83,6 +83,12 @@ const getCourseService = async (id: string) => {
   return result;
 };
 
+// create
+const createCourseService = async (data: CourseType) => {
+  const result = await Course.create(data);
+  return result;
+};
+
 // update
 const updateCourseService = async (id: string, updateData: CourseType) => {
   const course = await Course.findOne({ _id: id });
@@ -110,7 +116,12 @@ const deleteCourseService = async (id: string) => {
 
 // get course by user
 const getCoursesByUserService = async (id: string) => {
-  const courses = await Course.find({ "courses.users": { $in: [id] } });
+  const courses = await Course.find({
+    $or: [
+      { "courses.users": { $in: [id] } },
+      { "courses.users": { $in: ["everyone"] } },
+    ],
+  });
 
   const result = courses.flatMap((course) =>
     course.courses
@@ -131,6 +142,7 @@ const getCoursesByUserService = async (id: string) => {
 export const courseService = {
   getAllCourseService,
   getCourseService,
+  createCourseService,
   updateCourseService,
   deleteCourseService,
   getCoursesByUserService,

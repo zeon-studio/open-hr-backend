@@ -74,6 +74,11 @@ const getCourseService = (id) => __awaiter(void 0, void 0, void 0, function* () 
     const result = yield course_model_1.Course.findOne({ platform: id });
     return result;
 });
+// create
+const createCourseService = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield course_model_1.Course.create(data);
+    return result;
+});
 // update
 const updateCourseService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
     const course = yield course_model_1.Course.findOne({ _id: id });
@@ -95,7 +100,12 @@ const deleteCourseService = (id) => __awaiter(void 0, void 0, void 0, function* 
 });
 // get course by user
 const getCoursesByUserService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const courses = yield course_model_1.Course.find({ "courses.users": { $in: [id] } });
+    const courses = yield course_model_1.Course.find({
+        $or: [
+            { "courses.users": { $in: [id] } },
+            { "courses.users": { $in: ["everyone"] } },
+        ],
+    });
     const result = courses.flatMap((course) => course.courses
         .filter((c) => c.users.includes(id))
         .map((c) => ({
@@ -111,6 +121,7 @@ const getCoursesByUserService = (id) => __awaiter(void 0, void 0, void 0, functi
 exports.courseService = {
     getAllCourseService,
     getCourseService,
+    createCourseService,
     updateCourseService,
     deleteCourseService,
     getCoursesByUserService,

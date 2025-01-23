@@ -15,6 +15,8 @@ courseRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_
 courseRouter.get("/user/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), course_controller_1.courseController.getCoursesByUserController);
 // get single data
 courseRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), course_controller_1.courseController.getCourseController);
+// create data
+courseRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), course_controller_1.courseController.createCourseController);
 // update data
 courseRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), course_controller_1.courseController.updateCourseController);
 // delete data

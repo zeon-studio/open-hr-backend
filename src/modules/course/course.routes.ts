@@ -30,6 +30,14 @@ courseRouter.get(
   courseController.getCourseController
 );
 
+// create data
+courseRouter.post(
+  "/",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  courseController.createCourseController
+);
+
 // update data
 courseRouter.patch(
   "/:id",

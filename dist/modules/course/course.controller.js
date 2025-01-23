@@ -42,6 +42,17 @@ const getCourseController = (0, catchAsync_1.default)((req, res) => __awaiter(vo
         message: "data get successfully",
     });
 }));
+// create data
+const createCourseController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const courseData = req.body;
+    const course = yield course_service_1.courseService.createCourseService(courseData);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: course,
+        message: "data created successfully",
+    });
+}));
 // update data
 const updateCourseController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -77,6 +88,7 @@ const getCoursesByUserController = (0, catchAsync_1.default)((req, res) => __awa
 exports.courseController = {
     getAllCourseController,
     getCourseController,
+    createCourseController,
     updateCourseController,
     deleteCourseController,
     getCoursesByUserController,
