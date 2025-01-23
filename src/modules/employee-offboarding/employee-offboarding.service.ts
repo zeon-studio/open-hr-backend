@@ -42,32 +42,20 @@ const getAllEmployeeOffboardingService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "employees",
-        localField: "employee_id",
-        foreignField: "id",
-        as: "employee",
-      },
+  pipeline.push({
+    $project: {
+      _id: 0,
+      employee_id: 1,
+      remove_fingerprint: 1,
+      task_handover: 1,
+      collect_id_card: 1,
+      collect_email: 1,
+      collect_devices: 1,
+      nda_agreement: 1,
+      provide_certificate: 1,
+      farewell: 1,
     },
-    {
-      $project: {
-        _id: 0,
-        employee_id: 1,
-        remove_fingerprint: 1,
-        task_handover: 1,
-        collect_id_card: 1,
-        collect_email: 1,
-        collect_devices: 1,
-        nda_agreement: 1,
-        provide_certificate: 1,
-        farewell: 1,
-        "employee.name": 1,
-        "employee.image": 1,
-      },
-    }
-  );
+  });
 
   const result = await EmployeeOffboarding.aggregate(pipeline);
   const total = await EmployeeOffboarding.countDocuments();

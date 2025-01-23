@@ -38,19 +38,10 @@ const getAllEmployeeContactService = (paginationOptions, filterOptions) => __awa
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "employee_id",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 0,
             employee_id: 1,
             contacts: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield employee_contact_model_1.EmployeeContact.aggregate(pipeline);

@@ -15,6 +15,8 @@ toolRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_RO
 toolRouter.get("/user/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), tool_controller_1.toolController.getToolByUserController);
 // get single data
 toolRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), tool_controller_1.toolController.getToolController);
+// create data
+toolRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), tool_controller_1.toolController.createToolController);
 // update data
 toolRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), tool_controller_1.toolController.updateToolController);
 // delete data

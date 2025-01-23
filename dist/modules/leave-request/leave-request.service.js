@@ -56,19 +56,10 @@ const getAllLeaveRequestService = (paginationOptions, filterOptions) => __awaite
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "user",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 1,
             employee_id: 1,
             years: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield leave_request_model_1.LeaveRequest.aggregate(pipeline);
@@ -155,7 +146,6 @@ const updateLeaveRequestService = (id, updateData) => __awaiter(void 0, void 0, 
     const employeeData = yield employee_model_1.Employee.findOne({
         id: leaveReqData === null || leaveReqData === void 0 ? void 0 : leaveReqData.employee_id,
     });
-    console.log(employeeData);
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {

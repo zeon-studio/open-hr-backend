@@ -105,7 +105,7 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
     };
 });
 // get all employees id
-const getAllEmployeeIdService = () => __awaiter(void 0, void 0, void 0, function* () {
+const getAllEmployeeBasicsService = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield employee_model_1.Employee.aggregate([
         {
             $lookup: {
@@ -295,7 +295,7 @@ const deleteEmployeeService = (id) => __awaiter(void 0, void 0, void 0, function
 });
 exports.employeeService = {
     getAllEmployeeService,
-    getAllEmployeeIdService,
+    getAllEmployeeBasicsService,
     createEmployeeService,
     getSingleEmployeeService,
     getSingleEmployeeByInviteTokenService,

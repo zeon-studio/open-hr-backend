@@ -42,13 +42,6 @@ const getAllEmployeeJobService = (paginationOptions, filterOptions) => __awaiter
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "employee_id",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 0,
             employee_id: 1,
@@ -64,8 +57,6 @@ const getAllEmployeeJobService = (paginationOptions, filterOptions) => __awaiter
             prev_jobs: 1,
             promotions: 1,
             note: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield employee_job_model_1.EmployeeJob.aggregate(pipeline);

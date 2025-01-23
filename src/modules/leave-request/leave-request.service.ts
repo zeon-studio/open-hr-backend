@@ -57,25 +57,13 @@ const getAllLeaveRequestService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "employees",
-        localField: "user",
-        foreignField: "id",
-        as: "employee",
-      },
+  pipeline.push({
+    $project: {
+      _id: 1,
+      employee_id: 1,
+      years: 1,
     },
-    {
-      $project: {
-        _id: 1,
-        employee_id: 1,
-        years: 1,
-        "employee.name": 1,
-        "employee.image": 1,
-      },
-    }
-  );
+  });
 
   const result = await LeaveRequest.aggregate(pipeline);
   const total = await LeaveRequest.countDocuments();
@@ -202,8 +190,6 @@ const updateLeaveRequestService = async (
   const employeeData = await Employee.findOne({
     id: leaveReqData?.employee_id,
   });
-
-  console.log(employeeData);
 
   const session = await mongoose.startSession();
   session.startTransaction();

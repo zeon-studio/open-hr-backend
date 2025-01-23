@@ -44,25 +44,13 @@ const getAllLeaveService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "employees",
-        localField: "user",
-        foreignField: "id",
-        as: "employee",
-      },
+  pipeline.push({
+    $project: {
+      _id: 0,
+      employee_id: 1,
+      years: 1,
     },
-    {
-      $project: {
-        _id: 0,
-        employee_id: 1,
-        years: 1,
-        "employee.name": 1,
-        "employee.image": 1,
-      },
-    }
-  );
+  });
 
   const result = await Leave.aggregate(pipeline);
   const total = await Leave.countDocuments();

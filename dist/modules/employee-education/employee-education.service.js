@@ -38,19 +38,10 @@ const getAllEmployeeEducationService = (paginationOptions, filterOptions) => __a
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "employee_id",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 0,
             employee_id: 1,
             educations: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield employee_education_model_1.EmployeeEducation.aggregate(pipeline);

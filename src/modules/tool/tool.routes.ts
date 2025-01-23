@@ -30,6 +30,14 @@ toolRouter.get(
   toolController.getToolController
 );
 
+// create data
+toolRouter.post(
+  "/",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  toolController.createToolController
+);
+
 // update data
 toolRouter.patch(
   "/:id",

@@ -25,7 +25,7 @@ const getAllCourseService = (paginationOptions, filterOptions) => __awaiter(void
         const searchKeyword = String(search).replace(/\+/g, " ");
         const keywords = searchKeyword.split("|");
         const searchConditions = keywords.map((keyword) => ({
-            $or: [{ name: { $regex: keyword, $options: "i" } }],
+            $or: [{ platform: { $regex: keyword, $options: "i" } }],
         }));
         matchStage.$match.$or = searchConditions;
     }
@@ -42,22 +42,13 @@ const getAllCourseService = (paginationOptions, filterOptions) => __awaiter(void
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "courses.user",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
-            _id: 0,
+            _id: 1,
             platform: 1,
             website: 1,
             email: 1,
             password: 1,
             courses: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield course_model_1.Course.aggregate(pipeline);
@@ -81,25 +72,14 @@ const createCourseService = (data) => __awaiter(void 0, void 0, void 0, function
 });
 // update
 const updateCourseService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const course = yield course_model_1.Course.findOne({ platform: id });
+    const course = yield course_model_1.Course.findOne({ _id: id });
     if (course) {
-        // Update existing courses or add new ones
-        updateData.courses.forEach((newCourse) => {
-            const existingCourseIndex = course.courses.findIndex((course) => course.name === newCourse.name);
-            if (existingCourseIndex !== -1) {
-                // Update existing course
-                course.courses[existingCourseIndex] = Object.assign(Object.assign({}, course.courses[existingCourseIndex]), newCourse);
-            }
-            else {
-                // Add new course
-                course.courses.push(newCourse);
-            }
-        });
-        yield course.save();
-        return course;
+        // Update existing course
+        const updatedCourse = yield course_model_1.Course.findOneAndUpdate({ _id: id }, updateData, { new: true });
+        return updatedCourse;
     }
     else {
-        // Create new course if it doesn't exist
+        // Create new course
         const newCourse = new course_model_1.Course(updateData);
         yield newCourse.save();
         return newCourse;
@@ -111,7 +91,12 @@ const deleteCourseService = (id) => __awaiter(void 0, void 0, void 0, function* 
 });
 // get course by user
 const getCoursesByUserService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const courses = yield course_model_1.Course.find({ "courses.users": { $in: [id] } });
+    const courses = yield course_model_1.Course.find({
+        $or: [
+            { "courses.users": { $in: [id] } },
+            { "courses.users": { $in: ["everyone"] } },
+        ],
+    });
     const result = courses.flatMap((course) => course.courses
         .filter((c) => c.users.includes(id))
         .map((c) => ({

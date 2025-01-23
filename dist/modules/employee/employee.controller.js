@@ -38,8 +38,8 @@ const getAllEmployeeController = (0, catchAsync_1.default)((req, res) => __await
     });
 }));
 // get all employees id
-const getAllEmployeeIdController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const employee = yield employee_service_1.employeeService.getAllEmployeeIdService();
+const getAllEmployeeBasicsController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const employee = yield employee_service_1.employeeService.getAllEmployeeBasicsService();
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,
@@ -134,7 +134,7 @@ const deleteEmployeeController = (0, catchAsync_1.default)((req, res) => __await
 }));
 exports.employeeController = {
     getAllEmployeeController,
-    getAllEmployeeIdController,
+    getAllEmployeeBasicsController,
     getSingleEmployeeController,
     getSingleEmployeeByInviteTokenController,
     createEmployeeController,

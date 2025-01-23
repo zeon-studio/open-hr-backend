@@ -37,6 +37,18 @@ const getToolController = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// create data
+const createToolController = catchAsync(async (req: Request, res: Response) => {
+  const toolData = req.body;
+  const tool = await toolService.createToolService(toolData);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    result: tool,
+    message: "data created successfully",
+  });
+});
+
 // update data
 const updateToolController = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
@@ -80,6 +92,7 @@ const getToolByUserController = catchAsync(
 export const toolController = {
   getAllToolController,
   getToolController,
+  createToolController,
   updateToolController,
   deleteToolController,
   getToolByUserController,

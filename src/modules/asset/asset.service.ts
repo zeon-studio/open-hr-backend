@@ -45,34 +45,22 @@ const getAllAssetService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "employees",
-        localField: "user",
-        foreignField: "id",
-        as: "employee",
-      },
+  pipeline.push({
+    $project: {
+      _id: 0,
+      asset_id: 1,
+      user: 1,
+      name: 1,
+      type: 1,
+      serial_number: 1,
+      price: 1,
+      currency: 1,
+      purchase_date: 1,
+      archive: 1,
+      note: 1,
+      logs: 1,
     },
-    {
-      $project: {
-        _id: 0,
-        asset_id: 1,
-        user: 1,
-        name: 1,
-        type: 1,
-        serial_number: 1,
-        price: 1,
-        currency: 1,
-        purchase_date: 1,
-        archive: 1,
-        note: 1,
-        logs: 1,
-        "employee.name": 1,
-        "employee.image": 1,
-      },
-    }
-  );
+  });
 
   const result = await Asset.aggregate(pipeline);
   const total = await Asset.countDocuments();

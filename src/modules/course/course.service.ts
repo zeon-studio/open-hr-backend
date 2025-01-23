@@ -23,7 +23,7 @@ const getAllCourseService = async (
     const searchKeyword = String(search).replace(/\+/g, " ");
     const keywords = searchKeyword.split("|");
     const searchConditions = keywords.map((keyword) => ({
-      $or: [{ name: { $regex: keyword, $options: "i" } }],
+      $or: [{ platform: { $regex: keyword, $options: "i" } }],
     }));
     matchStage.$match.$or = searchConditions;
   }
@@ -44,28 +44,16 @@ const getAllCourseService = async (
     pipeline.push({ $limit: limit });
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "employees",
-        localField: "courses.user",
-        foreignField: "id",
-        as: "employee",
-      },
+  pipeline.push({
+    $project: {
+      _id: 1,
+      platform: 1,
+      website: 1,
+      email: 1,
+      password: 1,
+      courses: 1,
     },
-    {
-      $project: {
-        _id: 0,
-        platform: 1,
-        website: 1,
-        email: 1,
-        password: 1,
-        courses: 1,
-        "employee.name": 1,
-        "employee.image": 1,
-      },
-    }
-  );
+  });
 
   const result = await Course.aggregate(pipeline);
   const total = await Course.countDocuments();
@@ -91,29 +79,18 @@ const createCourseService = async (data: CourseType) => {
 
 // update
 const updateCourseService = async (id: string, updateData: CourseType) => {
-  const course = await Course.findOne({ platform: id });
+  const course = await Course.findOne({ _id: id });
 
   if (course) {
-    // Update existing courses or add new ones
-    updateData.courses.forEach((newCourse) => {
-      const existingCourseIndex = course.courses.findIndex(
-        (course) => course.name === newCourse.name
-      );
-      if (existingCourseIndex !== -1) {
-        // Update existing course
-        course.courses[existingCourseIndex] = {
-          ...course.courses[existingCourseIndex],
-          ...newCourse,
-        };
-      } else {
-        // Add new course
-        course.courses.push(newCourse);
-      }
-    });
-    await course.save();
-    return course;
+    // Update existing course
+    const updatedCourse = await Course.findOneAndUpdate(
+      { _id: id },
+      updateData,
+      { new: true }
+    );
+    return updatedCourse;
   } else {
-    // Create new course if it doesn't exist
+    // Create new course
     const newCourse = new Course(updateData);
     await newCourse.save();
     return newCourse;
@@ -127,7 +104,12 @@ const deleteCourseService = async (id: string) => {
 
 // get course by user
 const getCoursesByUserService = async (id: string) => {
-  const courses = await Course.find({ "courses.users": { $in: [id] } });
+  const courses = await Course.find({
+    $or: [
+      { "courses.users": { $in: [id] } },
+      { "courses.users": { $in: ["everyone"] } },
+    ],
+  });
 
   const result = courses.flatMap((course) =>
     course.courses

@@ -43,13 +43,6 @@ const getAllAssetService = (paginationOptions, filterOptions) => __awaiter(void 
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "user",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 0,
             asset_id: 1,
@@ -63,8 +56,6 @@ const getAllAssetService = (paginationOptions, filterOptions) => __awaiter(void 
             archive: 1,
             note: 1,
             logs: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield asset_model_1.Asset.aggregate(pipeline);

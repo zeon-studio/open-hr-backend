@@ -42,20 +42,11 @@ const getAllToolService = (paginationOptions, filterOptions) => __awaiter(void 0
         pipeline.push({ $limit: limit });
     }
     pipeline.push({
-        $lookup: {
-            from: "employees",
-            localField: "organizations.users",
-            foreignField: "id",
-            as: "employee",
-        },
-    }, {
         $project: {
             _id: 0,
             platform: 1,
             website: 1,
             organizations: 1,
-            "employee.name": 1,
-            "employee.image": 1,
         },
     });
     const result = yield tool_model_1.Tool.aggregate(pipeline);
@@ -72,24 +63,21 @@ const getToolService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield tool_model_1.Tool.findOne({ tool_id: id });
     return result;
 });
-// add or update
+// create
+const createToolService = (toolData) => __awaiter(void 0, void 0, void 0, function* () {
+    const tool = new tool_model_1.Tool(toolData);
+    yield tool.save();
+    return tool;
+});
+// update
 const updateToolService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const tool = yield tool_model_1.Tool.findOne({ platform: id });
+    const tool = yield tool_model_1.Tool.findOne({ _id: id });
     if (tool) {
-        // Update existing organizations or add new ones
-        updateData.organizations.forEach((newOrg) => {
-            const existingOrgIndex = tool.organizations.findIndex((org) => org.name === newOrg.name);
-            if (existingOrgIndex !== -1) {
-                // Update existing organization
-                tool.organizations[existingOrgIndex] = Object.assign(Object.assign({}, tool.organizations[existingOrgIndex]), newOrg);
-            }
-            else {
-                // Add new organization
-                tool.organizations.push(newOrg);
-            }
+        // Update existing tool
+        const updatedTool = yield tool_model_1.Tool.findOneAndUpdate({ _id: id }, updateData, {
+            new: true,
         });
-        yield tool.save();
-        return tool;
+        return updatedTool;
     }
     else {
         // Create new tool if it doesn't exist
@@ -104,7 +92,12 @@ const deleteToolService = (id) => __awaiter(void 0, void 0, void 0, function* ()
 });
 // get tool by user
 const getToolByUserService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const tools = yield tool_model_1.Tool.find({ "organizations.users": { $in: [id] } });
+    const tools = yield tool_model_1.Tool.find({
+        $or: [
+            { "organizations.users": { $in: [id] } },
+            { "organizations.users": { $in: ["everyone"] } },
+        ],
+    });
     const result = tools.flatMap((tool) => tool.organizations
         .filter((org) => org.users.includes(id))
         .map((org) => ({
@@ -122,6 +115,7 @@ const getToolByUserService = (id) => __awaiter(void 0, void 0, void 0, function*
 exports.toolService = {
     getAllToolService,
     getToolService,
+    createToolService,
     updateToolService,
     deleteToolService,
     getToolByUserService,
