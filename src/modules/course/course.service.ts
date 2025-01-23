@@ -55,7 +55,7 @@ const getAllCourseService = async (
     },
     {
       $project: {
-        _id: 0,
+        _id: 1,
         platform: 1,
         website: 1,
         email: 1,
@@ -83,37 +83,20 @@ const getCourseService = async (id: string) => {
   return result;
 };
 
-// create
-const createCourseService = async (data: CourseType) => {
-  const result = await Course.create(data);
-  return result;
-};
-
 // update
 const updateCourseService = async (id: string, updateData: CourseType) => {
-  const course = await Course.findOne({ platform: id });
+  const course = await Course.findOne({ _id: id });
 
   if (course) {
-    // Update existing courses or add new ones
-    updateData.courses.forEach((newCourse) => {
-      const existingCourseIndex = course.courses.findIndex(
-        (course) => course.name === newCourse.name
-      );
-      if (existingCourseIndex !== -1) {
-        // Update existing course
-        course.courses[existingCourseIndex] = {
-          ...course.courses[existingCourseIndex],
-          ...newCourse,
-        };
-      } else {
-        // Add new course
-        course.courses.push(newCourse);
-      }
-    });
-    await course.save();
-    return course;
+    // Update existing course
+    const updatedCourse = await Course.findOneAndUpdate(
+      { _id: id },
+      updateData,
+      { new: true }
+    );
+    return updatedCourse;
   } else {
-    // Create new course if it doesn't exist
+    // Create new course
     const newCourse = new Course(updateData);
     await newCourse.save();
     return newCourse;
@@ -148,7 +131,6 @@ const getCoursesByUserService = async (id: string) => {
 export const courseService = {
   getAllCourseService,
   getCourseService,
-  createCourseService,
   updateCourseService,
   deleteCourseService,
   getCoursesByUserService,

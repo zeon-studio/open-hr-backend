@@ -12,7 +12,7 @@ const employeeRouter = express_1.default.Router();
 // get all employee
 employeeRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.getAllEmployeeController);
 // get all employee id
-employeeRouter.get("/id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.getAllEmployeeIdController);
+employeeRouter.get("/basics", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.getAllEmployeeBasicsController);
 // get single employee by invite token
 employeeRouter.get("/invite-token/:inviteToken", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.getSingleEmployeeByInviteTokenController);
 // get single employee

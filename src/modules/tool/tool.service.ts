@@ -83,27 +83,14 @@ const getToolService = async (id: string) => {
 
 // add or update
 const updateToolService = async (id: string, updateData: ToolType) => {
-  const tool = await Tool.findOne({ platform: id });
+  const tool = await Tool.findOne({ _id: id });
 
   if (tool) {
-    // Update existing organizations or add new ones
-    updateData.organizations.forEach((newOrg) => {
-      const existingOrgIndex = tool.organizations.findIndex(
-        (org) => org.name === newOrg.name
-      );
-      if (existingOrgIndex !== -1) {
-        // Update existing organization
-        tool.organizations[existingOrgIndex] = {
-          ...tool.organizations[existingOrgIndex],
-          ...newOrg,
-        };
-      } else {
-        // Add new organization
-        tool.organizations.push(newOrg);
-      }
+    // Update existing tool
+    const updatedTool = await Tool.findOneAndUpdate({ _id: id }, updateData, {
+      new: true,
     });
-    await tool.save();
-    return tool;
+    return updatedTool;
   } else {
     // Create new tool if it doesn't exist
     const newTool = new Tool(updateData);

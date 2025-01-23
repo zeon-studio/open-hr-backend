@@ -35,9 +35,9 @@ const getAllEmployeeController = catchAsync(
 );
 
 // get all employees id
-const getAllEmployeeIdController = catchAsync(
+const getAllEmployeeBasicsController = catchAsync(
   async (req: Request, res: Response) => {
-    const employee = await employeeService.getAllEmployeeIdService();
+    const employee = await employeeService.getAllEmployeeBasicsService();
     sendResponse(res, {
       success: true,
       statusCode: 200,
@@ -182,7 +182,7 @@ const deleteEmployeeController = catchAsync(
 
 export const employeeController = {
   getAllEmployeeController,
-  getAllEmployeeIdController,
+  getAllEmployeeBasicsController,
   getSingleEmployeeController,
   getSingleEmployeeByInviteTokenController,
   createEmployeeController,

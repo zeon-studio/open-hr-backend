@@ -50,7 +50,7 @@ const getAllCourseService = (paginationOptions, filterOptions) => __awaiter(void
         },
     }, {
         $project: {
-            _id: 0,
+            _id: 1,
             platform: 1,
             website: 1,
             email: 1,
@@ -74,32 +74,16 @@ const getCourseService = (id) => __awaiter(void 0, void 0, void 0, function* () 
     const result = yield course_model_1.Course.findOne({ platform: id });
     return result;
 });
-// create
-const createCourseService = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield course_model_1.Course.create(data);
-    return result;
-});
 // update
 const updateCourseService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const course = yield course_model_1.Course.findOne({ platform: id });
+    const course = yield course_model_1.Course.findOne({ _id: id });
     if (course) {
-        // Update existing courses or add new ones
-        updateData.courses.forEach((newCourse) => {
-            const existingCourseIndex = course.courses.findIndex((course) => course.name === newCourse.name);
-            if (existingCourseIndex !== -1) {
-                // Update existing course
-                course.courses[existingCourseIndex] = Object.assign(Object.assign({}, course.courses[existingCourseIndex]), newCourse);
-            }
-            else {
-                // Add new course
-                course.courses.push(newCourse);
-            }
-        });
-        yield course.save();
-        return course;
+        // Update existing course
+        const updatedCourse = yield course_model_1.Course.findOneAndUpdate({ _id: id }, updateData, { new: true });
+        return updatedCourse;
     }
     else {
-        // Create new course if it doesn't exist
+        // Create new course
         const newCourse = new course_model_1.Course(updateData);
         yield newCourse.save();
         return newCourse;
@@ -127,7 +111,6 @@ const getCoursesByUserService = (id) => __awaiter(void 0, void 0, void 0, functi
 exports.courseService = {
     getAllCourseService,
     getCourseService,
-    createCourseService,
     updateCourseService,
     deleteCourseService,
     getCoursesByUserService,

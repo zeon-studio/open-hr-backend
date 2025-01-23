@@ -113,7 +113,7 @@ const getAllEmployeeService = async (
 };
 
 // get all employees id
-const getAllEmployeeIdService = async () => {
+const getAllEmployeeBasicsService = async () => {
   const result = await Employee.aggregate([
     {
       $lookup: {
@@ -366,7 +366,7 @@ const deleteEmployeeService = async (id: string) => {
 
 export const employeeService = {
   getAllEmployeeService,
-  getAllEmployeeIdService,
+  getAllEmployeeBasicsService,
   createEmployeeService,
   getSingleEmployeeService,
   getSingleEmployeeByInviteTokenService,

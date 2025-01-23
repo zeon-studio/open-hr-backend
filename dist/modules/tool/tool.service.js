@@ -74,22 +74,13 @@ const getToolService = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // add or update
 const updateToolService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const tool = yield tool_model_1.Tool.findOne({ platform: id });
+    const tool = yield tool_model_1.Tool.findOne({ _id: id });
     if (tool) {
-        // Update existing organizations or add new ones
-        updateData.organizations.forEach((newOrg) => {
-            const existingOrgIndex = tool.organizations.findIndex((org) => org.name === newOrg.name);
-            if (existingOrgIndex !== -1) {
-                // Update existing organization
-                tool.organizations[existingOrgIndex] = Object.assign(Object.assign({}, tool.organizations[existingOrgIndex]), newOrg);
-            }
-            else {
-                // Add new organization
-                tool.organizations.push(newOrg);
-            }
+        // Update existing tool
+        const updatedTool = yield tool_model_1.Tool.findOneAndUpdate({ _id: id }, updateData, {
+            new: true,
         });
-        yield tool.save();
-        return tool;
+        return updatedTool;
     }
     else {
         // Create new tool if it doesn't exist
