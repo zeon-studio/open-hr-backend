@@ -1,3 +1,4 @@
+import { conditionalWeekendDays, weekendDays } from "@/config/constants";
 import ApiError from "@/errors/ApiError";
 import { Calendar } from "@/modules/calendar/calendar.model";
 import { LeaveRequest } from "@/modules/leave-request/leave-request.model";
@@ -7,11 +8,16 @@ import {
   differenceInDays,
   eachDayOfInterval,
   endOfDay,
-  isFriday,
   isWithinInterval,
   parseISO,
   startOfDay,
 } from "date-fns";
+
+// Helper function to get week number of the month (1-based)
+const getWeekOfMonth = (date: Date): number => {
+  const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  return Math.ceil((date.getDate() + firstDayOfMonth.getDay()) / 7);
+};
 
 // leave day counter
 export const dayCounterWithoutHoliday = async (
@@ -69,12 +75,29 @@ export const dayCounterWithoutHoliday = async (
     return count + overlappingDays;
   }, 0);
 
-  // Find all Fridays in the interval
-  const fridaysInInterval = daysInterval.filter((day) => isFriday(day));
+  // Find all weekends in the interval
+  const weekendInterval = daysInterval.filter((day) => {
+    const dayName = day.toLocaleDateString("en-US", { weekday: "long" });
 
-  // Find Fridays that are not within holidays
-  const nonHolidayFridays = fridaysInInterval.filter(
-    (friday) =>
+    // Check regular weekend days
+    if (weekendDays.includes(dayName)) {
+      return true;
+    }
+
+    // Check conditional weekend days
+    if (dayName in conditionalWeekendDays) {
+      const weekNumber = getWeekOfMonth(day);
+      return conditionalWeekendDays[
+        dayName as keyof typeof conditionalWeekendDays
+      ].includes(weekNumber);
+    }
+
+    return false;
+  });
+
+  // Find weekends that are not within holidays
+  const nonHolidayWeekends = weekendInterval.filter(
+    (weekend) =>
       !holidayDays.some((holiday) => {
         const holidayStart = startOfDay(
           parseISO(new Date(holiday.start_date).toISOString())
@@ -82,7 +105,7 @@ export const dayCounterWithoutHoliday = async (
         const holidayEnd = endOfDay(
           parseISO(new Date(holiday.end_date).toISOString())
         );
-        return isWithinInterval(friday, {
+        return isWithinInterval(weekend, {
           start: holidayStart,
           end: holidayEnd,
         });
@@ -96,8 +119,8 @@ export const dayCounterWithoutHoliday = async (
   // Reduce days for holidays
   finalDays -= totalHolidays;
 
-  // Reduce days for non-holiday Fridays
-  finalDays -= nonHolidayFridays.length;
+  // Reduce days for non-holiday weekends
+  finalDays -= nonHolidayWeekends.length;
 
   return finalDays;
 };

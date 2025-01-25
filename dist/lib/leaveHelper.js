@@ -14,11 +14,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.leaveValidator = exports.dayCounterWithoutHoliday = void 0;
 exports.calculateRemainingLeave = calculateRemainingLeave;
+const constants_1 = require("../config/constants");
 const ApiError_1 = __importDefault(require("../errors/ApiError"));
 const calendar_model_1 = require("../modules/calendar/calendar.model");
 const leave_request_model_1 = require("../modules/leave-request/leave-request.model");
 const leave_model_1 = require("../modules/leave/leave.model");
 const date_fns_1 = require("date-fns");
+// Helper function to get week number of the month (1-based)
+const getWeekOfMonth = (date) => {
+    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    return Math.ceil((date.getDate() + firstDayOfMonth.getDay()) / 7);
+};
 // leave day counter
 const dayCounterWithoutHoliday = (startDate, endDate) => __awaiter(void 0, void 0, void 0, function* () {
     const year = startDate.getFullYear();
@@ -53,13 +59,25 @@ const dayCounterWithoutHoliday = (startDate, endDate) => __awaiter(void 0, void 
         const overlappingDays = (0, date_fns_1.differenceInDays)(overlapEnd, overlapStart) + 1;
         return count + overlappingDays;
     }, 0);
-    // Find all Fridays in the interval
-    const fridaysInInterval = daysInterval.filter((day) => (0, date_fns_1.isFriday)(day));
-    // Find Fridays that are not within holidays
-    const nonHolidayFridays = fridaysInInterval.filter((friday) => !holidayDays.some((holiday) => {
+    // Find all weekends in the interval
+    const weekendInterval = daysInterval.filter((day) => {
+        const dayName = day.toLocaleDateString("en-US", { weekday: "long" });
+        // Check regular weekend days
+        if (constants_1.weekendDays.includes(dayName)) {
+            return true;
+        }
+        // Check conditional weekend days
+        if (dayName in constants_1.conditionalWeekendDays) {
+            const weekNumber = getWeekOfMonth(day);
+            return constants_1.conditionalWeekendDays[dayName].includes(weekNumber);
+        }
+        return false;
+    });
+    // Find weekends that are not within holidays
+    const nonHolidayWeekends = weekendInterval.filter((weekend) => !holidayDays.some((holiday) => {
         const holidayStart = (0, date_fns_1.startOfDay)((0, date_fns_1.parseISO)(new Date(holiday.start_date).toISOString()));
         const holidayEnd = (0, date_fns_1.endOfDay)((0, date_fns_1.parseISO)(new Date(holiday.end_date).toISOString()));
-        return (0, date_fns_1.isWithinInterval)(friday, {
+        return (0, date_fns_1.isWithinInterval)(weekend, {
             start: holidayStart,
             end: holidayEnd,
         });
@@ -68,8 +86,8 @@ const dayCounterWithoutHoliday = (startDate, endDate) => __awaiter(void 0, void 
     let finalDays = totalDays;
     // Reduce days for holidays
     finalDays -= totalHolidays;
-    // Reduce days for non-holiday Fridays
-    finalDays -= nonHolidayFridays.length;
+    // Reduce days for non-holiday weekends
+    finalDays -= nonHolidayWeekends.length;
     return finalDays;
 });
 exports.dayCounterWithoutHoliday = dayCounterWithoutHoliday;
