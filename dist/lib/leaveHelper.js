@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.leaveValidator = exports.leaveDayCounter = void 0;
+exports.leaveValidator = exports.dayCounterWithoutHoliday = void 0;
 exports.calculateRemainingLeave = calculateRemainingLeave;
 const ApiError_1 = __importDefault(require("../errors/ApiError"));
 const calendar_model_1 = require("../modules/calendar/calendar.model");
@@ -20,7 +20,7 @@ const leave_request_model_1 = require("../modules/leave-request/leave-request.mo
 const leave_model_1 = require("../modules/leave/leave.model");
 const date_fns_1 = require("date-fns");
 // leave day counter
-const leaveDayCounter = (startDate, endDate) => __awaiter(void 0, void 0, void 0, function* () {
+const dayCounterWithoutHoliday = (startDate, endDate) => __awaiter(void 0, void 0, void 0, function* () {
     const year = startDate.getFullYear();
     const holidayRecords = yield calendar_model_1.Calendar.find({ year });
     // Flatten the holidays from each record
@@ -72,7 +72,7 @@ const leaveDayCounter = (startDate, endDate) => __awaiter(void 0, void 0, void 0
     finalDays -= nonHolidayFridays.length;
     return finalDays;
 });
-exports.leaveDayCounter = leaveDayCounter;
+exports.dayCounterWithoutHoliday = dayCounterWithoutHoliday;
 // leave data validator
 const leaveValidator = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const { leave_type, employee_id, start_date, end_date } = data;

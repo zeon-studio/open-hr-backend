@@ -14,7 +14,10 @@ import {
 } from "date-fns";
 
 // leave day counter
-export const leaveDayCounter = async (startDate: Date, endDate: Date) => {
+export const dayCounterWithoutHoliday = async (
+  startDate: Date,
+  endDate: Date
+) => {
   const year = startDate.getFullYear();
 
   const holidayRecords = await Calendar.find({ year });

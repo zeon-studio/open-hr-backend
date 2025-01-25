@@ -53,7 +53,7 @@ const getAllAssetService = (paginationOptions, filterOptions) => __awaiter(void 
             price: 1,
             currency: 1,
             purchase_date: 1,
-            archive: 1,
+            status: 1,
             note: 1,
             logs: 1,
         },
@@ -86,7 +86,8 @@ const createAssetService = (data) => __awaiter(void 0, void 0, void 0, function*
         price: data.price,
         currency: data.currency,
         purchase_date: data.purchase_date,
-        archive: data.archive,
+        status: data.status,
+        logs: data.logs,
         note: data.note,
     };
     const newAssetData = new asset_model_1.Asset(createAssetData);

@@ -43,7 +43,7 @@ const getAllToolService = (paginationOptions, filterOptions) => __awaiter(void 0
     }
     pipeline.push({
         $project: {
-            _id: 0,
+            _id: 1,
             platform: 1,
             website: 1,
             organizations: 1,

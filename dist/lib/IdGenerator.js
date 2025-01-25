@@ -8,12 +8,19 @@ const departmentGenerator = {
     admin: "ADM",
 };
 const assetTypeGenerator = {
+    macbook: "MBK",
+    macmini: "MNI",
+    imac: "IMC",
     laptop: "LPT",
     desktop: "DPT",
     mobile: "MBL",
-    monitor: "MON",
     keyboard: "KBD",
     mouse: "MUS",
+    monitor: "MON",
+    headset: "HST",
+    printer: "PRN",
+    router: "RTR",
+    other: "OTH",
 };
 const findYear = (date) => {
     const year = date.getFullYear();

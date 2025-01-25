@@ -70,9 +70,10 @@ const assetSchema = new mongoose_1.default.Schema({
         type: Date,
         required: true,
     },
-    archive: {
-        type: Boolean,
-        default: false,
+    status: {
+        type: String,
+        required: true,
+        default: "active",
     },
     note: {
         type: String,

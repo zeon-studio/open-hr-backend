@@ -26,7 +26,7 @@ export type AssetType = {
   price: number;
   currency: "bdt" | "usd";
   purchase_date: Date;
-  archive: boolean;
+  status: "active" | "inactive" | "lost" | "damaged";
   note: string;
   logs: Log[];
 };

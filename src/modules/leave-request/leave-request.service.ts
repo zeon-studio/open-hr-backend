@@ -1,7 +1,7 @@
 import config from "@/config/variables";
 import ApiError from "@/errors/ApiError";
 import { localDate } from "@/lib/dateConverter";
-import { leaveDayCounter, leaveValidator } from "@/lib/leaveHelper";
+import { dayCounterWithoutHoliday, leaveValidator } from "@/lib/leaveHelper";
 import { mailSender } from "@/lib/mailSender";
 import { leaveRequestDiscordTemplate } from "@/lib/mailTemplate";
 import { paginationHelpers } from "@/lib/paginationHelper";
@@ -88,7 +88,7 @@ const createLeaveRequestService = async (data: LeaveRequestType) => {
   try {
     const startDate = localDate(data.start_date);
     const endDate = localDate(data.end_date);
-    const dayCount = await leaveDayCounter(startDate, endDate);
+    const dayCount = await dayCounterWithoutHoliday(startDate, endDate);
     data = {
       ...data,
       start_date: startDate,

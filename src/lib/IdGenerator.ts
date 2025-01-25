@@ -6,12 +6,19 @@ const departmentGenerator: { [key: string]: string } = {
 };
 
 const assetTypeGenerator: { [key: string]: string } = {
+  macbook: "MBK",
+  macmini: "MNI",
+  imac: "IMC",
   laptop: "LPT",
   desktop: "DPT",
   mobile: "MBL",
-  monitor: "MON",
   keyboard: "KBD",
   mouse: "MUS",
+  monitor: "MON",
+  headset: "HST",
+  printer: "PRN",
+  router: "RTR",
+  other: "OTH",
 };
 
 const findYear = (date: Date) => {
