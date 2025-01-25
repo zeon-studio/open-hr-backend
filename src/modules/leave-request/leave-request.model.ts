@@ -31,10 +31,6 @@ const leaveSchema = new mongoose.Schema<LeaveRequestType>(
       required: true,
       default: "pending",
     },
-    submit_date: {
-      type: Date,
-      required: true,
-    },
     response_date: {
       type: Date,
     },

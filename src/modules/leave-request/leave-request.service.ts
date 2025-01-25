@@ -48,7 +48,26 @@ const getAllLeaveRequestService = async (
 
   let pipeline: PipelineStage[] = [matchStage];
 
-  pipeline.push({ $sort: { updatedAt: -1 } });
+  pipeline.push({
+    $addFields: {
+      isPending: {
+        $cond: { if: { $eq: ["$status", "pending"] }, then: 1, else: 0 },
+      },
+    },
+  });
+
+  pipeline.push({
+    $sort: {
+      isPending: -1,
+      createdAt: -1,
+    },
+  });
+
+  pipeline.push({
+    $project: {
+      isPending: 0,
+    },
+  });
 
   if (skip) {
     pipeline.push({ $skip: skip });
@@ -61,7 +80,12 @@ const getAllLeaveRequestService = async (
     $project: {
       _id: 1,
       employee_id: 1,
-      years: 1,
+      leave_type: 1,
+      start_date: 1,
+      end_date: 1,
+      day_count: 1,
+      reason: 1,
+      status: 1,
     },
   });
 

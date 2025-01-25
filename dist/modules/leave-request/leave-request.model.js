@@ -64,10 +64,6 @@ const leaveSchema = new mongoose_1.default.Schema({
         required: true,
         default: "pending",
     },
-    submit_date: {
-        type: Date,
-        required: true,
-    },
     response_date: {
         type: Date,
     },
