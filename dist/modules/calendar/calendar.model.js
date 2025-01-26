@@ -39,12 +39,10 @@ const calendarSchema = new mongoose_1.default.Schema({
     year: {
         type: Number,
         required: true,
+        unique: true,
     },
     holidays: [
         {
-            name: {
-                type: String,
-            },
             start_date: {
                 type: Date,
             },
@@ -61,9 +59,6 @@ const calendarSchema = new mongoose_1.default.Schema({
     ],
     events: [
         {
-            name: {
-                type: String,
-            },
             start_date: {
                 type: Date,
             },

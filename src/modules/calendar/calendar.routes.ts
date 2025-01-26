@@ -32,7 +32,7 @@ calendarRouter.get(
 
 // update data
 calendarRouter.patch(
-  "/:id",
+  "/:year",
   checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   calendarController.updateCalendarController
@@ -40,7 +40,7 @@ calendarRouter.patch(
 
 // delete data
 calendarRouter.delete(
-  "/:id",
+  "/:year",
   checkToken,
   auth(ENUM_ROLE.ADMIN),
   calendarController.deleteCalendarController

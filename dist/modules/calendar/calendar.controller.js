@@ -42,9 +42,9 @@ const createCalendarController = (0, catchAsync_1.default)((req, res) => __await
 }));
 // update data
 const updateCalendarController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
+    const year = req.params.year;
     const updateData = req.body;
-    yield calendar_service_1.calendarService.updateCalendarService(id, updateData);
+    yield calendar_service_1.calendarService.updateCalendarService(year, updateData);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,
@@ -53,8 +53,8 @@ const updateCalendarController = (0, catchAsync_1.default)((req, res) => __await
 }));
 // delete data
 const deleteCalendarController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    yield calendar_service_1.calendarService.deleteCalendarService(id);
+    const year = req.params.year;
+    yield calendar_service_1.calendarService.deleteCalendarService(year);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,

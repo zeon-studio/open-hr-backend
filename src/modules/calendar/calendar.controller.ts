@@ -37,10 +37,10 @@ const createCalendarController = catchAsync(
 // update data
 const updateCalendarController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const year = req.params.year;
     const updateData = req.body;
 
-    await calendarService.updateCalendarService(id, updateData);
+    await calendarService.updateCalendarService(year, updateData);
     sendResponse(res, {
       success: true,
       statusCode: 200,
@@ -52,8 +52,8 @@ const updateCalendarController = catchAsync(
 // delete data
 const deleteCalendarController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
-    await calendarService.deleteCalendarService(id);
+    const year = req.params.year;
+    await calendarService.deleteCalendarService(year);
 
     sendResponse(res, {
       success: true,

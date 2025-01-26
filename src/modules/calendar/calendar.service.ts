@@ -15,18 +15,19 @@ const createCalendarService = async (calendarData: CalendarType) => {
 
 // update calendar
 const updateCalendarService = async (
-  calendarId: string,
-  calendarData: CalendarType
+  year: string,
+  updateData: CalendarType
 ) => {
-  const calendar = await Calendar.findByIdAndUpdate(calendarId, calendarData, {
+  const calendar = await Calendar.findOneAndUpdate({ year }, updateData, {
     new: true,
   });
+
   return calendar;
 };
 
 // delete calendar
-const deleteCalendarService = async (calendarId: string) => {
-  const calendar = await Calendar.findByIdAndDelete(calendarId);
+const deleteCalendarService = async (year: string) => {
+  const calendar = await Calendar.findOneAndDelete({ year });
   return calendar;
 };
 

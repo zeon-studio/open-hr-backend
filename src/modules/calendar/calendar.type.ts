@@ -1,5 +1,4 @@
 export type Event = {
-  name: string;
   start_date: Date;
   end_date: Date;
   day_count: number;

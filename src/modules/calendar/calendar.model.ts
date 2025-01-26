@@ -6,12 +6,10 @@ const calendarSchema = new mongoose.Schema<CalendarType>(
     year: {
       type: Number,
       required: true,
+      unique: true,
     },
     holidays: [
       {
-        name: {
-          type: String,
-        },
         start_date: {
           type: Date,
         },
@@ -28,9 +26,6 @@ const calendarSchema = new mongoose.Schema<CalendarType>(
     ],
     events: [
       {
-        name: {
-          type: String,
-        },
         start_date: {
           type: Date,
         },

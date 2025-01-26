@@ -22,15 +22,15 @@ const createCalendarService = (calendarData) => __awaiter(void 0, void 0, void 0
     return calendar;
 });
 // update calendar
-const updateCalendarService = (calendarId, calendarData) => __awaiter(void 0, void 0, void 0, function* () {
-    const calendar = yield calendar_model_1.Calendar.findByIdAndUpdate(calendarId, calendarData, {
+const updateCalendarService = (year, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    const calendar = yield calendar_model_1.Calendar.findOneAndUpdate({ year }, updateData, {
         new: true,
     });
     return calendar;
 });
 // delete calendar
-const deleteCalendarService = (calendarId) => __awaiter(void 0, void 0, void 0, function* () {
-    const calendar = yield calendar_model_1.Calendar.findByIdAndDelete(calendarId);
+const deleteCalendarService = (year) => __awaiter(void 0, void 0, void 0, function* () {
+    const calendar = yield calendar_model_1.Calendar.findOneAndDelete({ year });
     return calendar;
 });
 // get upcoming events and holidays

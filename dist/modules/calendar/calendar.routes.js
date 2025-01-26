@@ -16,8 +16,8 @@ calendarRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.EN
 // get upcoming events and holidays
 calendarRouter.get("/upcoming", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), calendar_controller_1.calendarController.getUpcomingEventsAndHolidaysController);
 // update data
-calendarRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), calendar_controller_1.calendarController.updateCalendarController);
+calendarRouter.patch("/:year", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), calendar_controller_1.calendarController.updateCalendarController);
 // delete data
-calendarRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), calendar_controller_1.calendarController.deleteCalendarController);
+calendarRouter.delete("/:year", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), calendar_controller_1.calendarController.deleteCalendarController);
 exports.default = calendarRouter;
 //# sourceMappingURL=calendar.routes.js.map
