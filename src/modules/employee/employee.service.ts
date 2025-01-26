@@ -66,7 +66,17 @@ const getAllEmployeeService = async (
   }
 
   pipeline.push({
+    $lookup: {
+      from: "employee_jobs",
+      localField: "id",
+      foreignField: "employee_id",
+      as: "job",
+    },
+  });
+
+  pipeline.push({
     $project: {
+      _id: 0,
       id: 1,
       name: 1,
       image: 1,
@@ -90,6 +100,8 @@ const getAllEmployeeService = async (
       status: 1,
       note: 1,
       createdAt: 1,
+      department: { $arrayElemAt: ["$job.department", 0] },
+      designation: { $arrayElemAt: ["$job.designation", 0] },
     },
   });
 
