@@ -32,7 +32,7 @@ employeeDocumentRouter.patch(
 
 // delete data
 employeeDocumentRouter.delete(
-  "/:id",
+  "/:employeeId/:documentId",
   checkToken,
   auth(ENUM_ROLE.ADMIN),
   employeeDocumentController.deleteEmployeeDocumentController

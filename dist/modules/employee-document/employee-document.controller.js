@@ -55,8 +55,11 @@ const updateEmployeeDocumentController = (0, catchAsync_1.default)((req, res) =>
 }));
 // delete data
 const deleteEmployeeDocumentController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    yield employee_document_service_1.employeeDocumentService.deleteEmployeeDocumentService(id);
+    const { employeeId, documentId } = req.params;
+    yield employee_document_service_1.employeeDocumentService.deleteEmployeeDocumentService({
+        employeeId: employeeId,
+        documentId: documentId,
+    });
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,

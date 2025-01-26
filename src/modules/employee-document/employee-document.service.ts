@@ -113,8 +113,17 @@ const updateEmployeeDocumentService = async (
 };
 
 // delete
-const deleteEmployeeDocumentService = async (id: string) => {
-  await EmployeeDocument.findOneAndDelete({ employee_id: id });
+const deleteEmployeeDocumentService = async ({
+  employeeId,
+  documentId,
+}: {
+  employeeId: string;
+  documentId: string;
+}) => {
+  await EmployeeDocument.updateOne(
+    { employee_id: employeeId },
+    { $pull: { documents: { _id: documentId } } }
+  );
 };
 
 export const employeeDocumentService = {

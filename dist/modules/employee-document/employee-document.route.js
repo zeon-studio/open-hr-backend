@@ -16,6 +16,6 @@ employeeDocumentRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(
 // update data
 employeeDocumentRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_document_controller_1.employeeDocumentController.updateEmployeeDocumentController);
 // delete data
-employeeDocumentRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_document_controller_1.employeeDocumentController.deleteEmployeeDocumentController);
+employeeDocumentRouter.delete("/:employeeId/:documentId", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_document_controller_1.employeeDocumentController.deleteEmployeeDocumentController);
 exports.default = employeeDocumentRouter;
 //# sourceMappingURL=employee-document.route.js.map

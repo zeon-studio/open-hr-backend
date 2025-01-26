@@ -94,8 +94,8 @@ const updateEmployeeDocumentService = (id, updateData) => __awaiter(void 0, void
     }
 });
 // delete
-const deleteEmployeeDocumentService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield employee_document_model_1.EmployeeDocument.findOneAndDelete({ employee_id: id });
+const deleteEmployeeDocumentService = (_a) => __awaiter(void 0, [_a], void 0, function* ({ employeeId, documentId, }) {
+    yield employee_document_model_1.EmployeeDocument.updateOne({ employee_id: employeeId }, { $pull: { documents: { _id: documentId } } });
 });
 exports.employeeDocumentService = {
     getAllEmployeeDocumentService,

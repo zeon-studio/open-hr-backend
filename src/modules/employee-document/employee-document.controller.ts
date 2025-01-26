@@ -61,8 +61,11 @@ const updateEmployeeDocumentController = catchAsync(
 // delete data
 const deleteEmployeeDocumentController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
-    await employeeDocumentService.deleteEmployeeDocumentService(id);
+    const { employeeId, documentId } = req.params;
+    await employeeDocumentService.deleteEmployeeDocumentService({
+      employeeId: employeeId,
+      documentId: documentId,
+    });
 
     sendResponse(res, {
       success: true,
