@@ -2,7 +2,7 @@ import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import { PipelineStage } from "mongoose";
 import { Leave } from "./leave.model";
-import { LeaveFilterOptions, LeaveType } from "./leave.type";
+import { LeaveFilterOptions, LeaveType, LeaveYear } from "./leave.type";
 
 // get all data
 const getAllLeaveService = async (
@@ -16,22 +16,20 @@ const getAllLeaveService = async (
     paginationHelpers.calculatePagination(paginationOptions);
 
   // Extract search and filter options
-  const { search, employee_id } = filterOptions;
-
-  // Search condition
-  if (search) {
-    const searchKeyword = String(search).replace(/\+/g, " ");
-    const keywords = searchKeyword.split("|");
-    const searchConditions = keywords.map((keyword) => ({
-      $or: [{ name: { $regex: keyword, $options: "i" } }],
-    }));
-    matchStage.$match.$or = searchConditions;
+  const { year } = filterOptions;
+  if (!year) {
+    throw new Error("Year is required");
   }
 
-  // employee_id condition
-  if (employee_id) {
-    matchStage.$match.employee_id = employee_id;
+  // year filter
+  const parsedYear = parseInt(year);
+  if (isNaN(parsedYear)) {
+    throw new Error("Year must be a valid number");
   }
+
+  matchStage.$match.years = {
+    $elemMatch: { year: parsedYear },
+  };
 
   let pipeline: PipelineStage[] = [matchStage];
 
@@ -48,14 +46,33 @@ const getAllLeaveService = async (
     $project: {
       _id: 0,
       employee_id: 1,
-      years: 1,
+      years: {
+        $filter: {
+          input: "$years",
+          as: "year",
+          cond: { $eq: ["$$year.year", parsedYear] },
+        },
+      },
     },
   });
 
   const result = await Leave.aggregate(pipeline);
-  const total = await Leave.countDocuments();
+
+  // Transform the result to the desired format
+  const transformedResult = result.flatMap((leave: any) =>
+    leave.years.map((yearData: any) => ({
+      employee_id: leave.employee_id,
+      year: yearData.year,
+      casual: yearData.casual,
+      earned: yearData.earned,
+      sick: yearData.sick,
+      without_pay: yearData.without_pay,
+    }))
+  );
+
+  const total = await Leave.countDocuments(matchStage.$match);
   return {
-    result: result,
+    result: transformedResult,
     meta: {
       total: total,
     },
@@ -75,10 +92,18 @@ const createLeaveService = async (data: LeaveType) => {
 };
 
 // update
-const updateLeaveService = async (id: string, updateData: LeaveType) => {
-  const result = await Leave.findOneAndUpdate({ employee_id: id }, updateData, {
-    new: true,
-  });
+const updateLeaveService = async (
+  id: string,
+  year: number,
+  updateData: LeaveYear
+) => {
+  const result = await Leave.findOneAndUpdate(
+    { employee_id: id, "years.year": year },
+    { $set: { "years.$": updateData } },
+    {
+      new: true,
+    }
+  );
   return result;
 };
 

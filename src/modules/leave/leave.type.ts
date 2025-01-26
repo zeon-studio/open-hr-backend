@@ -24,6 +24,5 @@ export type LeaveType = {
 };
 
 export type LeaveFilterOptions = {
-  search?: string;
-  employee_id?: string;
+  year?: string;
 };

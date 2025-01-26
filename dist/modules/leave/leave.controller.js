@@ -21,7 +21,7 @@ const leave_service_1 = require("./leave.service");
 // get all data
 const getAllLeaveController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const paginationOptions = (0, filterPicker_1.default)(req.query, constants_1.paginationField);
-    const filterOption = (0, filterPicker_1.default)(req.query, ["search"]);
+    const filterOption = (0, filterPicker_1.default)(req.query, ["year"]);
     const leave = yield leave_service_1.leaveService.getAllLeaveService(paginationOptions, filterOption);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
@@ -56,8 +56,9 @@ const createLeaveController = (0, catchAsync_1.default)((req, res) => __awaiter(
 // update data
 const updateLeaveController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
+    const year = Number(req.params.year);
     const updateData = req.body;
-    yield leave_service_1.leaveService.updateLeaveService(id, updateData);
+    yield leave_service_1.leaveService.updateLeaveService(id, year, updateData);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,

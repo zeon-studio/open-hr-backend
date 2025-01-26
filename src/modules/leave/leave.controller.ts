@@ -9,7 +9,7 @@ import { leaveService } from "./leave.service";
 const getAllLeaveController = catchAsync(
   async (req: Request, res: Response) => {
     const paginationOptions = pick(req.query, paginationField);
-    const filterOption = pick(req.query, ["search"]);
+    const filterOption = pick(req.query, ["year"]);
 
     const leave = await leaveService.getAllLeaveService(
       paginationOptions,
@@ -57,9 +57,10 @@ const createLeaveController = catchAsync(
 const updateLeaveController = catchAsync(
   async (req: Request, res: Response) => {
     const id = req.params.id;
+    const year = Number(req.params.year);
     const updateData = req.body;
 
-    await leaveService.updateLeaveService(id, updateData);
+    await leaveService.updateLeaveService(id, year, updateData);
     sendResponse(res, {
       success: true,
       statusCode: 200,
