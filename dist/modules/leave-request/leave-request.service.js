@@ -93,9 +93,12 @@ const getAllLeaveRequestService = (paginationOptions, filterOptions) => __awaite
         },
     };
 });
-// get single data
+// get single employee data
 const getLeaveRequestService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield leave_request_model_1.LeaveRequest.findOne({ employee_id: id });
+    const result = yield leave_request_model_1.LeaveRequest.find({ employee_id: id }).sort({
+        isPending: -1,
+        createdAt: -1,
+    });
     return result;
 });
 // create
@@ -201,7 +204,28 @@ const updateLeaveRequestService = (id, updateData) => __awaiter(void 0, void 0, 
 });
 // delete
 const deleteLeaveRequestService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield leave_request_model_1.LeaveRequest.findOneAndDelete({ employee_id: id, status: "pending" });
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
+    try {
+        const leaveReqData = yield leave_request_model_1.LeaveRequest.findOne({ _id: id }).session(session);
+        // deduct leave days
+        const currentYear = leaveReqData.start_date.getFullYear();
+        yield leave_model_1.Leave.findOneAndUpdate({ employee_id: leaveReqData.employee_id, "years.year": currentYear }, {
+            $inc: {
+                [`years.$.${leaveReqData.leave_type}.consumed`]: -leaveReqData.day_count,
+            },
+        }, { session });
+        yield leave_request_model_1.LeaveRequest.findOneAndDelete({ _id: id, status: "pending" }).session(session);
+        yield session.commitTransaction();
+    }
+    catch (error) {
+        yield session.abortTransaction();
+        console.log(error);
+        throw new ApiError_1.default(error.message, 400);
+    }
+    finally {
+        session.endSession();
+    }
 });
 // get upcoming leave request
 const getUpcomingLeaveRequestService = (current_date) => __awaiter(void 0, void 0, void 0, function* () {

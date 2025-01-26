@@ -99,9 +99,12 @@ const getAllLeaveRequestService = async (
   };
 };
 
-// get single data
+// get single employee data
 const getLeaveRequestService = async (id: string) => {
-  const result = await LeaveRequest.findOne({ employee_id: id });
+  const result = await LeaveRequest.find({ employee_id: id }).sort({
+    isPending: -1,
+    createdAt: -1,
+  });
   return result;
 };
 
@@ -269,7 +272,38 @@ const updateLeaveRequestService = async (
 
 // delete
 const deleteLeaveRequestService = async (id: string) => {
-  await LeaveRequest.findOneAndDelete({ employee_id: id, status: "pending" });
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const leaveReqData = await LeaveRequest.findOne({ _id: id }).session(
+      session
+    );
+
+    // deduct leave days
+    const currentYear = leaveReqData!.start_date.getFullYear();
+    await Leave.findOneAndUpdate(
+      { employee_id: leaveReqData!.employee_id, "years.year": currentYear },
+      {
+        $inc: {
+          [`years.$.${leaveReqData!.leave_type}.consumed`]:
+            -leaveReqData!.day_count,
+        },
+      },
+      { session }
+    );
+
+    await LeaveRequest.findOneAndDelete({ _id: id, status: "pending" }).session(
+      session
+    );
+
+    await session.commitTransaction();
+  } catch (error: any) {
+    await session.abortTransaction();
+    console.log(error);
+    throw new ApiError(error.message, 400);
+  } finally {
+    session.endSession();
+  }
 };
 
 // get upcoming leave request
