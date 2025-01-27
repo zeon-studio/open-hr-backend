@@ -22,12 +22,12 @@ leaveRouter.get(
   leaveController.getLeaveController
 );
 
-// create data
-leaveRouter.post(
-  "/",
+// add new year data
+leaveRouter.patch(
+  "/update-year",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
-  leaveController.createLeaveController
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  leaveController.addNewYearLeaveController
 );
 
 // update data

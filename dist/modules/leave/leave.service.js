@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.leaveService = void 0;
+const constants_1 = require("../../config/constants");
 const paginationHelper_1 = require("../../lib/paginationHelper");
 const leave_model_1 = require("./leave.model");
 // get all data
@@ -75,10 +76,27 @@ const getLeaveService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield leave_model_1.Leave.findOne({ employee_id: id });
     return result;
 });
-// create
-const createLeaveService = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield leave_model_1.Leave.create(data);
-    return result;
+// renew
+const addNewYearLeaveService = (year) => __awaiter(void 0, void 0, void 0, function* () {
+    const createEmployeeLeaveData = {
+        year: year,
+        casual: {
+            allotted: constants_1.leaveAllottedDays.casual,
+            consumed: 0,
+        },
+        sick: {
+            allotted: constants_1.leaveAllottedDays.sick,
+            consumed: 0,
+        },
+        earned: {
+            allotted: constants_1.leaveAllottedDays.earned,
+            consumed: 0,
+        },
+        without_pay: {
+            allotted: constants_1.leaveAllottedDays.without_pay,
+            consumed: 0,
+        },
+    };
 });
 // update
 const updateLeaveService = (id, year, updateData) => __awaiter(void 0, void 0, void 0, function* () {
@@ -94,7 +112,7 @@ const deleteLeaveService = (id) => __awaiter(void 0, void 0, void 0, function* (
 exports.leaveService = {
     getAllLeaveService,
     getLeaveService,
-    createLeaveService,
+    addNewYearLeaveService,
     updateLeaveService,
     deleteLeaveService,
 };

@@ -39,11 +39,11 @@ const getLeaveController = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// create data
-const createLeaveController = catchAsync(
+// create new year leave
+const addNewYearLeaveController = catchAsync(
   async (req: Request, res: Response) => {
-    const leaveData = req.body;
-    const leave = await leaveService.createLeaveService(leaveData);
+    const year = Number(req.params.year);
+    const leave = await leaveService.addNewYearLeaveService(year);
     sendResponse(res, {
       success: true,
       statusCode: 200,
@@ -86,7 +86,7 @@ const deleteLeaveController = catchAsync(
 export const leaveController = {
   getAllLeaveController,
   getLeaveController,
-  createLeaveController,
+  addNewYearLeaveController,
   updateLeaveController,
   deleteLeaveController,
 };

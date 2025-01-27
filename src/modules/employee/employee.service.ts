@@ -1,3 +1,4 @@
+import { leaveAllottedDays } from "@/config/constants";
 import config from "@/config/variables";
 import ApiError from "@/errors/ApiError";
 import { generateEmployeeId } from "@/lib/IdGenerator";
@@ -209,11 +210,17 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
         {
           year: joiningDate.getFullYear(),
           casual: {
-            allotted: calculateRemainingLeave(joiningDate, 10),
+            allotted: calculateRemainingLeave(
+              joiningDate,
+              leaveAllottedDays.casual
+            ),
             consumed: 0,
           },
           sick: {
-            allotted: calculateRemainingLeave(joiningDate, 5),
+            allotted: calculateRemainingLeave(
+              joiningDate,
+              leaveAllottedDays.sick
+            ),
             consumed: 0,
           },
           earned: {
@@ -221,7 +228,10 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
             consumed: 0,
           },
           without_pay: {
-            allotted: calculateRemainingLeave(joiningDate, 30),
+            allotted: calculateRemainingLeave(
+              joiningDate,
+              leaveAllottedDays.without_pay
+            ),
             consumed: 0,
           },
         },

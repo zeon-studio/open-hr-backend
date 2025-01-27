@@ -1,8 +1,9 @@
+import { leaveAllottedDays } from "@/config/constants";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import { PipelineStage } from "mongoose";
 import { Leave } from "./leave.model";
-import { LeaveFilterOptions, LeaveType, LeaveYear } from "./leave.type";
+import { LeaveFilterOptions, LeaveYear } from "./leave.type";
 
 // get all data
 const getAllLeaveService = async (
@@ -85,10 +86,27 @@ const getLeaveService = async (id: string) => {
   return result;
 };
 
-// create
-const createLeaveService = async (data: LeaveType) => {
-  const result = await Leave.create(data);
-  return result;
+// renew
+const addNewYearLeaveService = async (year: number) => {
+  const createEmployeeLeaveData = {
+    year: year,
+    casual: {
+      allotted: leaveAllottedDays.casual,
+      consumed: 0,
+    },
+    sick: {
+      allotted: leaveAllottedDays.sick,
+      consumed: 0,
+    },
+    earned: {
+      allotted: leaveAllottedDays.earned,
+      consumed: 0,
+    },
+    without_pay: {
+      allotted: leaveAllottedDays.without_pay,
+      consumed: 0,
+    },
+  };
 };
 
 // update
@@ -115,7 +133,7 @@ const deleteLeaveService = async (id: string) => {
 export const leaveService = {
   getAllLeaveService,
   getLeaveService,
-  createLeaveService,
+  addNewYearLeaveService,
   updateLeaveService,
   deleteLeaveService,
 };
