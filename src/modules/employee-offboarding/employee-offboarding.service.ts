@@ -1,8 +1,12 @@
+import ApiError from "@/errors/ApiError";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
-import { PipelineStage } from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
+import { EmployeeJob } from "../employee-job/employee-job.model";
+import { Employee } from "../employee/employee.model";
 import { EmployeeOffboarding } from "./employee-offboarding.model";
 import {
+  EmployeeOffboardingCreate,
   EmployeeOffboardingFilterOptions,
   EmployeeOffboardingType,
 } from "./employee-offboarding.type";
@@ -71,6 +75,87 @@ const getAllEmployeeOffboardingService = async (
 const getEmployeeOffboardingService = async (id: string) => {
   const result = await EmployeeOffboarding.findOne({ employee_id: id });
   return result;
+};
+
+// create
+const createEmployeeOffboardingService = async (
+  data: EmployeeOffboardingCreate
+) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    // update employee status
+    await Employee.findOneAndUpdate(
+      { employee_id: data.employee_id },
+      { $set: { status: "archived" } },
+      { session }
+    );
+
+    // update resignation date on employee job
+    await EmployeeJob.findOneAndUpdate(
+      { employee_id: data.employee_id },
+      { $set: { resignation_date: data.resignation_date } },
+      { session }
+    );
+
+    const createEmployeeOffboardingData = {
+      employee_id: data.employee_id,
+      remove_fingerprint: {
+        task_name: "Remove Fingerprint",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      task_handover: {
+        task_name: "Handover Tasks",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      collect_id_card: {
+        task_name: "Collect ID Card",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      collect_email: {
+        task_name: "Collect Email Credentials",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      collect_devices: {
+        task_name: "Collect Devices",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      nda_agreement: {
+        task_name: "Provide NDA",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      provide_certificate: {
+        task_name: "Provide Certificate",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+      farewell: {
+        task_name: "Farewell",
+        assigned_to: "TFADM2022001",
+        status: "pending",
+      },
+    };
+
+    const result = await EmployeeOffboarding.create(
+      [createEmployeeOffboardingData],
+      { session }
+    );
+
+    await session.commitTransaction();
+    return result;
+  } catch (error: any) {
+    await session.abortTransaction();
+    console.log(error);
+    throw new ApiError(error.message, 400);
+  } finally {
+    session.endSession();
+  }
 };
 
 // update
@@ -173,6 +258,7 @@ const getPendingOffboardingTaskService = async () => {
 export const employeeOffboardingService = {
   getAllEmployeeOffboardingService,
   getEmployeeOffboardingService,
+  createEmployeeOffboardingService,
   updateEmployeeOffboardingService,
   updateOffboardingTaskStatusService,
   deleteEmployeeOffboardingService,

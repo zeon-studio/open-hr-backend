@@ -42,6 +42,17 @@ const getEmployeeOffboardingController = (0, catchAsync_1.default)((req, res) =>
         message: "data get successfully",
     });
 }));
+// create data
+const createEmployeeOffboardingController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const employeeOffboardingData = req.body;
+    const employeeOffboarding = yield employee_offboarding_service_1.employeeOffboardingService.createEmployeeOffboardingService(employeeOffboardingData);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: employeeOffboarding,
+        message: "data created successfully",
+    });
+}));
 // update data
 const updateEmployeeOffboardingController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -87,6 +98,7 @@ const getPendingOffboardingTaskController = (0, catchAsync_1.default)((req, res)
 exports.employeeOffboardingController = {
     getAllEmployeeOffboardingController,
     getEmployeeOffboardingController,
+    createEmployeeOffboardingController,
     updateEmployeeOffboardingController,
     updateOffboardingTaskStatusController,
     deleteEmployeeOffboardingController,

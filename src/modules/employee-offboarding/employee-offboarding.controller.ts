@@ -43,6 +43,23 @@ const getEmployeeOffboardingController = catchAsync(
   }
 );
 
+// create data
+const createEmployeeOffboardingController = catchAsync(
+  async (req: Request, res: Response) => {
+    const employeeOffboardingData = req.body;
+    const employeeOffboarding =
+      await employeeOffboardingService.createEmployeeOffboardingService(
+        employeeOffboardingData
+      );
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: employeeOffboarding,
+      message: "data created successfully",
+    });
+  }
+);
+
 // update data
 const updateEmployeeOffboardingController = catchAsync(
   async (req: Request, res: Response) => {
@@ -110,6 +127,7 @@ const getPendingOffboardingTaskController = catchAsync(
 export const employeeOffboardingController = {
   getAllEmployeeOffboardingController,
   getEmployeeOffboardingController,
+  createEmployeeOffboardingController,
   updateEmployeeOffboardingController,
   updateOffboardingTaskStatusController,
   deleteEmployeeOffboardingController,

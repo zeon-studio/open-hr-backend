@@ -13,6 +13,8 @@ const employeeOffboardingRouter = express_1.default.Router();
 employeeOffboardingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_offboarding_controller_1.employeeOffboardingController.getAllEmployeeOffboardingController);
 // get pending onboarding task
 employeeOffboardingRouter.get("/pending-task", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.getPendingOffboardingTaskController);
+// create data
+employeeOffboardingRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.createEmployeeOffboardingController);
 // update task status
 employeeOffboardingRouter.patch("/task/:id/:task", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.updateOffboardingTaskStatusController);
 // get single data

@@ -8,9 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeOffboardingService = void 0;
+const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const paginationHelper_1 = require("../../lib/paginationHelper");
+const mongoose_1 = __importDefault(require("mongoose"));
+const employee_job_model_1 = require("../employee-job/employee-job.model");
+const employee_model_1 = require("../employee/employee.model");
 const employee_offboarding_model_1 = require("./employee-offboarding.model");
 // get all data
 const getAllEmployeeOffboardingService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -64,6 +71,71 @@ const getAllEmployeeOffboardingService = (paginationOptions, filterOptions) => _
 const getEmployeeOffboardingService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield employee_offboarding_model_1.EmployeeOffboarding.findOne({ employee_id: id });
     return result;
+});
+// create
+const createEmployeeOffboardingService = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
+    try {
+        // update employee status
+        yield employee_model_1.Employee.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { status: "archived" } }, { session });
+        // update resignation date on employee job
+        yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { resignation_date: data.resignation_date } }, { session });
+        const createEmployeeOffboardingData = {
+            employee_id: data.employee_id,
+            remove_fingerprint: {
+                task_name: "Remove Fingerprint",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            task_handover: {
+                task_name: "Handover Tasks",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            collect_id_card: {
+                task_name: "Collect ID Card",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            collect_email: {
+                task_name: "Collect Email Credentials",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            collect_devices: {
+                task_name: "Collect Devices",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            nda_agreement: {
+                task_name: "Provide NDA",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            provide_certificate: {
+                task_name: "Provide Certificate",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+            farewell: {
+                task_name: "Farewell",
+                assigned_to: "TFADM2022001",
+                status: "pending",
+            },
+        };
+        const result = yield employee_offboarding_model_1.EmployeeOffboarding.create([createEmployeeOffboardingData], { session });
+        yield session.commitTransaction();
+        return result;
+    }
+    catch (error) {
+        yield session.abortTransaction();
+        console.log(error);
+        throw new ApiError_1.default(error.message, 400);
+    }
+    finally {
+        session.endSession();
+    }
 });
 // update
 const updateEmployeeOffboardingService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
@@ -142,6 +214,7 @@ const getPendingOffboardingTaskService = () => __awaiter(void 0, void 0, void 0,
 exports.employeeOffboardingService = {
     getAllEmployeeOffboardingService,
     getEmployeeOffboardingService,
+    createEmployeeOffboardingService,
     updateEmployeeOffboardingService,
     updateOffboardingTaskStatusService,
     deleteEmployeeOffboardingService,

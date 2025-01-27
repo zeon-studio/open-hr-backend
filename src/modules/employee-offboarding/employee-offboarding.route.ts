@@ -22,6 +22,14 @@ employeeOffboardingRouter.get(
   employeeOffboardingController.getPendingOffboardingTaskController
 );
 
+// create data
+employeeOffboardingRouter.post(
+  "/",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  employeeOffboardingController.createEmployeeOffboardingController
+);
+
 // update task status
 employeeOffboardingRouter.patch(
   "/task/:id/:task",

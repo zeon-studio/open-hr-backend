@@ -16,6 +16,11 @@ export type EmployeeOffboardingType = {
   farewell: OffboardingTask;
 };
 
+export type EmployeeOffboardingCreate = {
+  employee_id: string;
+  resignation_date: Date;
+};
+
 export type EmployeeOffboardingFilterOptions = {
   search?: string;
 };
