@@ -11,7 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.leaveService = void 0;
 const constants_1 = require("../../config/constants");
+const dateConverter_1 = require("../../lib/dateConverter");
 const paginationHelper_1 = require("../../lib/paginationHelper");
+const employee_job_model_1 = require("../employee-job/employee-job.model");
 const leave_model_1 = require("./leave.model");
 // get all data
 const getAllLeaveService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -76,27 +78,53 @@ const getLeaveService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield leave_model_1.Leave.findOne({ employee_id: id });
     return result;
 });
-// renew
+// add new year data
 const addNewYearLeaveService = (year) => __awaiter(void 0, void 0, void 0, function* () {
-    const createEmployeeLeaveData = {
-        year: year,
-        casual: {
-            allotted: constants_1.leaveAllottedDays.casual,
-            consumed: 0,
-        },
-        sick: {
-            allotted: constants_1.leaveAllottedDays.sick,
-            consumed: 0,
-        },
-        earned: {
-            allotted: constants_1.leaveAllottedDays.earned,
-            consumed: 0,
-        },
-        without_pay: {
-            allotted: constants_1.leaveAllottedDays.without_pay,
-            consumed: 0,
-        },
-    };
+    // Check if the year data already exists
+    const existingYearData = yield leave_model_1.Leave.findOne({ "years.year": year });
+    if (existingYearData) {
+        return { message: "Year data already exists" };
+    }
+    const employees = yield employee_job_model_1.EmployeeJob.find({});
+    for (const employee of employees) {
+        const createEmployeeLeaveData = {
+            year: year,
+            casual: {
+                allotted: constants_1.leaveAllottedDays.casual,
+                consumed: 0,
+            },
+            sick: {
+                allotted: constants_1.leaveAllottedDays.sick,
+                consumed: 0,
+            },
+            earned: {
+                allotted: constants_1.leaveAllottedDays.earned,
+                consumed: 0,
+            },
+            without_pay: {
+                allotted: constants_1.leaveAllottedDays.without_pay,
+                consumed: 0,
+            },
+        };
+        const previousYearData = yield leave_model_1.Leave.findOne({
+            employee_id: employee.employee_id,
+            "years.year": year - 1,
+        });
+        const permanentDate = new Date(employee.permanent_date);
+        const currentDate = new Date(`01-01-${year}`);
+        if (!(0, dateConverter_1.isOneYearPassed)(permanentDate, currentDate)) {
+            createEmployeeLeaveData.earned.allotted = 0;
+        }
+        if (previousYearData) {
+            const previousYear = previousYearData.years.find((y) => y.year === year - 1);
+            if (previousYear) {
+                createEmployeeLeaveData.earned.allotted +=
+                    previousYear.earned.allotted - previousYear.earned.consumed;
+            }
+        }
+        yield leave_model_1.Leave.updateMany({ employee_id: employee.employee_id, "years.year": { $ne: year } }, { $push: { years: createEmployeeLeaveData } });
+    }
+    return { message: "Year data added successfully" };
 });
 // update
 const updateLeaveService = (id, year, updateData) => __awaiter(void 0, void 0, void 0, function* () {
