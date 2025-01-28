@@ -68,6 +68,25 @@ const getAllEmployeeJobService = (paginationOptions, filterOptions) => __awaiter
         },
     };
 });
+// promote employee
+const promoteEmployee = (employeeId, promotions) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Find the employee job document
+        const job = yield employee_job_model_1.EmployeeJob.findOne({ employee_id: employeeId });
+        if (!job) {
+            throw new Error("Employee job not found");
+        }
+        // Replace the promotions field with the new array
+        const result = yield employee_job_model_1.EmployeeJob.updateOne({ employee_id: employeeId }, { $set: { promotions: promotions } });
+        if (result.modifiedCount === 0) {
+            throw new Error("Promotions were not updated");
+        }
+        return result;
+    }
+    catch (error) {
+        console.error("Error updating promotions:", error);
+    }
+});
 // get single data
 const getEmployeeJobService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield employee_job_model_1.EmployeeJob.findOne({ employee_id: id });
@@ -75,7 +94,7 @@ const getEmployeeJobService = (id) => __awaiter(void 0, void 0, void 0, function
 });
 // update
 const updateEmployeeJobService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const job = yield employee_job_model_1.EmployeeJob.findOne({ platform: id });
+    const job = yield employee_job_model_1.EmployeeJob.findOne({ employee_id: id });
     if (job) {
         // Update existing jobs or add new ones
         updateData.prev_jobs.forEach((newJob) => {
@@ -108,5 +127,6 @@ exports.employeeJobService = {
     getEmployeeJobService,
     deleteEmployeeJobService,
     updateEmployeeJobService,
+    promoteEmployee,
 };
 //# sourceMappingURL=employee-job.service.js.map

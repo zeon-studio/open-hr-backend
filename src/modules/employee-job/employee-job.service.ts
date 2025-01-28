@@ -73,6 +73,35 @@ const getAllEmployeeJobService = async (
   };
 };
 
+// promote employee
+
+const promoteEmployee = async (
+  employeeId: string,
+  promotions: EmployeeJobType["promotions"]
+) => {
+  try {
+    // Find the employee job document
+    const job = await EmployeeJob.findOne({ employee_id: employeeId });
+    if (!job) {
+      throw new Error("Employee job not found");
+    }
+
+    // Replace the promotions field with the new array
+    const result = await EmployeeJob.updateOne(
+      { employee_id: employeeId },
+      { $set: { promotions: promotions } }
+    );
+
+    if (result.modifiedCount === 0) {
+      throw new Error("Promotions were not updated");
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error updating promotions:", error);
+  }
+};
+
 // get single data
 const getEmployeeJobService = async (id: string) => {
   const result = await EmployeeJob.findOne({ employee_id: id });
@@ -84,8 +113,7 @@ const updateEmployeeJobService = async (
   id: string,
   updateData: EmployeeJobType
 ) => {
-  const job = await EmployeeJob.findOne({ platform: id });
-
+  const job = await EmployeeJob.findOne({ employee_id: id });
   if (job) {
     // Update existing jobs or add new ones
     updateData.prev_jobs.forEach((newJob) => {
@@ -123,4 +151,5 @@ export const employeeJobService = {
   getEmployeeJobService,
   deleteEmployeeJobService,
   updateEmployeeJobService,
+  promoteEmployee,
 };
