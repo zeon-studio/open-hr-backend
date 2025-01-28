@@ -12,14 +12,15 @@ const getAllCalendarService = async (year: number) => {
 const createCalendarService = async (calendarData: CalendarType) => {
   calendarData.holidays = calendarData.holidays.map((holiday) => ({
     ...holiday,
-    start_date: localDate(holiday.start_date),
-    end_date: localDate(holiday.end_date),
+    start_date: localDate(new Date(holiday.start_date)),
+    end_date: localDate(new Date(holiday.end_date)),
   }));
   calendarData.events = calendarData.events.map((event) => ({
     ...event,
-    start_date: localDate(event.start_date),
-    end_date: localDate(event.end_date),
+    start_date: localDate(new Date(event.start_date)),
+    end_date: localDate(new Date(event.end_date)),
   }));
+
   const calendar = await Calendar.create(calendarData);
   return calendar;
 };
@@ -31,13 +32,13 @@ const updateCalendarService = async (
 ) => {
   updateData.holidays = updateData.holidays.map((holiday) => ({
     ...holiday,
-    start_date: localDate(holiday.start_date),
-    end_date: localDate(holiday.end_date),
+    start_date: localDate(new Date(holiday.start_date)),
+    end_date: localDate(new Date(holiday.end_date)),
   }));
   updateData.events = updateData.events.map((event) => ({
     ...event,
-    start_date: localDate(event.start_date),
-    end_date: localDate(event.end_date),
+    start_date: localDate(new Date(event.start_date)),
+    end_date: localDate(new Date(event.end_date)),
   }));
   const calendar = await Calendar.findOneAndUpdate({ year }, updateData, {
     new: true,

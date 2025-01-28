@@ -11,8 +11,7 @@ const formatDate = (date, pattern = "EEEE, dd MMMM, yyyy") => {
 };
 exports.formatDate = formatDate;
 const localDate = (date) => {
-    const removeTime = new Date(date).toISOString().split("T")[0];
-    const utcDate = new Date(removeTime);
+    const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
     const dhakaTime = (0, date_fns_1.add)(utcDate, { hours: 6 });
     return dhakaTime;
 };

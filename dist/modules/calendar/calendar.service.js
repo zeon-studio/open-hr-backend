@@ -19,15 +19,15 @@ const getAllCalendarService = (year) => __awaiter(void 0, void 0, void 0, functi
 });
 // create calendar
 const createCalendarService = (calendarData) => __awaiter(void 0, void 0, void 0, function* () {
-    calendarData.holidays = calendarData.holidays.map((holiday) => (Object.assign(Object.assign({}, holiday), { start_date: (0, dateConverter_1.localDate)(holiday.start_date), end_date: (0, dateConverter_1.localDate)(holiday.end_date) })));
-    calendarData.events = calendarData.events.map((event) => (Object.assign(Object.assign({}, event), { start_date: (0, dateConverter_1.localDate)(event.start_date), end_date: (0, dateConverter_1.localDate)(event.end_date) })));
+    calendarData.holidays = calendarData.holidays.map((holiday) => (Object.assign(Object.assign({}, holiday), { start_date: (0, dateConverter_1.localDate)(new Date(holiday.start_date)), end_date: (0, dateConverter_1.localDate)(new Date(holiday.end_date)) })));
+    calendarData.events = calendarData.events.map((event) => (Object.assign(Object.assign({}, event), { start_date: (0, dateConverter_1.localDate)(new Date(event.start_date)), end_date: (0, dateConverter_1.localDate)(new Date(event.end_date)) })));
     const calendar = yield calendar_model_1.Calendar.create(calendarData);
     return calendar;
 });
 // update calendar
 const updateCalendarService = (year, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    updateData.holidays = updateData.holidays.map((holiday) => (Object.assign(Object.assign({}, holiday), { start_date: (0, dateConverter_1.localDate)(holiday.start_date), end_date: (0, dateConverter_1.localDate)(holiday.end_date) })));
-    updateData.events = updateData.events.map((event) => (Object.assign(Object.assign({}, event), { start_date: (0, dateConverter_1.localDate)(event.start_date), end_date: (0, dateConverter_1.localDate)(event.end_date) })));
+    updateData.holidays = updateData.holidays.map((holiday) => (Object.assign(Object.assign({}, holiday), { start_date: (0, dateConverter_1.localDate)(new Date(holiday.start_date)), end_date: (0, dateConverter_1.localDate)(new Date(holiday.end_date)) })));
+    updateData.events = updateData.events.map((event) => (Object.assign(Object.assign({}, event), { start_date: (0, dateConverter_1.localDate)(new Date(event.start_date)), end_date: (0, dateConverter_1.localDate)(new Date(event.end_date)) })));
     const calendar = yield calendar_model_1.Calendar.findOneAndUpdate({ year }, updateData, {
         new: true,
     });

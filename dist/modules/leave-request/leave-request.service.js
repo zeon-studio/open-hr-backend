@@ -106,8 +106,8 @@ const createLeaveRequestService = (data) => __awaiter(void 0, void 0, void 0, fu
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
-        const startDate = (0, dateConverter_1.localDate)(data.start_date);
-        const endDate = (0, dateConverter_1.localDate)(data.end_date);
+        const startDate = (0, dateConverter_1.localDate)(new Date(data.start_date));
+        const endDate = (0, dateConverter_1.localDate)(new Date(data.end_date));
         const dayCount = yield (0, leaveHelper_1.dayCounterWithoutHoliday)(startDate, endDate);
         data = Object.assign(Object.assign({}, data), { start_date: startDate, end_date: endDate, day_count: dayCount });
         const leaveData = yield (0, leaveHelper_1.leaveValidator)(data);
