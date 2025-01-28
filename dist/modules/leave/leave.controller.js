@@ -42,10 +42,10 @@ const getLeaveController = (0, catchAsync_1.default)((req, res) => __awaiter(voi
         message: "data get successfully",
     });
 }));
-// create data
-const createLeaveController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const leaveData = req.body;
-    const leave = yield leave_service_1.leaveService.createLeaveService(leaveData);
+// create new year leave
+const addNewYearLeaveController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const year = Number(req.params.year);
+    const leave = yield leave_service_1.leaveService.addNewYearLeaveService(year);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,
@@ -78,7 +78,7 @@ const deleteLeaveController = (0, catchAsync_1.default)((req, res) => __awaiter(
 exports.leaveController = {
     getAllLeaveController,
     getLeaveController,
-    createLeaveController,
+    addNewYearLeaveController,
     updateLeaveController,
     deleteLeaveController,
 };

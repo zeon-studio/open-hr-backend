@@ -1,8 +1,11 @@
+import { leaveAllottedDays } from "@/config/constants";
+import { isOneYearPassed } from "@/lib/dateConverter";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import { PipelineStage } from "mongoose";
+import { EmployeeJob } from "../employee-job/employee-job.model";
 import { Leave } from "./leave.model";
-import { LeaveFilterOptions, LeaveType, LeaveYear } from "./leave.type";
+import { LeaveFilterOptions, LeaveYear } from "./leave.type";
 
 // get all data
 const getAllLeaveService = async (
@@ -85,10 +88,65 @@ const getLeaveService = async (id: string) => {
   return result;
 };
 
-// create
-const createLeaveService = async (data: LeaveType) => {
-  const result = await Leave.create(data);
-  return result;
+// add new year data
+const addNewYearLeaveService = async (year: number) => {
+  // Check if the year data already exists
+  const existingYearData = await Leave.findOne({ "years.year": year });
+  if (existingYearData) {
+    return { message: "Year data already exists" };
+  }
+
+  const employees = await EmployeeJob.find({});
+
+  for (const employee of employees) {
+    const createEmployeeLeaveData = {
+      year: year,
+      casual: {
+        allotted: leaveAllottedDays.casual,
+        consumed: 0,
+      },
+      sick: {
+        allotted: leaveAllottedDays.sick,
+        consumed: 0,
+      },
+      earned: {
+        allotted: leaveAllottedDays.earned,
+        consumed: 0,
+      },
+      without_pay: {
+        allotted: leaveAllottedDays.without_pay,
+        consumed: 0,
+      },
+    };
+    const previousYearData = await Leave.findOne({
+      employee_id: employee.employee_id,
+      "years.year": year - 1,
+    });
+
+    const permanentDate = new Date(employee.permanent_date);
+    const currentDate = new Date(`01-01-${year}`);
+
+    if (!isOneYearPassed(permanentDate, currentDate)) {
+      createEmployeeLeaveData.earned.allotted = 0;
+    }
+
+    if (previousYearData) {
+      const previousYear = previousYearData.years.find(
+        (y: any) => y.year === year - 1
+      );
+      if (previousYear) {
+        createEmployeeLeaveData.earned.allotted +=
+          previousYear.earned.allotted - previousYear.earned.consumed;
+      }
+    }
+
+    await Leave.updateMany(
+      { employee_id: employee.employee_id, "years.year": { $ne: year } },
+      { $push: { years: createEmployeeLeaveData } }
+    );
+  }
+
+  return { message: "Year data added successfully" };
 };
 
 // update
@@ -115,7 +173,7 @@ const deleteLeaveService = async (id: string) => {
 export const leaveService = {
   getAllLeaveService,
   getLeaveService,
-  createLeaveService,
+  addNewYearLeaveService,
   updateLeaveService,
   deleteLeaveService,
 };

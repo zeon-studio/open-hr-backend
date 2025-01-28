@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.invitationTemplate = invitationTemplate;
+exports.offboardingTemplate = offboardingTemplate;
 exports.leaveRequestTemplate = leaveRequestTemplate;
 exports.leaveRequestDiscordTemplate = leaveRequestDiscordTemplate;
 exports.leaveRequestApprovedTemplate = leaveRequestApprovedTemplate;
@@ -8,8 +9,8 @@ exports.leaveRequestRejectedTemplate = leaveRequestRejectedTemplate;
 const dateConverter_1 = require("./dateConverter");
 // invitation template
 function invitationTemplate(designation, joining_date, invite_token) {
-    return `<div style="text-align: center;">
-    <h1>Welcome to Themefisher!</h1>
+    return `<div style="text-align: center; font-family: Arial, sans-serif; color: #333;">
+    <h1 style="color: #007bff;">Welcome to Themefisher!</h1>
     <br>
     <br>
     <br>
@@ -23,18 +24,34 @@ function invitationTemplate(designation, joining_date, invite_token) {
     </div>
     `;
 }
+// offboarding template
+function offboardingTemplate(name, resignation_date) {
+    return `
+  <div style="font-family: Arial, sans-serif; color: #333;">
+    <p>Dear ${name},</p>
+
+    <p>We regret to inform you that your employment has been terminated effective ${(0, dateConverter_1.formatDate)(resignation_date)}.</p>
+
+    <p>We appreciate your contributions to the company and wish you all the best in your future endeavors.</p>
+
+    <p>Best Regards,<br>Admin Team</p>
+  </div>
+  `;
+}
 // leave request template
 function leaveRequestTemplate(name, leaveType, dayCount, startDate, endDate, reason) {
     return `
-  <p>${name} has submitted a request for leave. Below are the details:</p>
+  <div style="font-family: Arial, sans-serif; color: #333;">
+    <p>${name} has submitted a request for leave. Below are the details:</p>
 
-  <ul>
-    <li style="text-transform: capitalize;">Type of Leave: ${leaveType}</li>
-    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${startDate}` : `${dayCount} days starts from ${startDate} to ${endDate}`}</li>
-    <li>Reason: ${reason}</li>
-  </ul>
+    <ul style="list-style-type: none; padding: 0;">
+      <li style="text-transform: capitalize; margin-bottom: 5px;"><strong>Type of Leave:</strong> ${leaveType}</li>
+      <li style="margin-bottom: 5px;"><strong>Number of ${dayCount === 1 ? "Day" : "Days"}:</strong> ${dayCount === 1 ? `${dayCount} day on ${(0, dateConverter_1.formatDate)(startDate)}` : `${dayCount} days starts from ${(0, dateConverter_1.formatDate)(startDate)} to ${(0, dateConverter_1.formatDate)(endDate)}`}</li>
+      <li style="margin-bottom: 5px;"><strong>Reason:</strong> ${reason}</li>
+    </ul>
 
-  <p>To accept or reject the request please visit <a href="https://erp.teamosis.com/request">Teamosis ERP</a></p>
+    <p>To accept or reject the request please visit <a href="https://erp.teamosis.com/request" style="color: #007bff;">Themefisher ERP</a></p>
+  </div>
   `;
 }
 // leave request discord template
@@ -44,41 +61,45 @@ function leaveRequestDiscordTemplate(name, leaveType, dayCount, startDate, endDa
 // leave Request Approved Template
 function leaveRequestApprovedTemplate(name, leaveType, dayCount, startDate, endDate, reason) {
     return `
-  <p>Dear ${name},</p>
+  <div style="font-family: Arial, sans-serif; color: #333;">
+    <p>Dear ${name},</p>
 
-  <p>I hope this message finds you well. Your request for leave has been reviewed and approved. Below are the details:</p>
+    <p>I hope this message finds you well. Your request for leave has been reviewed and approved. Below are the details:</p>
 
-  <ul>
-    <li>Type of Leave: ${leaveType}</li>
-    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${(0, dateConverter_1.formatDate)(startDate)}` : `${dayCount} days starts from ${(0, dateConverter_1.formatDate)(startDate)} to ${(0, dateConverter_1.formatDate)(endDate)}`}</li>
-    <li>Reason: ${reason}</li>
-  </ul>
+    <ul style="list-style-type: none; padding: 0;">
+      <li style="margin-bottom: 5px;"><strong>Type of Leave:</strong> ${leaveType}</li>
+      <li style="margin-bottom: 5px;"><strong>Number of ${dayCount === 1 ? "Day" : "Days"}:</strong> ${dayCount === 1 ? `${dayCount} day on ${(0, dateConverter_1.formatDate)(startDate)}` : `${dayCount} days starts from ${(0, dateConverter_1.formatDate)(startDate)} to ${(0, dateConverter_1.formatDate)(endDate)}`}</li>
+      <li style="margin-bottom: 5px;"><strong>Reason:</strong> ${reason}</li>
+    </ul>
 
-  <p>Please ensure all necessary handovers and preparations are made before your leave period begins.</p>
+    <p>Please ensure all necessary handovers and preparations are made before your leave period begins.</p>
 
-  <p>Thank you for following the proper procedures for your leave request. We hope you have a restful time off.</p>
+    <p>Thank you for following the proper procedures for your leave request. We hope you have a restful time off.</p>
 
-  <p>Best Regards,<br>Admin Team</p>
-`;
+    <p>Best Regards,<br>Admin Team</p>
+  </div>
+  `;
 }
 // leave Request Rejected Template
 function leaveRequestRejectedTemplate(name, leaveType, dayCount, startDate, endDate, reason) {
     return `
-  <p>Dear ${name},</p>
-          
-  <p>I regret to inform you that your request for leave has been reviewed but cannot be approved at this time. Below are the details of your request:</p>
+  <div style="font-family: Arial, sans-serif; color: #333;">
+    <p>Dear ${name},</p>
+            
+    <p>I regret to inform you that your request for leave has been reviewed but cannot be approved at this time. Below are the details of your request:</p>
 
-  <ul>
-    <li>Type of Leave: ${leaveType}</li>
-    <li>Number of ${dayCount === 1 ? "Day" : "Days"}: ${dayCount === 1 ? `${dayCount} day on ${(0, dateConverter_1.formatDate)(startDate)}` : `${dayCount} days starts from ${(0, dateConverter_1.formatDate)(startDate)} to ${(0, dateConverter_1.formatDate)(endDate)}`}</li>
-    <li>Reason: ${reason}</li>
-  </ul>
+    <ul style="list-style-type: none; padding: 0;">
+      <li style="margin-bottom: 5px;"><strong>Type of Leave:</strong> ${leaveType}</li>
+      <li style="margin-bottom: 5px;"><strong>Number of ${dayCount === 1 ? "Day" : "Days"}:</strong> ${dayCount === 1 ? `${dayCount} day on ${(0, dateConverter_1.formatDate)(startDate)}` : `${dayCount} days starts from ${(0, dateConverter_1.formatDate)(startDate)} to ${(0, dateConverter_1.formatDate)(endDate)}`}</li>
+      <li style="margin-bottom: 5px;"><strong>Reason:</strong> ${reason}</li>
+    </ul>
 
-  <p>We understand the importance of time off, but due to current circumstances, your request cannot be accommodated. Please reach out if you need further clarification or assistance.</p>
+    <p>We understand the importance of time off, but due to current circumstances, your request cannot be accommodated. Please reach out if you need further clarification or assistance.</p>
 
-  <p>We appreciate your understanding and encourage you to discuss any alternative options with your supervisor.</p>
+    <p>We appreciate your understanding and encourage you to discuss any alternative options with your supervisor.</p>
 
-  <p>Best Regards,<br>Admin Team</p>
+    <p>Best Regards,<br>Admin Team</p>
+  </div>
   `;
 }
 //# sourceMappingURL=mailTemplate.js.map

@@ -16,3 +16,19 @@ export const localDate = (date: Date) => {
   const dhakaTime = add(utcDate, { hours: 6 });
   return dhakaTime;
 };
+
+export const isOneYearPassed = (prevDate: Date, currentDate: Date) => {
+  const oneYearLater = new Date(prevDate);
+  oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+
+  // Compare only the date values
+  const isPassed =
+    oneYearLater.getFullYear() < currentDate.getFullYear() ||
+    (oneYearLater.getFullYear() === currentDate.getFullYear() &&
+      oneYearLater.getMonth() < currentDate.getMonth()) ||
+    (oneYearLater.getFullYear() === currentDate.getFullYear() &&
+      oneYearLater.getMonth() === currentDate.getMonth() &&
+      oneYearLater.getDate() <= currentDate.getDate());
+
+  return isPassed;
+};

@@ -10,19 +10,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calendarService = void 0;
+const dateConverter_1 = require("../../lib/dateConverter");
 const calendar_model_1 = require("./calendar.model");
 // get all calendars
-const getAllCalendarService = () => __awaiter(void 0, void 0, void 0, function* () {
-    const calendars = yield calendar_model_1.Calendar.find();
+const getAllCalendarService = (year) => __awaiter(void 0, void 0, void 0, function* () {
+    const calendars = yield calendar_model_1.Calendar.find({ year: year });
     return calendars;
 });
 // create calendar
 const createCalendarService = (calendarData) => __awaiter(void 0, void 0, void 0, function* () {
+    calendarData.holidays = calendarData.holidays.map((holiday) => (Object.assign(Object.assign({}, holiday), { start_date: (0, dateConverter_1.localDate)(holiday.start_date), end_date: (0, dateConverter_1.localDate)(holiday.end_date) })));
+    calendarData.events = calendarData.events.map((event) => (Object.assign(Object.assign({}, event), { start_date: (0, dateConverter_1.localDate)(event.start_date), end_date: (0, dateConverter_1.localDate)(event.end_date) })));
     const calendar = yield calendar_model_1.Calendar.create(calendarData);
     return calendar;
 });
 // update calendar
 const updateCalendarService = (year, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    updateData.holidays = updateData.holidays.map((holiday) => (Object.assign(Object.assign({}, holiday), { start_date: (0, dateConverter_1.localDate)(holiday.start_date), end_date: (0, dateConverter_1.localDate)(holiday.end_date) })));
+    updateData.events = updateData.events.map((event) => (Object.assign(Object.assign({}, event), { start_date: (0, dateConverter_1.localDate)(event.start_date), end_date: (0, dateConverter_1.localDate)(event.end_date) })));
     const calendar = yield calendar_model_1.Calendar.findOneAndUpdate({ year }, updateData, {
         new: true,
     });

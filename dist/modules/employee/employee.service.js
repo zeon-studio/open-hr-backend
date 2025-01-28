@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeService = void 0;
+const constants_1 = require("../../config/constants");
 const variables_1 = __importDefault(require("../../config/variables"));
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const IdGenerator_1 = require("../../lib/IdGenerator");
@@ -180,11 +181,11 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
                 {
                     year: joiningDate.getFullYear(),
                     casual: {
-                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, 10),
+                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, constants_1.leaveAllottedDays.casual),
                         consumed: 0,
                     },
                     sick: {
-                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, 5),
+                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, constants_1.leaveAllottedDays.sick),
                         consumed: 0,
                     },
                     earned: {
@@ -192,7 +193,7 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
                         consumed: 0,
                     },
                     without_pay: {
-                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, 30),
+                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, constants_1.leaveAllottedDays.without_pay),
                         consumed: 0,
                     },
                 },
