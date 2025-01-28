@@ -98,7 +98,7 @@ const createEmployeeController = catchAsync(
 // update controller
 const updateEmployeeController = catchAsync(
   async (req: Request, res: Response) => {
-    const employeeData = req.body.employeeData;
+    const employeeData = req.body;
     const updateData = await employeeService.updateEmployeeService(
       employeeData,
       req.params.id

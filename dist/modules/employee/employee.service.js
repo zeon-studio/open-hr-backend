@@ -267,7 +267,9 @@ const updateEmployeeService = (updatedData, id) => __awaiter(void 0, void 0, voi
     // ) {
     //   await deleteFile(employee?.image);
     // }
-    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, updatedData, {
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, {
+        $set: updatedData,
+    }, {
         new: true,
     });
     return result;

@@ -31,7 +31,6 @@ const getEmployeeJobController = catchAsync(
   async (req: Request, res: Response) => {
     const id = req.params.id;
     const employeeJob = await employeeJobService.getEmployeeJobService(id);
-
     sendResponse(res, {
       success: true,
       statusCode: 200,
@@ -70,27 +69,9 @@ const deleteEmployeeJobController = catchAsync(
   }
 );
 
-// promote employee
-export const promoteEmployeeController = catchAsync(
-  async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const data = await employeeJobService.promoteEmployee(
-      id,
-      req.body.promotions
-    );
-    sendResponse(res, {
-      success: true,
-      statusCode: 200,
-      result: data,
-      message: "Employee promoted successfully",
-    });
-  }
-);
-
 export const employeeJobController = {
   getAllEmployeeJobController,
   getEmployeeJobController,
   deleteEmployeeJobController,
   updateEmployeeJobController,
-  promoteEmployeeController,
 };

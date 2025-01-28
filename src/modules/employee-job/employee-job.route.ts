@@ -22,14 +22,6 @@ employeeJobRouter.get(
   employeeJobController.getEmployeeJobController
 );
 
-// promote employee
-employeeJobRouter.post(
-  "/promote/:id",
-  checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
-  employeeJobController.promoteEmployeeController
-);
-
 // update data
 employeeJobRouter.patch(
   "/:id",

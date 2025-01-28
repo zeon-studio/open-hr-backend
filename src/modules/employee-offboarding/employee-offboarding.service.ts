@@ -89,6 +89,7 @@ const createEmployeeOffboardingService = async (
       {
         id: data.employee_id,
       },
+      null,
       { session }
     );
 
@@ -156,7 +157,7 @@ const createEmployeeOffboardingService = async (
     );
 
     await mailSender.offboardingInitiate(
-      employeeData?.personal_email!,
+      employeeData?.personal_email! ?? employeeData?.work_email,
       employeeData?.name!,
       data.resignation_date
     );
@@ -165,7 +166,6 @@ const createEmployeeOffboardingService = async (
     return result;
   } catch (error: any) {
     await session.abortTransaction();
-    console.log(error);
     throw new ApiError(error.message, 400);
   } finally {
     session.endSession();

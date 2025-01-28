@@ -325,9 +325,16 @@ const updateEmployeeService = async (updatedData: EmployeeType, id: string) => {
   // ) {
   //   await deleteFile(employee?.image);
   // }
-  const result = await Employee.findOneAndUpdate({ id: id }, updatedData, {
-    new: true,
-  });
+
+  const result = await Employee.findOneAndUpdate(
+    { id: id },
+    {
+      $set: updatedData,
+    },
+    {
+      new: true,
+    }
+  );
   return result;
 };
 

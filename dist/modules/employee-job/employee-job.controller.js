@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.employeeJobController = exports.promoteEmployeeController = void 0;
+exports.employeeJobController = void 0;
 const constants_1 = require("../../config/constants");
 const catchAsync_1 = __importDefault(require("../../lib/catchAsync"));
 const filterPicker_1 = __importDefault(require("../../lib/filterPicker"));
@@ -63,22 +63,10 @@ const deleteEmployeeJobController = (0, catchAsync_1.default)((req, res) => __aw
         message: "data deleted successfully",
     });
 }));
-// promote employee
-exports.promoteEmployeeController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const data = yield employee_job_service_1.employeeJobService.promoteEmployee(id, req.body.promotions);
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: 200,
-        result: data,
-        message: "Employee promoted successfully",
-    });
-}));
 exports.employeeJobController = {
     getAllEmployeeJobController,
     getEmployeeJobController,
     deleteEmployeeJobController,
     updateEmployeeJobController,
-    promoteEmployeeController: exports.promoteEmployeeController,
 };
 //# sourceMappingURL=employee-job.controller.js.map

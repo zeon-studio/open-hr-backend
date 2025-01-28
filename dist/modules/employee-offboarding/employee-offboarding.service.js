@@ -75,12 +75,13 @@ const getEmployeeOffboardingService = (id) => __awaiter(void 0, void 0, void 0, 
 });
 // create
 const createEmployeeOffboardingService = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
         const employeeData = yield employee_model_1.Employee.findOne({
             id: data.employee_id,
-        }, { session });
+        }, null, { session });
         // update employee status
         yield employee_model_1.Employee.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { status: "archived" } }, { session });
         // update resignation date on employee job
@@ -129,13 +130,12 @@ const createEmployeeOffboardingService = (data) => __awaiter(void 0, void 0, voi
             },
         };
         const result = yield employee_offboarding_model_1.EmployeeOffboarding.create([createEmployeeOffboardingData], { session });
-        yield mailSender_1.mailSender.offboardingInitiate(employeeData === null || employeeData === void 0 ? void 0 : employeeData.personal_email, employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, data.resignation_date);
+        yield mailSender_1.mailSender.offboardingInitiate((_a = employeeData === null || employeeData === void 0 ? void 0 : employeeData.personal_email) !== null && _a !== void 0 ? _a : employeeData === null || employeeData === void 0 ? void 0 : employeeData.work_email, employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, data.resignation_date);
         yield session.commitTransaction();
         return result;
     }
     catch (error) {
         yield session.abortTransaction();
-        console.log(error);
         throw new ApiError_1.default(error.message, 400);
     }
     finally {

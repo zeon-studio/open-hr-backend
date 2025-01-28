@@ -80,7 +80,7 @@ const createEmployeeController = (0, catchAsync_1.default)((req, res) => __await
 }));
 // update controller
 const updateEmployeeController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const employeeData = req.body.employeeData;
+    const employeeData = req.body;
     const updateData = yield employee_service_1.employeeService.updateEmployeeService(employeeData, req.params.id);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,

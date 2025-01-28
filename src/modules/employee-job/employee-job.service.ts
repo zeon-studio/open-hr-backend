@@ -73,35 +73,6 @@ const getAllEmployeeJobService = async (
   };
 };
 
-// promote employee
-
-const promoteEmployee = async (
-  employeeId: string,
-  promotions: EmployeeJobType["promotions"]
-) => {
-  try {
-    // Find the employee job document
-    const job = await EmployeeJob.findOne({ employee_id: employeeId });
-    if (!job) {
-      throw new Error("Employee job not found");
-    }
-
-    // Replace the promotions field with the new array
-    const result = await EmployeeJob.updateOne(
-      { employee_id: employeeId },
-      { $set: { promotions: promotions } }
-    );
-
-    if (result.modifiedCount === 0) {
-      throw new Error("Promotions were not updated");
-    }
-
-    return result;
-  } catch (error) {
-    console.error("Error updating promotions:", error);
-  }
-};
-
 // get single data
 const getEmployeeJobService = async (id: string) => {
   const result = await EmployeeJob.findOne({ employee_id: id });
@@ -115,24 +86,14 @@ const updateEmployeeJobService = async (
 ) => {
   const job = await EmployeeJob.findOne({ employee_id: id });
   if (job) {
-    // Update existing jobs or add new ones
-    updateData.prev_jobs.forEach((newJob) => {
-      const existingJobIndex = job.prev_jobs.findIndex(
-        (job) => job.company_name === newJob.company_name
-      );
-      if (existingJobIndex !== -1) {
-        // Update existing job
-        job.prev_jobs[existingJobIndex] = {
-          ...job.prev_jobs[existingJobIndex],
-          ...newJob,
-        };
-      } else {
-        // Add new job
-        job.prev_jobs.push(newJob);
+    await EmployeeJob.updateOne(
+      {
+        employee_id: id,
+      },
+      {
+        $set: updateData,
       }
-    });
-    await job.save();
-    return job;
+    );
   } else {
     // Create new job if it doesn't exist
     const newEmployeeJob = new EmployeeJob(updateData);
@@ -151,5 +112,4 @@ export const employeeJobService = {
   getEmployeeJobService,
   deleteEmployeeJobService,
   updateEmployeeJobService,
-  promoteEmployee,
 };
