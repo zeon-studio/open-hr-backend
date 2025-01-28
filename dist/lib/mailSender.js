@@ -33,6 +33,16 @@ const invitationRequest = (email, designation, invite_token, joining_date) => __
     };
     yield mailTransporter.sendMail(mailDetails);
 });
+// offboarding
+const offboardingInitiate = (email, name, resignation_date) => __awaiter(void 0, void 0, void 0, function* () {
+    let mailDetails = {
+        from: variables_1.default.sender_email,
+        to: email,
+        subject: "Invitation from Themefisher",
+        html: (0, mailTemplate_1.offboardingTemplate)(name, resignation_date),
+    };
+    yield mailTransporter.sendMail(mailDetails);
+});
 // leave request
 const leaveRequest = (emails, name, leaveType, dayCount, startDate, endDate, reason) => __awaiter(void 0, void 0, void 0, function* () {
     let mailDetails = {
@@ -57,6 +67,7 @@ const leaveRequestResponse = (email, name, leaveType, dayCount, startDate, endDa
 });
 exports.mailSender = {
     invitationRequest,
+    offboardingInitiate,
     leaveRequest,
     leaveRequestResponse,
 };

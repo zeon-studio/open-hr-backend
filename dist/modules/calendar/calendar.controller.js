@@ -18,7 +18,8 @@ const sendResponse_1 = require("../../lib/sendResponse");
 const calendar_service_1 = require("./calendar.service");
 // get all data
 const getAllCalendarController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const calendar = yield calendar_service_1.calendarService.getAllCalendarService();
+    const year = Number(req.params.year);
+    const calendar = yield calendar_service_1.calendarService.getAllCalendarService(year);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,

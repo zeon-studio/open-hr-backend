@@ -5,6 +5,7 @@ import {
   leaveRequestApprovedTemplate,
   leaveRequestRejectedTemplate,
   leaveRequestTemplate,
+  offboardingTemplate,
 } from "./mailTemplate";
 
 let mailTransporter = nodemailer.createTransport({
@@ -27,6 +28,21 @@ const invitationRequest = async (
     to: email,
     subject: "Invitation from Themefisher",
     html: invitationTemplate(designation, joining_date, invite_token),
+  };
+  await mailTransporter.sendMail(mailDetails);
+};
+
+// offboarding
+const offboardingInitiate = async (
+  email: string,
+  name: string,
+  resignation_date: Date
+) => {
+  let mailDetails = {
+    from: config.sender_email,
+    to: email,
+    subject: "Invitation from Themefisher",
+    html: offboardingTemplate(name, resignation_date),
   };
   await mailTransporter.sendMail(mailDetails);
 };
@@ -96,6 +112,7 @@ const leaveRequestResponse = async (
 
 export const mailSender = {
   invitationRequest,
+  offboardingInitiate,
   leaveRequest,
   leaveRequestResponse,
 };

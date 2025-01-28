@@ -6,7 +6,8 @@ import { calendarService } from "./calendar.service";
 // get all data
 const getAllCalendarController = catchAsync(
   async (req: Request, res: Response) => {
-    const calendar = await calendarService.getAllCalendarService();
+    const year = Number(req.params.year);
+    const calendar = await calendarService.getAllCalendarService(year);
 
     sendResponse(res, {
       success: true,

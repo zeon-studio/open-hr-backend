@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeOffboardingService = void 0;
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
+const mailSender_1 = require("../../lib/mailSender");
 const paginationHelper_1 = require("../../lib/paginationHelper");
 const mongoose_1 = __importDefault(require("mongoose"));
 const employee_job_model_1 = require("../employee-job/employee-job.model");
@@ -77,6 +78,9 @@ const createEmployeeOffboardingService = (data) => __awaiter(void 0, void 0, voi
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
+        const employeeData = yield employee_model_1.Employee.findOne({
+            id: data.employee_id,
+        }, { session });
         // update employee status
         yield employee_model_1.Employee.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { status: "archived" } }, { session });
         // update resignation date on employee job
@@ -125,6 +129,7 @@ const createEmployeeOffboardingService = (data) => __awaiter(void 0, void 0, voi
             },
         };
         const result = yield employee_offboarding_model_1.EmployeeOffboarding.create([createEmployeeOffboardingData], { session });
+        yield mailSender_1.mailSender.offboardingInitiate(employeeData === null || employeeData === void 0 ? void 0 : employeeData.personal_email, employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, data.resignation_date);
         yield session.commitTransaction();
         return result;
     }

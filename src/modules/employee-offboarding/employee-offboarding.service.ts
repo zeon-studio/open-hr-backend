@@ -1,4 +1,5 @@
 import ApiError from "@/errors/ApiError";
+import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import mongoose, { PipelineStage } from "mongoose";
@@ -84,6 +85,13 @@ const createEmployeeOffboardingService = async (
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
+    const employeeData = await Employee.findOne(
+      {
+        id: data.employee_id,
+      },
+      { session }
+    );
+
     // update employee status
     await Employee.findOneAndUpdate(
       { employee_id: data.employee_id },
@@ -145,6 +153,12 @@ const createEmployeeOffboardingService = async (
     const result = await EmployeeOffboarding.create(
       [createEmployeeOffboardingData],
       { session }
+    );
+
+    await mailSender.offboardingInitiate(
+      employeeData?.personal_email!,
+      employeeData?.name!,
+      data.resignation_date
     );
 
     await session.commitTransaction();

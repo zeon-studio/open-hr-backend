@@ -8,7 +8,7 @@ const calendarRouter = express.Router();
 
 // get all data
 calendarRouter.get(
-  "/",
+  "/:year",
   checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   calendarController.getAllCalendarController
