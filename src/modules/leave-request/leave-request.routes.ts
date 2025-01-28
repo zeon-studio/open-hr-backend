@@ -16,7 +16,7 @@ leaveRequestRouter.get(
 
 // get upcoming leave request
 leaveRequestRouter.get(
-  "/upcoming",
+  "/upcoming/:current_date",
   checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   leaveRequestController.getUpcomingLeaveRequestController

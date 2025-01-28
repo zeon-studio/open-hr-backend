@@ -67,8 +67,8 @@ const deleteCalendarController = catchAsync(
 // get upcoming events and holidays
 const getUpcomingEventsAndHolidaysController = catchAsync(
   async (req: Request, res: Response) => {
-    const current_date = req.query.current_date
-      ? new Date(req.query.current_date as string)
+    const current_date = req.params.current_date
+      ? new Date(req.params.current_date as string)
       : new Date();
     const calendar =
       await calendarService.getUpcomingEventsAndHolidaysService(current_date);

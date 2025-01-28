@@ -24,7 +24,7 @@ calendarRouter.post(
 
 // get upcoming events and holidays
 calendarRouter.get(
-  "/upcoming",
+  "/upcoming/:current_date",
   checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   calendarController.getUpcomingEventsAndHolidaysController
