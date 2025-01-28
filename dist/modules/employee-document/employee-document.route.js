@@ -14,7 +14,7 @@ employeeDocumentRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(rol
 // get single data
 employeeDocumentRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_document_controller_1.employeeDocumentController.getEmployeeDocumentController);
 // update data
-employeeDocumentRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_document_controller_1.employeeDocumentController.updateEmployeeDocumentController);
+employeeDocumentRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_document_controller_1.employeeDocumentController.updateEmployeeDocumentController);
 // delete data
 employeeDocumentRouter.delete("/:employeeId/:documentId", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_document_controller_1.employeeDocumentController.deleteEmployeeDocumentController);
 exports.default = employeeDocumentRouter;
