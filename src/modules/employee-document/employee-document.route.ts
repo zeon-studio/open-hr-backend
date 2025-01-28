@@ -26,7 +26,7 @@ employeeDocumentRouter.get(
 employeeDocumentRouter.patch(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeDocumentController.updateEmployeeDocumentController
 );
 
