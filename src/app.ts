@@ -15,7 +15,7 @@ const corsProtectedOptions: cors.CorsOptions =
         optionsSuccessStatus: 204,
       }
     : {
-        origin: ["https://erp.teamosis.com"],
+        origin: ["https://erp.teamosis.com", "tf-erp-solution.vercel.app"],
         methods: "GET,PUT,PATCH,POST,DELETE",
         preflightContinue: false,
         optionsSuccessStatus: 204,
