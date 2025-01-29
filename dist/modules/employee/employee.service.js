@@ -148,7 +148,7 @@ const getSingleEmployeeService = (id) => __awaiter(void 0, void 0, void 0, funct
 // get single employee by invite token
 const getSingleEmployeeByInviteTokenService = (inviteToken) => __awaiter(void 0, void 0, void 0, function* () {
     const decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(inviteToken, variables_1.default.jwt_secret);
-    const userId = decodedToken.user_id;
+    const userId = decodedToken.id;
     const employee = yield employee_model_1.Employee.findOne({ id: userId });
     return employee;
 });

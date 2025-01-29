@@ -37,6 +37,31 @@ const loginService = (email) => __awaiter(void 0, void 0, void 0, function* () {
     userDetails.accessToken = token;
     return userDetails;
 });
+const loginWithTokenController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { token } = req.body;
+    const decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(token, variables_1.default.jwt_secret);
+    const userId = decodedToken.id;
+    const employee = yield employee_model_1.Employee.findOne({ id: userId });
+    if (!employee) {
+        throw new Error("User not found");
+    }
+    const userDetails = {
+        userId: employee.id,
+        name: employee.name,
+        email: employee.work_email,
+        image: employee.image,
+        role: employee.role || "user",
+        accessToken: "",
+    };
+    const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employee.id, role: employee.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+    userDetails.accessToken = accessToken;
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: userDetails,
+        message: "user logged in successfully",
+    });
+}));
 const loginController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     const userDetails = yield loginService(email);
@@ -48,5 +73,6 @@ const loginController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     });
 }));
 authenticationRouter.post("/login", checkToken_1.checkToken, loginController);
+authenticationRouter.post("/login-with-token", loginWithTokenController);
 exports.default = authenticationRouter;
 //# sourceMappingURL=authentication.route.js.map

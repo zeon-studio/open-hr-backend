@@ -68,7 +68,7 @@ const getSingleEmployeeByInviteTokenController = catchAsync(
   async (req: Request, res: Response) => {
     const employee =
       await employeeService.getSingleEmployeeByInviteTokenService(
-        req.params.token
+        req.params.inviteToken
       );
 
     sendResponse(res, {

@@ -42,6 +42,46 @@ const loginService = async (email: string) => {
   return userDetails;
 };
 
+const loginWithTokenController = catchAsync(
+  async (req: Request, res: Response) => {
+    const { token } = req.body;
+    const decodedToken = jwtHelpers.verifyToken(
+      token,
+      config.jwt_secret as Secret
+    );
+
+    const userId = decodedToken.id;
+    const employee = await Employee.findOne({ id: userId });
+
+    if (!employee) {
+      throw new Error("User not found");
+    }
+
+    const userDetails = {
+      userId: employee.id,
+      name: employee.name,
+      email: employee.work_email,
+      image: employee.image,
+      role: employee.role || "user",
+      accessToken: "",
+    };
+
+    const accessToken = jwtHelpers.createToken(
+      { user_id: employee.id, role: employee.role },
+      config.jwt_secret as Secret,
+      config.jwt_expire as string
+    );
+
+    userDetails.accessToken = accessToken;
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: userDetails,
+      message: "user logged in successfully",
+    });
+  }
+);
+
 const loginController = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.body;
   const userDetails = await loginService(email);
@@ -55,5 +95,7 @@ const loginController = catchAsync(async (req: Request, res: Response) => {
 });
 
 authenticationRouter.post("/login", checkToken, loginController);
+
+authenticationRouter.post("/login-with-token", loginWithTokenController);
 
 export default authenticationRouter;

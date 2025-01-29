@@ -166,7 +166,7 @@ const getSingleEmployeeByInviteTokenService = async (
     inviteToken,
     config.jwt_secret as Secret
   );
-  const userId = decodedToken.user_id;
+  const userId = decodedToken.id;
   const employee = await Employee.findOne({ id: userId });
   return employee;
 };

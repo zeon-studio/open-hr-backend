@@ -59,7 +59,7 @@ const getSingleEmployeeController = (0, catchAsync_1.default)((req, res) => __aw
 }));
 // get single employee by invite token
 const getSingleEmployeeByInviteTokenController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const employee = yield employee_service_1.employeeService.getSingleEmployeeByInviteTokenService(req.params.token);
+    const employee = yield employee_service_1.employeeService.getSingleEmployeeByInviteTokenService(req.params.inviteToken);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,

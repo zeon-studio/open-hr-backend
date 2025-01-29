@@ -14,7 +14,9 @@ employeeRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENU
 // get all employee id
 employeeRouter.get("/basics", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.getAllEmployeeBasicsController);
 // get single employee by invite token
-employeeRouter.get("/invite-token/:inviteToken", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.getSingleEmployeeByInviteTokenController);
+employeeRouter.get("/invite-token/:inviteToken", checkToken_1.checkToken, 
+// auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+employee_controller_1.employeeController.getSingleEmployeeByInviteTokenController);
 // get single employee
 employeeRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.getSingleEmployeeController);
 // insert employee
@@ -22,9 +24,11 @@ employeeRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.EN
 // update employee data
 employeeRouter.patch("/update/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeeController);
 // update employee email
-employeeRouter.patch("/email/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.updateEmployeeEmailController);
+employeeRouter.patch("/email/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeeEmailController);
 // update employee discord
-employeeRouter.patch("/discord/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.updateEmployeeDiscordController);
+employeeRouter.patch("/discord/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeeDiscordController);
+// update employee personality
+employeeRouter.patch("/personality/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeePersonalityController);
 // delete testimonial
 employeeRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_controller_1.employeeController.deleteEmployeeController);
 exports.default = employeeRouter;

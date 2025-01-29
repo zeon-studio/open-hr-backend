@@ -26,7 +26,7 @@ employeeRouter.get(
 employeeRouter.get(
   "/invite-token/:inviteToken",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  // auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.getSingleEmployeeByInviteTokenController
 );
 
@@ -58,7 +58,7 @@ employeeRouter.patch(
 employeeRouter.patch(
   "/email/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.updateEmployeeEmailController
 );
 
@@ -66,8 +66,16 @@ employeeRouter.patch(
 employeeRouter.patch(
   "/discord/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.updateEmployeeDiscordController
+);
+
+// update employee personality
+employeeRouter.patch(
+  "/personality/:id",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  employeeController.updateEmployeePersonalityController
 );
 
 // delete testimonial
