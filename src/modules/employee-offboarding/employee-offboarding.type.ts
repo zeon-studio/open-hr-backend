@@ -6,19 +6,13 @@ export type OffboardingTask = {
 
 export type EmployeeOffboardingType = {
   employee_id: string;
-  remove_fingerprint: OffboardingTask;
-  task_handover: OffboardingTask;
-  collect_id_card: OffboardingTask;
-  collect_email: OffboardingTask;
-  collect_devices: OffboardingTask;
-  nda_agreement: OffboardingTask;
-  provide_certificate: OffboardingTask;
-  farewell: OffboardingTask;
+  tasks: OffboardingTask[];
 };
 
 export type EmployeeOffboardingCreate = {
   employee_id: string;
   resignation_date: Date;
+  tasks: OffboardingTask[];
 };
 
 export type EmployeeOffboardingFilterOptions = {

@@ -82,10 +82,10 @@ const updateEmployeeOffboardingController = catchAsync(
 const updateOffboardingTaskStatusController = catchAsync(
   async (req: Request, res: Response) => {
     const id = req.params.id;
-    const task = req.params.task;
+    const taskName = req.params.taskName;
     await employeeOffboardingService.updateOffboardingTaskStatusService(
       id,
-      task
+      taskName
     );
     sendResponse(res, {
       success: true,

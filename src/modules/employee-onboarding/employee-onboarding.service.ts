@@ -46,13 +46,7 @@ const getAllEmployeeOnboardingService = async (
     $project: {
       _id: 0,
       employee_id: 1,
-      add_fingerprint: 1,
-      provide_id_card: 1,
-      provide_appointment_letter: 1,
-      provide_employment_contract: 1,
-      provide_welcome_kit: 1,
-      provide_devices: 1,
-      provide_office_intro: 1,
+      tasks: 1,
     },
   });
 
@@ -89,10 +83,13 @@ const updateEmployeeOnboardingService = async (
 };
 
 // update onboarding task status
-const updateOnboardingTaskStatusService = async (id: string, task: string) => {
+const updateOnboardingTaskStatusService = async (
+  id: string,
+  taskName: string
+) => {
   const result = await EmployeeOnboarding.findOneAndUpdate(
-    { employee_id: id },
-    { $set: { [`${task}.status`]: "completed" } },
+    { employee_id: id, "tasks.task_name": taskName },
+    { $set: { "tasks.$.status": "completed" } },
     {
       new: true,
     }
@@ -107,65 +104,28 @@ const deleteEmployeeOnboardingService = async (id: string) => {
 
 // get all pending onboarding task
 const getPendingOnboardingTaskService = async () => {
-  const pendingTasks = [
-    "add_fingerprint",
-    "provide_id_card",
-    "provide_appointment_letter",
-    "provide_employment_contract",
-    "provide_welcome_kit",
-    "provide_devices",
-    "provide_office_intro",
-  ];
-
-  const matchConditions = pendingTasks.map((task) => ({
-    [`${task}.status`]: "pending",
-  }));
-
-  const projectFields = pendingTasks.reduce((acc, task) => {
-    acc[task] = {
-      $cond: {
-        if: { $eq: [`$${task}.status`, "pending"] },
-        then: {
-          $mergeObjects: [
-            `$${task}`,
-            {
-              employee_id: "$employee_id",
-              createdAt: "$createdAt",
-              task_id: task,
-            },
-          ],
-        },
-        else: "$$REMOVE",
-      },
-    };
-    return acc;
-  }, {});
-
   const result = await EmployeeOnboarding.aggregate([
     {
+      $unwind: "$tasks",
+    },
+    {
       $match: {
-        $or: matchConditions,
+        "tasks.status": "pending",
       },
     },
     {
       $project: {
         _id: 0,
-        ...projectFields,
+        employee_id: 1,
+        createdAt: 1,
+        task_name: "$tasks.task_name",
+        assigned_to: "$tasks.assigned_to",
+        status: "$tasks.status",
       },
     },
   ]);
 
-  // Flatten the result array
-  const flattenedResult = result.reduce((acc, item) => {
-    pendingTasks.forEach((task) => {
-      if (item[task]) {
-        acc.push(item[task]);
-      }
-    });
-    return acc;
-  }, []);
-
-  return flattenedResult;
+  return result;
 };
 
 export const employeeOnboardingService = {

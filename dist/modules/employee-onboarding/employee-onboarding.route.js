@@ -14,7 +14,7 @@ employeeOnboardingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(r
 // get pending onboarding task
 employeeOnboardingRouter.get("/pending-task", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_onboarding_controller_1.employeeOnboardingController.getPendingOnboardingTaskController);
 // update task status
-employeeOnboardingRouter.patch("/task/:id/:task", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_onboarding_controller_1.employeeOnboardingController.updateOnboardingTaskStatusController);
+employeeOnboardingRouter.patch("/task/:id/:taskName", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_onboarding_controller_1.employeeOnboardingController.updateOnboardingTaskStatusController);
 // get single data
 employeeOnboardingRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_onboarding_controller_1.employeeOnboardingController.getEmployeeOnboardingController);
 // update data

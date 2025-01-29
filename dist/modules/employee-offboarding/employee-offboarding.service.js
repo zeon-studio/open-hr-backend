@@ -50,14 +50,7 @@ const getAllEmployeeOffboardingService = (paginationOptions, filterOptions) => _
         $project: {
             _id: 0,
             employee_id: 1,
-            remove_fingerprint: 1,
-            task_handover: 1,
-            collect_id_card: 1,
-            collect_email: 1,
-            collect_devices: 1,
-            nda_agreement: 1,
-            provide_certificate: 1,
-            farewell: 1,
+            tasks: 1,
         },
     });
     const result = yield employee_offboarding_model_1.EmployeeOffboarding.aggregate(pipeline);
@@ -89,46 +82,7 @@ const createEmployeeOffboardingService = (data) => __awaiter(void 0, void 0, voi
         yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { resignation_date: data.resignation_date } }, { session });
         const createEmployeeOffboardingData = {
             employee_id: data.employee_id,
-            remove_fingerprint: {
-                task_name: "Remove Fingerprint",
-                assigned_to: constants_1.offboardingTasks.remove_fingerprint,
-                status: "pending",
-            },
-            task_handover: {
-                task_name: "Handover Tasks",
-                assigned_to: constants_1.offboardingTasks.task_handover,
-                status: "pending",
-            },
-            collect_id_card: {
-                task_name: "Collect ID Card",
-                assigned_to: constants_1.offboardingTasks.collect_id_card,
-                status: "pending",
-            },
-            collect_email: {
-                task_name: "Collect Email Credentials",
-                assigned_to: constants_1.offboardingTasks.collect_email,
-                status: "pending",
-            },
-            collect_devices: {
-                task_name: "Collect Devices",
-                assigned_to: constants_1.offboardingTasks.collect_devices,
-                status: "pending",
-            },
-            nda_agreement: {
-                task_name: "Provide NDA",
-                assigned_to: constants_1.offboardingTasks.nda_agreement,
-                status: "pending",
-            },
-            provide_certificate: {
-                task_name: "Provide Certificate",
-                assigned_to: constants_1.offboardingTasks.provide_certificate,
-                status: "pending",
-            },
-            farewell: {
-                task_name: "Farewell",
-                assigned_to: constants_1.offboardingTasks.farewell,
-                status: "pending",
-            },
+            tasks: constants_1.defaultOffboardingTasks,
         };
         const result = yield employee_offboarding_model_1.EmployeeOffboarding.create([createEmployeeOffboardingData], { session });
         yield mailSender_1.mailSender.offboardingInitiate((_a = employeeData === null || employeeData === void 0 ? void 0 : employeeData.personal_email) !== null && _a !== void 0 ? _a : employeeData === null || employeeData === void 0 ? void 0 : employeeData.work_email, employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, data.resignation_date);
@@ -152,8 +106,8 @@ const updateEmployeeOffboardingService = (id, updateData) => __awaiter(void 0, v
     return result;
 });
 // update onboarding task status
-const updateOffboardingTaskStatusService = (id, task) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_offboarding_model_1.EmployeeOffboarding.findOneAndUpdate({ employee_id: id }, { $set: { [`${task}.status`]: "completed" } }, {
+const updateOffboardingTaskStatusService = (id, taskName) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield employee_offboarding_model_1.EmployeeOffboarding.findOneAndUpdate({ employee_id: id, "tasks.task_name": taskName }, { $set: { "tasks.$.status": "completed" } }, {
         new: true,
     });
     return result;
@@ -164,58 +118,27 @@ const deleteEmployeeOffboardingService = (id) => __awaiter(void 0, void 0, void 
 });
 // get all pending offboarding task
 const getPendingOffboardingTaskService = () => __awaiter(void 0, void 0, void 0, function* () {
-    const pendingTasks = [
-        "remove_fingerprint",
-        "task_handover",
-        "collect_id_card",
-        "collect_email",
-        "collect_devices",
-        "nda_agreement",
-        "provide_certificate",
-        "farewell",
-    ];
-    const matchConditions = pendingTasks.map((task) => ({
-        [`${task}.status`]: "pending",
-    }));
-    const projectFields = pendingTasks.reduce((acc, task) => {
-        acc[task] = {
-            $cond: {
-                if: { $eq: [`$${task}.status`, "pending"] },
-                then: {
-                    $mergeObjects: [
-                        `$${task}`,
-                        {
-                            employee_id: "$employee_id",
-                            createdAt: "$createdAt",
-                            task_id: task,
-                        },
-                    ],
-                },
-                else: "$$REMOVE",
-            },
-        };
-        return acc;
-    }, {});
     const result = yield employee_offboarding_model_1.EmployeeOffboarding.aggregate([
         {
+            $unwind: "$tasks",
+        },
+        {
             $match: {
-                $or: matchConditions,
+                "tasks.status": "pending",
             },
         },
         {
-            $project: Object.assign({ _id: 0 }, projectFields),
+            $project: {
+                _id: 0,
+                employee_id: 1,
+                createdAt: 1,
+                task_name: "$tasks.task_name",
+                assigned_to: "$tasks.assigned_to",
+                status: "$tasks.status",
+            },
         },
     ]);
-    // Flatten the result array
-    const flattenedResult = result.reduce((acc, item) => {
-        pendingTasks.forEach((task) => {
-            if (item[task]) {
-                acc.push(item[task]);
-            }
-        });
-        return acc;
-    }, []);
-    return flattenedResult;
+    return result;
 });
 exports.employeeOffboardingService = {
     getAllEmployeeOffboardingService,
