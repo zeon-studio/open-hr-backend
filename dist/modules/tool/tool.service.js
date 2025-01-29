@@ -25,7 +25,10 @@ const getAllToolService = (paginationOptions, filterOptions) => __awaiter(void 0
         const searchKeyword = String(search).replace(/\+/g, " ");
         const keywords = searchKeyword.split("|");
         const searchConditions = keywords.map((keyword) => ({
-            $or: [{ name: { $regex: keyword, $options: "i" } }],
+            $or: [
+                { platform: { $regex: keyword, $options: "i" } },
+                { website: { $regex: keyword, $options: "i" } },
+            ],
         }));
         matchStage.$match.$or = searchConditions;
     }

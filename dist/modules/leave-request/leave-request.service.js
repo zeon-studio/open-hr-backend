@@ -39,7 +39,10 @@ const getAllLeaveRequestService = (paginationOptions, filterOptions) => __awaite
         const searchKeyword = String(search).replace(/\+/g, " ");
         const keywords = searchKeyword.split("|");
         const searchConditions = keywords.map((keyword) => ({
-            $or: [{ name: { $regex: keyword, $options: "i" } }],
+            $or: [
+                { employee_id: { $regex: keyword, $options: "i" } },
+                { reason: { $regex: keyword, $options: "i" } },
+            ],
         }));
         matchStage.$match.$or = searchConditions;
     }

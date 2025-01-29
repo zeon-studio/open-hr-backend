@@ -23,7 +23,10 @@ const getAllCourseService = async (
     const searchKeyword = String(search).replace(/\+/g, " ");
     const keywords = searchKeyword.split("|");
     const searchConditions = keywords.map((keyword) => ({
-      $or: [{ platform: { $regex: keyword, $options: "i" } }],
+      $or: [
+        { platform: { $regex: keyword, $options: "i" } },
+        { website: { $regex: keyword, $options: "i" } },
+      ],
     }));
     matchStage.$match.$or = searchConditions;
   }

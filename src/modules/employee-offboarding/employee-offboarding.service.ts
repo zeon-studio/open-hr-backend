@@ -1,3 +1,4 @@
+import { offboardingTasks } from "@/config/constants";
 import ApiError from "@/errors/ApiError";
 import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
@@ -111,42 +112,42 @@ const createEmployeeOffboardingService = async (
       employee_id: data.employee_id,
       remove_fingerprint: {
         task_name: "Remove Fingerprint",
-        assigned_to: "TFADM2022001",
+        assigned_to: offboardingTasks.remove_fingerprint,
         status: "pending",
       },
       task_handover: {
         task_name: "Handover Tasks",
-        assigned_to: "TFADM2022001",
+        assigned_to: offboardingTasks.task_handover,
         status: "pending",
       },
       collect_id_card: {
         task_name: "Collect ID Card",
-        assigned_to: "TFADM2022001",
+        assigned_to: offboardingTasks.collect_id_card,
         status: "pending",
       },
       collect_email: {
         task_name: "Collect Email Credentials",
-        assigned_to: "TFADM2022001",
+        assigned_to: offboardingTasks.collect_email,
         status: "pending",
       },
       collect_devices: {
         task_name: "Collect Devices",
-        assigned_to: "TFADM2022001",
+        assigned_to: offboardingTasks.collect_devices,
         status: "pending",
       },
       nda_agreement: {
         task_name: "Provide NDA",
-        assigned_to: "TFADM2022001",
+        assigned_to: offboardingTasks.nda_agreement,
         status: "pending",
       },
       provide_certificate: {
         task_name: "Provide Certificate",
-        assigned_to: "TFADM2022001",
+        assigned_to: offboardingTasks.provide_certificate,
         status: "pending",
       },
       farewell: {
         task_name: "Farewell",
-        assigned_to: "TFADM2022001",
+        assigned_to: offboardingTasks.farewell,
         status: "pending",
       },
     };

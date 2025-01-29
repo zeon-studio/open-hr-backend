@@ -203,37 +203,37 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
             employee_id: employeeId,
             add_fingerprint: {
                 task_name: "Add Fingerprint",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.onboardingTasks.add_fingerprint,
                 status: "pending",
             },
             provide_id_card: {
                 task_name: "Provide ID Card",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.onboardingTasks.provide_id_card,
                 status: "pending",
             },
             provide_appointment_letter: {
                 task_name: "Provide Appointment Letter",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.onboardingTasks.provide_appointment_letter,
                 status: "pending",
             },
             provide_employment_contract: {
                 task_name: "Provide Employment Contract",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.onboardingTasks.provide_employment_contract,
                 status: "pending",
             },
             provide_welcome_kit: {
                 task_name: "Provide Welcome Kit",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.onboardingTasks.provide_welcome_kit,
                 status: "pending",
             },
             provide_devices: {
                 task_name: "Provide Devices",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.onboardingTasks.provide_devices,
                 status: "pending",
             },
             provide_office_intro: {
                 task_name: "Provide Office Intro",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.onboardingTasks.provide_office_intro,
                 status: "pending",
             },
         };

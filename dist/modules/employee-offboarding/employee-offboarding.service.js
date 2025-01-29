@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeOffboardingService = void 0;
+const constants_1 = require("../../config/constants");
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const mailSender_1 = require("../../lib/mailSender");
 const paginationHelper_1 = require("../../lib/paginationHelper");
@@ -90,42 +91,42 @@ const createEmployeeOffboardingService = (data) => __awaiter(void 0, void 0, voi
             employee_id: data.employee_id,
             remove_fingerprint: {
                 task_name: "Remove Fingerprint",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.offboardingTasks.remove_fingerprint,
                 status: "pending",
             },
             task_handover: {
                 task_name: "Handover Tasks",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.offboardingTasks.task_handover,
                 status: "pending",
             },
             collect_id_card: {
                 task_name: "Collect ID Card",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.offboardingTasks.collect_id_card,
                 status: "pending",
             },
             collect_email: {
                 task_name: "Collect Email Credentials",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.offboardingTasks.collect_email,
                 status: "pending",
             },
             collect_devices: {
                 task_name: "Collect Devices",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.offboardingTasks.collect_devices,
                 status: "pending",
             },
             nda_agreement: {
                 task_name: "Provide NDA",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.offboardingTasks.nda_agreement,
                 status: "pending",
             },
             provide_certificate: {
                 task_name: "Provide Certificate",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.offboardingTasks.provide_certificate,
                 status: "pending",
             },
             farewell: {
                 task_name: "Farewell",
-                assigned_to: "TFADM2022001",
+                assigned_to: constants_1.offboardingTasks.farewell,
                 status: "pending",
             },
         };

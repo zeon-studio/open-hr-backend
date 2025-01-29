@@ -24,7 +24,11 @@ const getAllAssetService = async (
     const searchKeyword = String(search).replace(/\+/g, " ");
     const keywords = searchKeyword.split("|");
     const searchConditions = keywords.map((keyword) => ({
-      $or: [{ name: { $regex: keyword, $options: "i" } }],
+      $or: [
+        { name: { $regex: keyword, $options: "i" } },
+        { asset_id: { $regex: keyword, $options: "i" } },
+        { user: { $regex: keyword, $options: "i" } },
+      ],
     }));
     matchStage.$match.$or = searchConditions;
   }
