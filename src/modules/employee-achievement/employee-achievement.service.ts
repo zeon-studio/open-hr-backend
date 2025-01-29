@@ -71,33 +71,15 @@ const updateEmployeeAchievementService = async (
   id: string,
   updateData: EmployeeAchievementType
 ) => {
-  const achievement = await EmployeeAchievement.findOne({ platform: id });
-
-  if (achievement) {
-    // Update existing achievements or add new ones
-    updateData.achievements.forEach((newAchievement) => {
-      const existingAchievementIndex = achievement.achievements.findIndex(
-        (achievement) => achievement.name === newAchievement.name
-      );
-      if (existingAchievementIndex !== -1) {
-        // Update existing achievement
-        achievement.achievements[existingAchievementIndex] = {
-          ...achievement.achievements[existingAchievementIndex],
-          ...newAchievement,
-        };
-      } else {
-        // Add new achievement
-        achievement.achievements.push(newAchievement);
-      }
-    });
-    await achievement.save();
-    return achievement;
-  } else {
-    // Create new achievement if it doesn't exist
-    const newEmployeeAchievement = new EmployeeAchievement(updateData);
-    await newEmployeeAchievement.save();
-    return newEmployeeAchievement;
-  }
+  const result = await EmployeeAchievement.findOneAndUpdate(
+    { employee_id: id },
+    updateData,
+    {
+      new: true,
+      upsert: true,
+    }
+  );
+  return result;
 };
 
 // delete

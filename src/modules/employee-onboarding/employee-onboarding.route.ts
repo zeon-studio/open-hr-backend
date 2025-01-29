@@ -24,7 +24,7 @@ employeeOnboardingRouter.get(
 
 // update task status
 employeeOnboardingRouter.patch(
-  "/task/:id/:task",
+  "/task/:id/:taskName",
   checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeOnboardingController.updateOnboardingTaskStatusController

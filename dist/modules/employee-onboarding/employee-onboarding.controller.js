@@ -56,8 +56,8 @@ const updateEmployeeOnboardingController = (0, catchAsync_1.default)((req, res) 
 // update onboarding task status
 const updateOnboardingTaskStatusController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const task = req.params.task;
-    yield employee_onboarding_service_1.employeeOnboardingService.updateOnboardingTaskStatusService(id, task);
+    const taskName = req.params.taskName;
+    yield employee_onboarding_service_1.employeeOnboardingService.updateOnboardingTaskStatusService(id, taskName);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,

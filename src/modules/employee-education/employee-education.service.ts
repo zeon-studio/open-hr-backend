@@ -71,33 +71,15 @@ const updateEmployeeEducationService = async (
   id: string,
   updateData: EmployeeEducationType
 ) => {
-  const education = await EmployeeEducation.findOne({ platform: id });
-
-  if (education) {
-    // Update existing educations or add new ones
-    updateData.educations.forEach((newEducation) => {
-      const existingEducationIndex = education.educations.findIndex(
-        (education) => education.degree === newEducation.degree
-      );
-      if (existingEducationIndex !== -1) {
-        // Update existing education
-        education.educations[existingEducationIndex] = {
-          ...education.educations[existingEducationIndex],
-          ...newEducation,
-        };
-      } else {
-        // Add new education
-        education.educations.push(newEducation);
-      }
-    });
-    await education.save();
-    return education;
-  } else {
-    // Create new education if it doesn't exist
-    const newEmployeeEducation = new EmployeeEducation(updateData);
-    await newEmployeeEducation.save();
-    return newEmployeeEducation;
-  }
+  const result = await EmployeeEducation.findOneAndUpdate(
+    { employee_id: id },
+    updateData,
+    {
+      new: true,
+      upsert: true,
+    }
+  );
+  return result;
 };
 
 // delete

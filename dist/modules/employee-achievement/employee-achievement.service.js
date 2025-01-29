@@ -60,29 +60,11 @@ const getEmployeeAchievementService = (id) => __awaiter(void 0, void 0, void 0, 
 });
 // add or update
 const updateEmployeeAchievementService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const achievement = yield employee_achievement_model_1.EmployeeAchievement.findOne({ platform: id });
-    if (achievement) {
-        // Update existing achievements or add new ones
-        updateData.achievements.forEach((newAchievement) => {
-            const existingAchievementIndex = achievement.achievements.findIndex((achievement) => achievement.name === newAchievement.name);
-            if (existingAchievementIndex !== -1) {
-                // Update existing achievement
-                achievement.achievements[existingAchievementIndex] = Object.assign(Object.assign({}, achievement.achievements[existingAchievementIndex]), newAchievement);
-            }
-            else {
-                // Add new achievement
-                achievement.achievements.push(newAchievement);
-            }
-        });
-        yield achievement.save();
-        return achievement;
-    }
-    else {
-        // Create new achievement if it doesn't exist
-        const newEmployeeAchievement = new employee_achievement_model_1.EmployeeAchievement(updateData);
-        yield newEmployeeAchievement.save();
-        return newEmployeeAchievement;
-    }
+    const result = yield employee_achievement_model_1.EmployeeAchievement.findOneAndUpdate({ employee_id: id }, updateData, {
+        new: true,
+        upsert: true,
+    });
+    return result;
 });
 // delete
 const deleteEmployeeAchievementService = (id) => __awaiter(void 0, void 0, void 0, function* () {

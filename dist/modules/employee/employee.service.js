@@ -201,41 +201,7 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
         };
         const createEmployeeOnboardingData = {
             employee_id: employeeId,
-            add_fingerprint: {
-                task_name: "Add Fingerprint",
-                assigned_to: "TFADM2022001",
-                status: "pending",
-            },
-            provide_id_card: {
-                task_name: "Provide ID Card",
-                assigned_to: "TFADM2022001",
-                status: "pending",
-            },
-            provide_appointment_letter: {
-                task_name: "Provide Appointment Letter",
-                assigned_to: "TFADM2022001",
-                status: "pending",
-            },
-            provide_employment_contract: {
-                task_name: "Provide Employment Contract",
-                assigned_to: "TFADM2022001",
-                status: "pending",
-            },
-            provide_welcome_kit: {
-                task_name: "Provide Welcome Kit",
-                assigned_to: "TFADM2022001",
-                status: "pending",
-            },
-            provide_devices: {
-                task_name: "Provide Devices",
-                assigned_to: "TFADM2022001",
-                status: "pending",
-            },
-            provide_office_intro: {
-                task_name: "Provide Office Intro",
-                assigned_to: "TFADM2022001",
-                status: "pending",
-            },
+            tasks: constants_1.defaultOnboardingTasks,
         };
         const newEmployeeData = new employee_model_1.Employee(createEmployeeData);
         const insertedEmployee = yield newEmployeeData.save({ session });
@@ -245,7 +211,7 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
         yield newEmployeeLeaveData.save({ session });
         const newEmployeeOnboardingData = new employee_onboarding_model_1.EmployeeOnboarding(createEmployeeOnboardingData);
         yield newEmployeeOnboardingData.save({ session });
-        const invite_token = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employeeId, role: "user" }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+        const invite_token = jwtTokenHelper_1.jwtHelpers.createToken({ id: employeeId, role: "user" }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
         yield mailSender_1.mailSender.invitationRequest(employeeData.personal_email, employeeData.designation, invite_token, joiningDate);
         yield session.commitTransaction();
         session.endSession();

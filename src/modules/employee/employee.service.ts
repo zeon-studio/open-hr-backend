@@ -1,4 +1,4 @@
-import { leaveAllottedDays } from "@/config/constants";
+import { defaultOnboardingTasks, leaveAllottedDays } from "@/config/constants";
 import config from "@/config/variables";
 import ApiError from "@/errors/ApiError";
 import { generateEmployeeId } from "@/lib/IdGenerator";
@@ -240,41 +240,7 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
 
     const createEmployeeOnboardingData = {
       employee_id: employeeId,
-      add_fingerprint: {
-        task_name: "Add Fingerprint",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      provide_id_card: {
-        task_name: "Provide ID Card",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      provide_appointment_letter: {
-        task_name: "Provide Appointment Letter",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      provide_employment_contract: {
-        task_name: "Provide Employment Contract",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      provide_welcome_kit: {
-        task_name: "Provide Welcome Kit",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      provide_devices: {
-        task_name: "Provide Devices",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      provide_office_intro: {
-        task_name: "Provide Office Intro",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
+      tasks: defaultOnboardingTasks,
     };
 
     const newEmployeeData = new Employee(createEmployeeData);
@@ -292,7 +258,7 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
     await newEmployeeOnboardingData.save({ session });
 
     const invite_token = jwtHelpers.createToken(
-      { user_id: employeeId, role: "user" },
+      { id: employeeId, role: "user" },
       config.jwt_secret as Secret,
       config.jwt_expire as string
     );

@@ -88,8 +88,8 @@ const deleteLeaveRequestController = catchAsync(
 // get upcoming leave request
 const getUpcomingLeaveRequestController = catchAsync(
   async (req: Request, res: Response) => {
-    const current_date = req.query.current_date
-      ? new Date(req.query.current_date as string)
+    const current_date = req.params.current_date
+      ? new Date(req.params.current_date as string)
       : new Date();
     const leave =
       await leaveRequestService.getUpcomingLeaveRequestService(current_date);

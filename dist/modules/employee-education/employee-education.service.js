@@ -60,29 +60,11 @@ const getEmployeeEducationService = (id) => __awaiter(void 0, void 0, void 0, fu
 });
 // add or update
 const updateEmployeeEducationService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const education = yield employee_education_model_1.EmployeeEducation.findOne({ platform: id });
-    if (education) {
-        // Update existing educations or add new ones
-        updateData.educations.forEach((newEducation) => {
-            const existingEducationIndex = education.educations.findIndex((education) => education.degree === newEducation.degree);
-            if (existingEducationIndex !== -1) {
-                // Update existing education
-                education.educations[existingEducationIndex] = Object.assign(Object.assign({}, education.educations[existingEducationIndex]), newEducation);
-            }
-            else {
-                // Add new education
-                education.educations.push(newEducation);
-            }
-        });
-        yield education.save();
-        return education;
-    }
-    else {
-        // Create new education if it doesn't exist
-        const newEmployeeEducation = new employee_education_model_1.EmployeeEducation(updateData);
-        yield newEmployeeEducation.save();
-        return newEmployeeEducation;
-    }
+    const result = yield employee_education_model_1.EmployeeEducation.findOneAndUpdate({ employee_id: id }, updateData, {
+        new: true,
+        upsert: true,
+    });
+    return result;
 });
 // delete
 const deleteEmployeeEducationService = (id) => __awaiter(void 0, void 0, void 0, function* () {

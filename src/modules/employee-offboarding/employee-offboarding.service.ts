@@ -1,3 +1,4 @@
+import { defaultOffboardingTasks } from "@/config/constants";
 import ApiError from "@/errors/ApiError";
 import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
@@ -51,14 +52,7 @@ const getAllEmployeeOffboardingService = async (
     $project: {
       _id: 0,
       employee_id: 1,
-      remove_fingerprint: 1,
-      task_handover: 1,
-      collect_id_card: 1,
-      collect_email: 1,
-      collect_devices: 1,
-      nda_agreement: 1,
-      provide_certificate: 1,
-      farewell: 1,
+      tasks: 1,
     },
   });
 
@@ -109,46 +103,7 @@ const createEmployeeOffboardingService = async (
 
     const createEmployeeOffboardingData = {
       employee_id: data.employee_id,
-      remove_fingerprint: {
-        task_name: "Remove Fingerprint",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      task_handover: {
-        task_name: "Handover Tasks",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      collect_id_card: {
-        task_name: "Collect ID Card",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      collect_email: {
-        task_name: "Collect Email Credentials",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      collect_devices: {
-        task_name: "Collect Devices",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      nda_agreement: {
-        task_name: "Provide NDA",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      provide_certificate: {
-        task_name: "Provide Certificate",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
-      farewell: {
-        task_name: "Farewell",
-        assigned_to: "TFADM2022001",
-        status: "pending",
-      },
+      tasks: defaultOffboardingTasks,
     };
 
     const result = await EmployeeOffboarding.create(
@@ -189,10 +144,13 @@ const updateEmployeeOffboardingService = async (
 };
 
 // update onboarding task status
-const updateOffboardingTaskStatusService = async (id: string, task: string) => {
+const updateOffboardingTaskStatusService = async (
+  id: string,
+  taskName: string
+) => {
   const result = await EmployeeOffboarding.findOneAndUpdate(
-    { employee_id: id },
-    { $set: { [`${task}.status`]: "completed" } },
+    { employee_id: id, "tasks.task_name": taskName },
+    { $set: { "tasks.$.status": "completed" } },
     {
       new: true,
     }
@@ -207,66 +165,28 @@ const deleteEmployeeOffboardingService = async (id: string) => {
 
 // get all pending offboarding task
 const getPendingOffboardingTaskService = async () => {
-  const pendingTasks = [
-    "remove_fingerprint",
-    "task_handover",
-    "collect_id_card",
-    "collect_email",
-    "collect_devices",
-    "nda_agreement",
-    "provide_certificate",
-    "farewell",
-  ];
-
-  const matchConditions = pendingTasks.map((task) => ({
-    [`${task}.status`]: "pending",
-  }));
-
-  const projectFields = pendingTasks.reduce((acc, task) => {
-    acc[task] = {
-      $cond: {
-        if: { $eq: [`$${task}.status`, "pending"] },
-        then: {
-          $mergeObjects: [
-            `$${task}`,
-            {
-              employee_id: "$employee_id",
-              createdAt: "$createdAt",
-              task_id: task,
-            },
-          ],
-        },
-        else: "$$REMOVE",
-      },
-    };
-    return acc;
-  }, {});
-
   const result = await EmployeeOffboarding.aggregate([
     {
+      $unwind: "$tasks",
+    },
+    {
       $match: {
-        $or: matchConditions,
+        "tasks.status": "pending",
       },
     },
     {
       $project: {
         _id: 0,
-        ...projectFields,
+        employee_id: 1,
+        createdAt: 1,
+        task_name: "$tasks.task_name",
+        assigned_to: "$tasks.assigned_to",
+        status: "$tasks.status",
       },
     },
   ]);
 
-  // Flatten the result array
-  const flattenedResult = result.reduce((acc, item) => {
-    pendingTasks.forEach((task) => {
-      if (item[task]) {
-        acc.push(item[task]);
-      }
-    });
-    return acc;
-  }, []);
-
-  return flattenedResult;
+  return result;
 };
 
 export const employeeOffboardingService = {

@@ -5,7 +5,7 @@ export type Course = {
   currency: string;
   users: string[];
   purchase_date: Date;
-  expire_date: Date;
+  expire_date?: Date;
 };
 
 export type CourseType = {

@@ -26,7 +26,7 @@ employeeEducationRouter.get(
 employeeEducationRouter.patch(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeEducationController.updateEmployeeEducationController
 );
 

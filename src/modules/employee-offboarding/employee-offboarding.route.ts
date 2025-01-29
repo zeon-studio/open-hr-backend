@@ -32,7 +32,7 @@ employeeOffboardingRouter.post(
 
 // update task status
 employeeOffboardingRouter.patch(
-  "/task/:id/:task",
+  "/task/:id/:taskName",
   checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeOffboardingController.updateOffboardingTaskStatusController

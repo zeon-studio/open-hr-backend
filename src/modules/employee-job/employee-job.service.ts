@@ -84,22 +84,15 @@ const updateEmployeeJobService = async (
   id: string,
   updateData: EmployeeJobType
 ) => {
-  const job = await EmployeeJob.findOne({ employee_id: id });
-  if (job) {
-    await EmployeeJob.updateOne(
-      {
-        employee_id: id,
-      },
-      {
-        $set: updateData,
-      }
-    );
-  } else {
-    // Create new job if it doesn't exist
-    const newEmployeeJob = new EmployeeJob(updateData);
-    await newEmployeeJob.save();
-    return newEmployeeJob;
-  }
+  const result = await EmployeeJob.findOneAndUpdate(
+    { employee_id: id },
+    updateData,
+    {
+      new: true,
+      upsert: true,
+    }
+  );
+  return result;
 };
 
 // delete

@@ -19,7 +19,7 @@ export function invitationTemplate(
     <br>
     <br>
     
-    <a href="https://erp.teamosis.com/onboard?${invite_token}" style="color: #007bff;">Click here</a> to join the team.
+    <a href="https://erp.teamosis.com/onboard?token=${invite_token}" style="color: #007bff;">Click here</a> to join the team.
     </div>
     `;
 }

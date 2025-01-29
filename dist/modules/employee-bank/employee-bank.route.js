@@ -14,7 +14,7 @@ employeeBankRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1
 // get single data
 employeeBankRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_bank_controller_1.employeeBankController.getEmployeeBankController);
 // update data
-employeeBankRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_bank_controller_1.employeeBankController.updateEmployeeBankController);
+employeeBankRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_bank_controller_1.employeeBankController.updateEmployeeBankController);
 // delete data
 employeeBankRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_bank_controller_1.employeeBankController.deleteEmployeeBankController);
 exports.default = employeeBankRouter;

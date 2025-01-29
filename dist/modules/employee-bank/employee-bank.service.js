@@ -60,29 +60,11 @@ const getEmployeeBankService = (id) => __awaiter(void 0, void 0, void 0, functio
 });
 // add or update
 const updateEmployeeBankService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const bank = yield employee_bank_model_1.EmployeeBank.findOne({ platform: id });
-    if (bank) {
-        // Update existing banks or add new ones
-        updateData.banks.forEach((newBank) => {
-            const existingBankIndex = bank.banks.findIndex((bank) => bank.bank_name === newBank.bank_name);
-            if (existingBankIndex !== -1) {
-                // Update existing bank
-                bank.banks[existingBankIndex] = Object.assign(Object.assign({}, bank.banks[existingBankIndex]), newBank);
-            }
-            else {
-                // Add new bank
-                bank.banks.push(newBank);
-            }
-        });
-        yield bank.save();
-        return bank;
-    }
-    else {
-        // Create new bank if it doesn't exist
-        const newEmployeeBank = new employee_bank_model_1.EmployeeBank(updateData);
-        yield newEmployeeBank.save();
-        return newEmployeeBank;
-    }
+    const result = yield employee_bank_model_1.EmployeeBank.findOneAndUpdate({ employee_id: id }, updateData, {
+        new: true,
+        upsert: true,
+    });
+    return result;
 });
 // delete
 const deleteEmployeeBankService = (id) => __awaiter(void 0, void 0, void 0, function* () {

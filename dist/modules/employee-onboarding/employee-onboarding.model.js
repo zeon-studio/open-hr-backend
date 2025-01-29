@@ -35,95 +35,26 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmployeeOnboarding = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const onboardingTaskSchema = new mongoose_1.default.Schema({
+    task_name: {
+        type: String,
+        required: true,
+    },
+    assigned_to: {
+        type: String,
+        required: true,
+    },
+    status: {
+        type: String,
+        required: true,
+    },
+});
 const employeeOnboardingSchema = new mongoose_1.default.Schema({
     employee_id: {
         type: String,
         required: true,
     },
-    add_fingerprint: {
-        task_name: {
-            type: String,
-            required: true,
-        },
-        assigned_to: {
-            type: String,
-            required: true,
-        },
-        status: {
-            type: String,
-            required: true,
-        },
-    },
-    provide_id_card: {
-        task_name: {
-            type: String,
-            required: true,
-        },
-        assigned_to: {
-            type: String,
-            required: true,
-        },
-        status: {
-            type: String,
-            required: true,
-        },
-    },
-    provide_appointment_letter: {
-        task_name: {
-            type: String,
-            required: true,
-        },
-        assigned_to: {
-            type: String,
-            required: true,
-        },
-        status: {
-            type: String,
-            required: true,
-        },
-    },
-    provide_employment_contract: {
-        task_name: {
-            type: String,
-            required: true,
-        },
-        assigned_to: {
-            type: String,
-            required: true,
-        },
-        status: {
-            type: String,
-            required: true,
-        },
-    },
-    provide_welcome_kit: {
-        task_name: {
-            type: String,
-            required: true,
-        },
-        assigned_to: {
-            type: String,
-            required: true,
-        },
-        status: {
-            type: String,
-            required: true,
-        },
-    },
-    provide_office_intro: {
-        task_name: {
-            type: String,
-            required: true,
-        },
-        assigned_to: {
-            type: String,
-            required: true,
-        },
-        status: {
-            type: String,
-            required: true,
-        },
-    },
+    tasks: [onboardingTaskSchema],
 }, {
     timestamps: true,
 });

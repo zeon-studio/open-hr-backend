@@ -14,7 +14,7 @@ employeeEducationRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(ro
 // get single data
 employeeEducationRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_education_controller_1.employeeEducationController.getEmployeeEducationController);
 // update data
-employeeEducationRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_education_controller_1.employeeEducationController.updateEmployeeEducationController);
+employeeEducationRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_education_controller_1.employeeEducationController.updateEmployeeEducationController);
 // delete data
 employeeEducationRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_education_controller_1.employeeEducationController.deleteEmployeeEducationController);
 exports.default = employeeEducationRouter;

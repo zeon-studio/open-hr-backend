@@ -36,7 +36,10 @@ const getAllLeaveRequestService = async (
     const searchKeyword = String(search).replace(/\+/g, " ");
     const keywords = searchKeyword.split("|");
     const searchConditions = keywords.map((keyword) => ({
-      $or: [{ name: { $regex: keyword, $options: "i" } }],
+      $or: [
+        { employee_id: { $regex: keyword, $options: "i" } },
+        { reason: { $regex: keyword, $options: "i" } },
+      ],
     }));
     matchStage.$match.$or = searchConditions;
   }
@@ -113,8 +116,8 @@ const createLeaveRequestService = async (data: LeaveRequestType) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const startDate = localDate(data.start_date);
-    const endDate = localDate(data.end_date);
+    const startDate = localDate(new Date(data.start_date));
+    const endDate = localDate(new Date(data.end_date));
     const dayCount = await dayCounterWithoutHoliday(startDate, endDate);
     data = {
       ...data,

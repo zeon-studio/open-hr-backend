@@ -22,6 +22,10 @@ const employeeEducationSchema = new mongoose.Schema<EmployeeEducationType>(
           required: true,
         },
         result: {
+          type: Number,
+          required: true,
+        },
+        result_type: {
           type: String,
           required: true,
         },

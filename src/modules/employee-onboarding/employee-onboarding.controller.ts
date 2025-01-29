@@ -65,8 +65,12 @@ const updateEmployeeOnboardingController = catchAsync(
 const updateOnboardingTaskStatusController = catchAsync(
   async (req: Request, res: Response) => {
     const id = req.params.id;
-    const task = req.params.task;
-    await employeeOnboardingService.updateOnboardingTaskStatusService(id, task);
+    const taskName = req.params.taskName;
+    await employeeOnboardingService.updateOnboardingTaskStatusService(
+      id,
+      taskName
+    );
+
     sendResponse(res, {
       success: true,
       statusCode: 200,
