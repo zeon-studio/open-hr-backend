@@ -245,7 +245,7 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
         yield newEmployeeLeaveData.save({ session });
         const newEmployeeOnboardingData = new employee_onboarding_model_1.EmployeeOnboarding(createEmployeeOnboardingData);
         yield newEmployeeOnboardingData.save({ session });
-        const invite_token = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employeeId, role: "user" }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+        const invite_token = jwtTokenHelper_1.jwtHelpers.createToken({ id: employeeId, role: "user" }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
         yield mailSender_1.mailSender.invitationRequest(employeeData.personal_email, employeeData.designation, invite_token, joiningDate);
         yield session.commitTransaction();
         session.endSession();

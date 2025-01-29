@@ -75,20 +75,11 @@ const getEmployeeJobService = (id) => __awaiter(void 0, void 0, void 0, function
 });
 // update
 const updateEmployeeJobService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const job = yield employee_job_model_1.EmployeeJob.findOne({ employee_id: id });
-    if (job) {
-        yield employee_job_model_1.EmployeeJob.updateOne({
-            employee_id: id,
-        }, {
-            $set: updateData,
-        });
-    }
-    else {
-        // Create new job if it doesn't exist
-        const newEmployeeJob = new employee_job_model_1.EmployeeJob(updateData);
-        yield newEmployeeJob.save();
-        return newEmployeeJob;
-    }
+    const result = yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: id }, updateData, {
+        new: true,
+        upsert: true,
+    });
+    return result;
 });
 // delete
 const deleteEmployeeJobService = (id) => __awaiter(void 0, void 0, void 0, function* () {

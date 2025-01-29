@@ -71,33 +71,15 @@ const updateEmployeeBankService = async (
   id: string,
   updateData: EmployeeBankType
 ) => {
-  const bank = await EmployeeBank.findOne({ platform: id });
-
-  if (bank) {
-    // Update existing banks or add new ones
-    updateData.banks.forEach((newBank) => {
-      const existingBankIndex = bank.banks.findIndex(
-        (bank) => bank.bank_name === newBank.bank_name
-      );
-      if (existingBankIndex !== -1) {
-        // Update existing bank
-        bank.banks[existingBankIndex] = {
-          ...bank.banks[existingBankIndex],
-          ...newBank,
-        };
-      } else {
-        // Add new bank
-        bank.banks.push(newBank);
-      }
-    });
-    await bank.save();
-    return bank;
-  } else {
-    // Create new bank if it doesn't exist
-    const newEmployeeBank = new EmployeeBank(updateData);
-    await newEmployeeBank.save();
-    return newEmployeeBank;
-  }
+  const result = await EmployeeBank.findOneAndUpdate(
+    { employee_id: id },
+    updateData,
+    {
+      new: true,
+      upsert: true,
+    }
+  );
+  return result;
 };
 
 // delete

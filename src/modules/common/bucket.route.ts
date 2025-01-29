@@ -47,7 +47,7 @@ const uploadFile = multer({
       if (!folder) {
         return cb(new Error("Folder name is required"));
       }
-      cb(null, folder + "/" + Date.now().toString() + "-" + file.originalname);
+      cb(null, folder + "/" + file.originalname + "-" + Date.now().toString());
     },
   }),
 });

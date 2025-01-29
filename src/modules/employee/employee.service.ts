@@ -292,7 +292,7 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
     await newEmployeeOnboardingData.save({ session });
 
     const invite_token = jwtHelpers.createToken(
-      { user_id: employeeId, role: "user" },
+      { id: employeeId, role: "user" },
       config.jwt_secret as Secret,
       config.jwt_expire as string
     );

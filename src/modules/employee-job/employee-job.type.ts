@@ -23,8 +23,8 @@ export type EmployeeJobType = {
   company_name: string;
   company_website: string;
   resignation_date: Date;
-  prev_jobs: PrevJob[];
   promotions: Promotion[];
+  prev_jobs: PrevJob[];
   note: string;
 };
 

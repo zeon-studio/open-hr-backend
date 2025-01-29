@@ -55,6 +55,10 @@ const employeeEducationSchema = new mongoose_1.default.Schema({
                 required: true,
             },
             result: {
+                type: Number,
+                required: true,
+            },
+            result_type: {
                 type: String,
                 required: true,
             },

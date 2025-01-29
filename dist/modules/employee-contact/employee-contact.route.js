@@ -14,7 +14,7 @@ employeeContactRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(role
 // get single data
 employeeContactRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_contact_controller_1.employeeContactController.getEmployeeContactController);
 // update data
-employeeContactRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_contact_controller_1.employeeContactController.updateEmployeeContactController);
+employeeContactRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_contact_controller_1.employeeContactController.updateEmployeeContactController);
 // delete data
 employeeContactRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_contact_controller_1.employeeContactController.deleteEmployeeContactController);
 exports.default = employeeContactRouter;
