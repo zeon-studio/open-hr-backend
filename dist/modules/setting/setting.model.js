@@ -39,12 +39,10 @@ const settingSchema = new mongoose_1.default.Schema({
     app_name: {
         type: String,
         required: true,
-        default: "ERP Solution",
     },
     app_url: {
         type: String,
         required: true,
-        default: "https://erp.teamosis.com",
     },
     favicon_url: {
         type: String,
@@ -85,7 +83,6 @@ const settingSchema = new mongoose_1.default.Schema({
     weekends: {
         type: [String],
         required: true,
-        default: ["Friday"],
     },
     conditional_weekends: [
         {
@@ -103,12 +100,8 @@ const settingSchema = new mongoose_1.default.Schema({
                 type: String,
                 required: true,
             },
-            type: {
-                type: String,
-                required: true,
-            },
-            date: {
-                type: Date,
+            days: {
+                type: Number,
                 required: true,
             },
         },
@@ -119,12 +112,8 @@ const settingSchema = new mongoose_1.default.Schema({
                 type: String,
                 required: true,
             },
-            type: {
+            assigned_to: {
                 type: String,
-                required: true,
-            },
-            date: {
-                type: Date,
                 required: true,
             },
         },
@@ -135,12 +124,8 @@ const settingSchema = new mongoose_1.default.Schema({
                 type: String,
                 required: true,
             },
-            type: {
+            assigned_to: {
                 type: String,
-                required: true,
-            },
-            date: {
-                type: Date,
                 required: true,
             },
         },
