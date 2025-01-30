@@ -1,5 +1,5 @@
 export type MenuItem = {
-  name: number;
+  name: string;
   url: string;
   access: ("admin" | "user" | "moderator")[];
 };
