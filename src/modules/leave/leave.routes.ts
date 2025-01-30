@@ -18,7 +18,7 @@ leaveRouter.get(
 leaveRouter.patch(
   "/update-year/:year",
   checkToken,
-  // auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   leaveController.addNewYearLeaveController
 );
 

@@ -12,9 +12,7 @@ const leaveRouter = express_1.default.Router();
 // get all data
 leaveRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), leave_controller_1.leaveController.getAllLeaveController);
 // add new year data
-leaveRouter.patch("/update-year/:year", checkToken_1.checkToken, 
-// auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
-leave_controller_1.leaveController.addNewYearLeaveController);
+leaveRouter.patch("/update-year/:year", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_controller_1.leaveController.addNewYearLeaveController);
 // get single data
 leaveRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_controller_1.leaveController.getLeaveController);
 // update data

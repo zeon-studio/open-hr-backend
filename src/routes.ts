@@ -15,6 +15,7 @@ import employeeOnboardingRouter from "./modules/employee-onboarding/employee-onb
 import employeeRouter from "./modules/employee/employee.route";
 import leaveRequestRouter from "./modules/leave-request/leave-request.routes";
 import leaveRouter from "./modules/leave/leave.routes";
+import settingRouter from "./modules/setting/setting.routes";
 import toolRouter from "./modules/tool/tool.routes";
 
 const router = express.Router();
@@ -87,6 +88,10 @@ const moduleRoutes = [
   {
     path: "/authentication",
     route: authenticationRouter,
+  },
+  {
+    path: "/setting",
+    route: settingRouter,
   },
 ];
 

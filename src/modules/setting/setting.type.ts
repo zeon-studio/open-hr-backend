@@ -15,6 +15,11 @@ export type TaskItem = {
   status: "pending" | "completed";
 };
 
+export type ConditionalWeekend = {
+  name: string;
+  pattern: number[];
+};
+
 export type SettingType = {
   app_name: string;
   app_url: string;
@@ -26,6 +31,7 @@ export type SettingType = {
   company_website: string;
   menus: MenuItem[];
   weekends: string[];
+  conditional_weekends: ConditionalWeekend[];
   leaves: LeaveItem[];
   onboarding_tasks: TaskItem[];
   offboarding_tasks: TaskItem[];
