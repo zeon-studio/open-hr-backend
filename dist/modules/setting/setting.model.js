@@ -48,33 +48,23 @@ const settingSchema = new mongoose_1.default.Schema({
     },
     favicon_url: {
         type: String,
-        required: true,
-        default: "https://themefisher.com/images/brands/logo_mark_gradient.png",
     },
     logo_url: {
         type: String,
-        required: true,
-        default: "https://themefisher.com/images/brands/full_logo_gradient_dark.png",
     },
     logo_width: {
         type: Number,
-        required: true,
-        default: 166,
     },
     logo_height: {
         type: Number,
-        required: true,
-        default: 36,
     },
     company_name: {
         type: String,
         required: true,
-        default: "Themefisher",
     },
     company_website: {
         type: String,
         required: true,
-        default: "https://themefisher.com",
     },
     menus: [
         {
