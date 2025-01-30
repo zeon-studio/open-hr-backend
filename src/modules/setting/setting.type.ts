@@ -5,14 +5,13 @@ export type MenuItem = {
 };
 
 export type LeaveItem = {
-  name: string;
+  name: "earned" | "sick" | "casual" | "without_pay";
   days: number;
 };
 
 export type TaskItem = {
   name: string;
   assigned_to: string;
-  status: "pending" | "completed";
 };
 
 export type ConditionalWeekend = {
