@@ -13,7 +13,7 @@ exports.settingService = void 0;
 const setting_model_1 = require("./setting.model");
 // get single data
 const getSettingService = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield setting_model_1.Setting.find();
+    const result = yield setting_model_1.Setting.findOne();
     return result;
 });
 // update

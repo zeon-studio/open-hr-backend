@@ -3,7 +3,7 @@ import { SettingType } from "./setting.type";
 
 // get single data
 const getSettingService = async () => {
-  const result = await Setting.find();
+  const result = await Setting.findOne();
   return result;
 };
 
