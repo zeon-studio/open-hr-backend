@@ -26,10 +26,7 @@ const corsProtectedOptions = process.env.NODE_ENV === "development"
         optionsSuccessStatus: 204,
     }
     : {
-        origin: [
-            "https://erp.teamosis.com",
-            "https://tf-erp-solution.vercel.app",
-        ],
+        origin: [String(process.env.CORS_ORIGIN)],
         methods: "GET,PUT,PATCH,POST,DELETE",
         preflightContinue: false,
         optionsSuccessStatus: 204,
