@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.invitationTemplate = invitationTemplate;
 exports.offboardingTemplate = offboardingTemplate;
@@ -6,11 +15,17 @@ exports.leaveRequestTemplate = leaveRequestTemplate;
 exports.leaveRequestDiscordTemplate = leaveRequestDiscordTemplate;
 exports.leaveRequestApprovedTemplate = leaveRequestApprovedTemplate;
 exports.leaveRequestRejectedTemplate = leaveRequestRejectedTemplate;
+const setting_model_1 = require("../modules/setting/setting.model");
 const dateConverter_1 = require("./dateConverter");
 // invitation template
 function invitationTemplate(designation, joining_date, invite_token) {
-    return `<div style="text-align: center; font-family: Arial, sans-serif; color: #333;">
-    <h1 style="color: #007bff;">Welcome to Themefisher!</h1>
+    return __awaiter(this, void 0, void 0, function* () {
+        const settings = yield setting_model_1.Setting.findOne().exec();
+        if (!settings) {
+            throw new Error("Settings not found");
+        }
+        return `<div style="text-align: center; font-family: Arial, sans-serif; color: #333;">
+    <h1 style="color: #007bff;">Welcome to ${settings.company_name}!</h1>
     <br>
     <br>
     <br>
@@ -20,9 +35,10 @@ function invitationTemplate(designation, joining_date, invite_token) {
     <br>
     <br>
     
-    <a href="https://erp.teamosis.com/onboard?token=${invite_token}" style="color: #007bff;">Click here</a> to join the team.
+    <a href="${settings.company_website}/onboard?token=${invite_token}" style="color: #007bff;">Click here</a> to join the team.
     </div>
     `;
+    });
 }
 // offboarding template
 function offboardingTemplate(name, resignation_date) {
@@ -40,7 +56,12 @@ function offboardingTemplate(name, resignation_date) {
 }
 // leave request template
 function leaveRequestTemplate(name, leaveType, dayCount, startDate, endDate, reason) {
-    return `
+    return __awaiter(this, void 0, void 0, function* () {
+        const settings = yield setting_model_1.Setting.findOne().exec();
+        if (!settings) {
+            throw new Error("Settings not found");
+        }
+        return `
   <div style="font-family: Arial, sans-serif; color: #333;">
     <p>${name} has submitted a request for leave. Below are the details:</p>
 
@@ -50,9 +71,10 @@ function leaveRequestTemplate(name, leaveType, dayCount, startDate, endDate, rea
       <li style="margin-bottom: 5px;"><strong>Reason:</strong> ${reason}</li>
     </ul>
 
-    <p>To accept or reject the request please visit <a href="https://erp.teamosis.com/request" style="color: #007bff;">Themefisher ERP</a></p>
+    <p>To accept or reject the request please visit <a href="${settings.company_website}/request" style="color: #007bff;">${settings.company_name} ERP</a></p>
   </div>
   `;
+    });
 }
 // leave request discord template
 function leaveRequestDiscordTemplate(name, leaveType, dayCount, startDate, endDate, reason) {

@@ -1,13 +1,18 @@
+import { Setting } from "../modules/setting/setting.model";
 import { formatDate } from "./dateConverter";
 
 // invitation template
-export function invitationTemplate(
+export async function invitationTemplate(
   designation: string,
   joining_date: Date,
   invite_token: string
-): string {
+): Promise<string> {
+  const settings = await Setting.findOne().exec();
+  if (!settings) {
+    throw new Error("Settings not found");
+  }
   return `<div style="text-align: center; font-family: Arial, sans-serif; color: #333;">
-    <h1 style="color: #007bff;">Welcome to Themefisher!</h1>
+    <h1 style="color: #007bff;">Welcome to ${settings.company_name}!</h1>
     <br>
     <br>
     <br>
@@ -19,7 +24,7 @@ export function invitationTemplate(
     <br>
     <br>
     
-    <a href="https://erp.teamosis.com/onboard?token=${invite_token}" style="color: #007bff;">Click here</a> to join the team.
+    <a href="${settings.company_website}/onboard?token=${invite_token}" style="color: #007bff;">Click here</a> to join the team.
     </div>
     `;
 }
@@ -43,14 +48,18 @@ export function offboardingTemplate(
 }
 
 // leave request template
-export function leaveRequestTemplate(
+export async function leaveRequestTemplate(
   name: string,
   leaveType: string,
   dayCount: number,
   startDate: Date,
   endDate: Date,
   reason: string
-): string {
+): Promise<string> {
+  const settings = await Setting.findOne().exec();
+  if (!settings) {
+    throw new Error("Settings not found");
+  }
   return `
   <div style="font-family: Arial, sans-serif; color: #333;">
     <p>${name} has submitted a request for leave. Below are the details:</p>
@@ -61,7 +70,7 @@ export function leaveRequestTemplate(
       <li style="margin-bottom: 5px;"><strong>Reason:</strong> ${reason}</li>
     </ul>
 
-    <p>To accept or reject the request please visit <a href="https://erp.teamosis.com/request" style="color: #007bff;">Themefisher ERP</a></p>
+    <p>To accept or reject the request please visit <a href="${settings.company_website}/request" style="color: #007bff;">${settings.company_name} ERP</a></p>
   </div>
   `;
 }

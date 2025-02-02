@@ -29,7 +29,7 @@ const invitationRequest = (email, designation, invite_token, joining_date) => __
         from: variables_1.default.sender_email,
         to: email,
         subject: "Invitation from Themefisher",
-        html: (0, mailTemplate_1.invitationTemplate)(designation, joining_date, invite_token),
+        html: yield (0, mailTemplate_1.invitationTemplate)(designation, joining_date, invite_token),
     };
     yield mailTransporter.sendMail(mailDetails);
 });
@@ -39,7 +39,7 @@ const offboardingInitiate = (email, name, resignation_date) => __awaiter(void 0,
         from: variables_1.default.sender_email,
         to: email,
         subject: "Invitation from Themefisher",
-        html: (0, mailTemplate_1.offboardingTemplate)(name, resignation_date),
+        html: yield (0, mailTemplate_1.offboardingTemplate)(name, resignation_date),
     };
     yield mailTransporter.sendMail(mailDetails);
 });
@@ -49,7 +49,7 @@ const leaveRequest = (emails, name, leaveType, dayCount, startDate, endDate, rea
         from: variables_1.default.sender_email,
         to: emails,
         subject: `Leave Request by ${name}`,
-        html: (0, mailTemplate_1.leaveRequestTemplate)(name, leaveType, dayCount, startDate, endDate, reason),
+        html: yield (0, mailTemplate_1.leaveRequestTemplate)(name, leaveType, dayCount, startDate, endDate, reason),
     };
     yield mailTransporter.sendMail(mailDetails);
 });
@@ -60,8 +60,8 @@ const leaveRequestResponse = (email, name, leaveType, dayCount, startDate, endDa
         to: email,
         subject: `Leave Request ${status}`,
         html: status === "approved"
-            ? (0, mailTemplate_1.leaveRequestApprovedTemplate)(name, leaveType, dayCount, startDate, endDate, reason)
-            : (0, mailTemplate_1.leaveRequestRejectedTemplate)(name, leaveType, dayCount, startDate, endDate, reason),
+            ? yield (0, mailTemplate_1.leaveRequestApprovedTemplate)(name, leaveType, dayCount, startDate, endDate, reason)
+            : yield (0, mailTemplate_1.leaveRequestRejectedTemplate)(name, leaveType, dayCount, startDate, endDate, reason),
     };
     yield mailTransporter.sendMail(mailDetails);
 });

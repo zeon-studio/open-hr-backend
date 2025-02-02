@@ -27,7 +27,7 @@ const invitationRequest = async (
     from: config.sender_email,
     to: email,
     subject: "Invitation from Themefisher",
-    html: invitationTemplate(designation, joining_date, invite_token),
+    html: await invitationTemplate(designation, joining_date, invite_token),
   };
   await mailTransporter.sendMail(mailDetails);
 };
@@ -42,7 +42,7 @@ const offboardingInitiate = async (
     from: config.sender_email,
     to: email,
     subject: "Invitation from Themefisher",
-    html: offboardingTemplate(name, resignation_date),
+    html: await offboardingTemplate(name, resignation_date),
   };
   await mailTransporter.sendMail(mailDetails);
 };
@@ -61,7 +61,7 @@ const leaveRequest = async (
     from: config.sender_email,
     to: emails,
     subject: `Leave Request by ${name}`,
-    html: leaveRequestTemplate(
+    html: await leaveRequestTemplate(
       name,
       leaveType,
       dayCount,
@@ -90,7 +90,7 @@ const leaveRequestResponse = async (
     subject: `Leave Request ${status}`,
     html:
       status === "approved"
-        ? leaveRequestApprovedTemplate(
+        ? await leaveRequestApprovedTemplate(
             name,
             leaveType,
             dayCount,
@@ -98,7 +98,7 @@ const leaveRequestResponse = async (
             endDate,
             reason
           )
-        : leaveRequestRejectedTemplate(
+        : await leaveRequestRejectedTemplate(
             name,
             leaveType,
             dayCount,
