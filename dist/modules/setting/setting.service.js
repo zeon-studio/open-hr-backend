@@ -46,10 +46,28 @@ const getLeaveAllottedDays = () => __awaiter(void 0, void 0, void 0, function* (
     });
     return leaveAllottedDays;
 });
+// get onboarding tasks
+const getOnboardingTasksService = () => __awaiter(void 0, void 0, void 0, function* () {
+    const setting = yield setting_model_1.Setting.findOne().exec();
+    if (!setting) {
+        throw new Error("Settings not found");
+    }
+    return setting.onboarding_tasks;
+});
+// get offboarding tasks
+const getOffboardingTasksService = () => __awaiter(void 0, void 0, void 0, function* () {
+    const setting = yield setting_model_1.Setting.findOne().exec();
+    if (!setting) {
+        throw new Error("Settings not found");
+    }
+    return setting.offboarding_tasks;
+});
 exports.settingService = {
     getSettingService,
     updateSettingService,
     getWeekendsService,
     getLeaveAllottedDays,
+    getOnboardingTasksService,
+    getOffboardingTasksService,
 };
 //# sourceMappingURL=setting.service.js.map

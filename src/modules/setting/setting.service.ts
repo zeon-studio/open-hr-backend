@@ -44,9 +44,29 @@ const getLeaveAllottedDays = async () => {
   return leaveAllottedDays;
 };
 
+// get onboarding tasks
+const getOnboardingTasksService = async () => {
+  const setting = await Setting.findOne().exec();
+  if (!setting) {
+    throw new Error("Settings not found");
+  }
+  return setting.onboarding_tasks;
+};
+
+// get offboarding tasks
+const getOffboardingTasksService = async () => {
+  const setting = await Setting.findOne().exec();
+  if (!setting) {
+    throw new Error("Settings not found");
+  }
+  return setting.offboarding_tasks;
+};
+
 export const settingService = {
   getSettingService,
   updateSettingService,
   getWeekendsService,
   getLeaveAllottedDays,
+  getOnboardingTasksService,
+  getOffboardingTasksService,
 };

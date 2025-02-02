@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeService = void 0;
-const constants_1 = require("../../config/constants");
 const variables_1 = __importDefault(require("../../config/variables"));
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const IdGenerator_1 = require("../../lib/IdGenerator");
@@ -201,9 +200,14 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
                 },
             ],
         };
+        const onboardingTasks = yield setting_service_1.settingService.getOnboardingTasksService();
         const createEmployeeOnboardingData = {
             employee_id: employeeId,
-            tasks: constants_1.defaultOnboardingTasks,
+            tasks: onboardingTasks.map((task) => ({
+                task_name: task.name,
+                assigned_to: task.assigned_to,
+                status: "pending",
+            })),
         };
         const newEmployeeData = new employee_model_1.Employee(createEmployeeData);
         const insertedEmployee = yield newEmployeeData.save({ session });

@@ -1,4 +1,3 @@
-import { defaultOffboardingTasks } from "@/config/constants";
 import ApiError from "@/errors/ApiError";
 import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
@@ -6,6 +5,7 @@ import { PaginationType } from "@/types";
 import mongoose, { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
 import { Employee } from "../employee/employee.model";
+import { settingService } from "../setting/setting.service";
 import { EmployeeOffboarding } from "./employee-offboarding.model";
 import {
   EmployeeOffboardingCreate,
@@ -101,9 +101,14 @@ const createEmployeeOffboardingService = async (
       { session }
     );
 
+    const offboardingTasks = await settingService.getOnboardingTasksService();
     const createEmployeeOffboardingData = {
       employee_id: data.employee_id,
-      tasks: defaultOffboardingTasks,
+      tasks: offboardingTasks.map((task) => ({
+        task_name: task.name,
+        assigned_to: task.assigned_to,
+        status: "pending",
+      })),
     };
 
     const result = await EmployeeOffboarding.create(

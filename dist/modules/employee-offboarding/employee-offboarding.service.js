@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeOffboardingService = void 0;
-const constants_1 = require("../../config/constants");
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const mailSender_1 = require("../../lib/mailSender");
 const paginationHelper_1 = require("../../lib/paginationHelper");
 const mongoose_1 = __importDefault(require("mongoose"));
 const employee_job_model_1 = require("../employee-job/employee-job.model");
 const employee_model_1 = require("../employee/employee.model");
+const setting_service_1 = require("../setting/setting.service");
 const employee_offboarding_model_1 = require("./employee-offboarding.model");
 // get all data
 const getAllEmployeeOffboardingService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -80,9 +80,14 @@ const createEmployeeOffboardingService = (data) => __awaiter(void 0, void 0, voi
         yield employee_model_1.Employee.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { status: "archived" } }, { session });
         // update resignation date on employee job
         yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { resignation_date: data.resignation_date } }, { session });
+        const offboardingTasks = yield setting_service_1.settingService.getOnboardingTasksService();
         const createEmployeeOffboardingData = {
             employee_id: data.employee_id,
-            tasks: constants_1.defaultOffboardingTasks,
+            tasks: offboardingTasks.map((task) => ({
+                task_name: task.name,
+                assigned_to: task.assigned_to,
+                status: "pending",
+            })),
         };
         const result = yield employee_offboarding_model_1.EmployeeOffboarding.create([createEmployeeOffboardingData], { session });
         yield mailSender_1.mailSender.offboardingInitiate((_a = employeeData === null || employeeData === void 0 ? void 0 : employeeData.personal_email) !== null && _a !== void 0 ? _a : employeeData === null || employeeData === void 0 ? void 0 : employeeData.work_email, employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, data.resignation_date);

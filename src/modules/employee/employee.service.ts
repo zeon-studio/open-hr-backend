@@ -1,4 +1,3 @@
-import { defaultOnboardingTasks } from "@/config/constants";
 import config from "@/config/variables";
 import ApiError from "@/errors/ApiError";
 import { generateEmployeeId } from "@/lib/IdGenerator";
@@ -240,9 +239,14 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
       ],
     };
 
+    const onboardingTasks = await settingService.getOnboardingTasksService();
     const createEmployeeOnboardingData = {
       employee_id: employeeId,
-      tasks: defaultOnboardingTasks,
+      tasks: onboardingTasks.map((task) => ({
+        task_name: task.name,
+        assigned_to: task.assigned_to,
+        status: "pending",
+      })),
     };
 
     const newEmployeeData = new Employee(createEmployeeData);
