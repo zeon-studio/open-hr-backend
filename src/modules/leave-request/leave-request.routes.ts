@@ -22,6 +22,14 @@ leaveRequestRouter.get(
   leaveRequestController.getUpcomingLeaveRequestController
 );
 
+// get upcoming leave request
+leaveRequestRouter.get(
+  "/upcoming-dates/:current_date",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  leaveRequestController.getUpcomingLeaveRequestDatesController
+);
+
 // get single data
 leaveRequestRouter.get(
   "/:id",

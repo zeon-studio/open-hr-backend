@@ -233,10 +233,29 @@ const deleteLeaveRequestService = (id) => __awaiter(void 0, void 0, void 0, func
 // get upcoming leave request
 const getUpcomingLeaveRequestService = (current_date) => __awaiter(void 0, void 0, void 0, function* () {
     const leaveRequest = yield leave_request_model_1.LeaveRequest.find({
-        status: "approved",
+        status: { $in: ["approved", "pending"] },
         start_date: { $gte: current_date },
     });
     return leaveRequest;
+});
+// get upcoming leave request individual date
+const getUpcomingLeaveRequestDatesService = (current_date) => __awaiter(void 0, void 0, void 0, function* () {
+    const leaveRequest = yield leave_request_model_1.LeaveRequest.find({
+        status: { $in: ["approved", "pending"] },
+        start_date: { $gte: current_date },
+    });
+    return leaveRequest
+        .map((data) => {
+        const dates = [];
+        let currentDate = new Date(data.start_date);
+        const endDate = new Date(data.end_date);
+        while (currentDate <= endDate) {
+            dates.push(new Date(currentDate));
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        return dates;
+    })
+        .flat();
 });
 exports.leaveRequestService = {
     getAllLeaveRequestService,
@@ -245,5 +264,6 @@ exports.leaveRequestService = {
     updateLeaveRequestService,
     deleteLeaveRequestService,
     getUpcomingLeaveRequestService,
+    getUpcomingLeaveRequestDatesService,
 };
 //# sourceMappingURL=leave-request.service.js.map

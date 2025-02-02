@@ -103,6 +103,26 @@ const getUpcomingLeaveRequestController = catchAsync(
   }
 );
 
+// get upcoming leave request individual date
+const getUpcomingLeaveRequestDatesController = catchAsync(
+  async (req: Request, res: Response) => {
+    const current_date = req.params.current_date
+      ? new Date(req.params.current_date as string)
+      : new Date();
+    const leave =
+      await leaveRequestService.getUpcomingLeaveRequestDatesService(
+        current_date
+      );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: leave,
+      message: "data get successfully",
+    });
+  }
+);
+
 export const leaveRequestController = {
   getAllLeaveRequestController,
   getLeaveRequestController,
@@ -110,4 +130,5 @@ export const leaveRequestController = {
   updateLeaveRequestController,
   deleteLeaveRequestController,
   getUpcomingLeaveRequestController,
+  getUpcomingLeaveRequestDatesController,
 };

@@ -312,10 +312,33 @@ const deleteLeaveRequestService = async (id: string) => {
 // get upcoming leave request
 const getUpcomingLeaveRequestService = async (current_date: Date) => {
   const leaveRequest = await LeaveRequest.find({
-    status: "approved",
+    status: { $in: ["approved", "pending"] },
     start_date: { $gte: current_date },
   });
   return leaveRequest;
+};
+
+// get upcoming leave request individual date
+const getUpcomingLeaveRequestDatesService = async (current_date: Date) => {
+  const leaveRequest = await LeaveRequest.find({
+    status: { $in: ["approved", "pending"] },
+    start_date: { $gte: current_date },
+  });
+
+  return leaveRequest
+    .map((data) => {
+      const dates: Date[] = [];
+      let currentDate = new Date(data.start_date);
+      const endDate = new Date(data.end_date);
+
+      while (currentDate <= endDate) {
+        dates.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      return dates;
+    })
+    .flat();
 };
 
 export const leaveRequestService = {
@@ -325,4 +348,5 @@ export const leaveRequestService = {
   updateLeaveRequestService,
   deleteLeaveRequestService,
   getUpcomingLeaveRequestService,
+  getUpcomingLeaveRequestDatesService,
 };

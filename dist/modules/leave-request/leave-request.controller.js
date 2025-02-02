@@ -87,6 +87,19 @@ const getUpcomingLeaveRequestController = (0, catchAsync_1.default)((req, res) =
         message: "data get successfully",
     });
 }));
+// get upcoming leave request individual date
+const getUpcomingLeaveRequestDatesController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const current_date = req.params.current_date
+        ? new Date(req.params.current_date)
+        : new Date();
+    const leave = yield leave_request_service_1.leaveRequestService.getUpcomingLeaveRequestDatesService(current_date);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: leave,
+        message: "data get successfully",
+    });
+}));
 exports.leaveRequestController = {
     getAllLeaveRequestController,
     getLeaveRequestController,
@@ -94,5 +107,6 @@ exports.leaveRequestController = {
     updateLeaveRequestController,
     deleteLeaveRequestController,
     getUpcomingLeaveRequestController,
+    getUpcomingLeaveRequestDatesController,
 };
 //# sourceMappingURL=leave-request.controller.js.map

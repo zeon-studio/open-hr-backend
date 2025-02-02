@@ -13,6 +13,8 @@ const leaveRequestRouter = express_1.default.Router();
 leaveRequestRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), leave_request_controller_1.leaveRequestController.getAllLeaveRequestController);
 // get upcoming leave request
 leaveRequestRouter.get("/upcoming/:current_date", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), leave_request_controller_1.leaveRequestController.getUpcomingLeaveRequestController);
+// get upcoming leave request
+leaveRequestRouter.get("/upcoming-dates/:current_date", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_request_controller_1.leaveRequestController.getUpcomingLeaveRequestDatesController);
 // get single data
 leaveRequestRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_request_controller_1.leaveRequestController.getLeaveRequestController);
 // create data
