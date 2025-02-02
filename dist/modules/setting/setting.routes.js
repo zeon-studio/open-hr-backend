@@ -10,7 +10,7 @@ const express_1 = __importDefault(require("express"));
 const setting_controller_1 = require("./setting.controller");
 const settingRouter = express_1.default.Router();
 // get single data
-settingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), setting_controller_1.settingController.getSettingController);
+settingRouter.get("/", checkToken_1.checkToken, setting_controller_1.settingController.getSettingController);
 // update data
 settingRouter.patch("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), setting_controller_1.settingController.updateSettingController);
 exports.default = settingRouter;

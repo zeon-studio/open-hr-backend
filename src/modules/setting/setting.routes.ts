@@ -7,12 +7,7 @@ import { settingController } from "./setting.controller";
 const settingRouter = express.Router();
 
 // get single data
-settingRouter.get(
-  "/",
-  checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
-  settingController.getSettingController
-);
+settingRouter.get("/", checkToken, settingController.getSettingController);
 
 // update data
 settingRouter.patch(
