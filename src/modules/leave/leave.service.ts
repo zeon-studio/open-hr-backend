@@ -1,9 +1,9 @@
-import { leaveAllottedDays } from "@/config/constants";
 import { isOneYearPassed } from "@/lib/dateConverter";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
+import { settingService } from "../setting/setting.service";
 import { Leave } from "./leave.model";
 import { LeaveFilterOptions, LeaveYear } from "./leave.type";
 
@@ -96,6 +96,7 @@ const addNewYearLeaveService = async (year: number) => {
     return { message: "Year data already exists" };
   }
 
+  const leaveAllottedDays = await settingService.getLeaveAllottedDays();
   const employees = await EmployeeJob.find({});
 
   for (const employee of employees) {

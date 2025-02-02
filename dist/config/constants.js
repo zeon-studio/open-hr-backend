@@ -1,13 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defaultOffboardingTasks = exports.defaultOnboardingTasks = exports.leaveAllottedDays = exports.paginationField = void 0;
+exports.defaultOffboardingTasks = exports.defaultOnboardingTasks = exports.paginationField = void 0;
 exports.paginationField = ["limit", "page", "sortBy", "sortOrder"];
-exports.leaveAllottedDays = {
-    casual: 10,
-    sick: 5,
-    earned: 12,
-    without_pay: 30,
-};
 exports.defaultOnboardingTasks = [
     {
         task_name: "Add Fingerprint",

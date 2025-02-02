@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.leaveService = void 0;
-const constants_1 = require("../../config/constants");
 const dateConverter_1 = require("../../lib/dateConverter");
 const paginationHelper_1 = require("../../lib/paginationHelper");
 const employee_job_model_1 = require("../employee-job/employee-job.model");
+const setting_service_1 = require("../setting/setting.service");
 const leave_model_1 = require("./leave.model");
 // get all data
 const getAllLeaveService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -85,24 +85,25 @@ const addNewYearLeaveService = (year) => __awaiter(void 0, void 0, void 0, funct
     if (existingYearData) {
         return { message: "Year data already exists" };
     }
+    const leaveAllottedDays = yield setting_service_1.settingService.getLeaveAllottedDays();
     const employees = yield employee_job_model_1.EmployeeJob.find({});
     for (const employee of employees) {
         const createEmployeeLeaveData = {
             year: year,
             casual: {
-                allotted: constants_1.leaveAllottedDays.casual,
+                allotted: leaveAllottedDays.casual,
                 consumed: 0,
             },
             sick: {
-                allotted: constants_1.leaveAllottedDays.sick,
+                allotted: leaveAllottedDays.sick,
                 consumed: 0,
             },
             earned: {
-                allotted: constants_1.leaveAllottedDays.earned,
+                allotted: leaveAllottedDays.earned,
                 consumed: 0,
             },
             without_pay: {
-                allotted: constants_1.leaveAllottedDays.without_pay,
+                allotted: leaveAllottedDays.without_pay,
                 consumed: 0,
             },
         };

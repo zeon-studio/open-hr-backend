@@ -31,8 +31,22 @@ const getWeekendsService = async () => {
   };
 };
 
+// get leave allotted days
+const getLeaveAllottedDays = async () => {
+  const setting = await Setting.findOne().exec();
+  if (!setting) {
+    throw new Error("Settings not found");
+  }
+  const leaveAllottedDays: { [key: string]: number } = {};
+  setting.leaves.forEach((leave) => {
+    leaveAllottedDays[leave.name] = leave.days;
+  });
+  return leaveAllottedDays;
+};
+
 export const settingService = {
   getSettingService,
   updateSettingService,
   getWeekendsService,
+  getLeaveAllottedDays,
 };

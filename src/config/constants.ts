@@ -1,12 +1,5 @@
 export const paginationField = ["limit", "page", "sortBy", "sortOrder"];
 
-export const leaveAllottedDays = {
-  casual: 10,
-  sick: 5,
-  earned: 12,
-  without_pay: 30,
-};
-
 export const defaultOnboardingTasks = [
   {
     task_name: "Add Fingerprint",

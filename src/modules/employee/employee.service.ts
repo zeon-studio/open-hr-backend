@@ -1,4 +1,4 @@
-import { defaultOnboardingTasks, leaveAllottedDays } from "@/config/constants";
+import { defaultOnboardingTasks } from "@/config/constants";
 import config from "@/config/variables";
 import ApiError from "@/errors/ApiError";
 import { generateEmployeeId } from "@/lib/IdGenerator";
@@ -13,6 +13,7 @@ import mongoose, { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
 import { EmployeeOnboarding } from "../employee-onboarding/employee-onboarding.model";
 import { Leave } from "../leave/leave.model";
+import { settingService } from "../setting/setting.service";
 import { Employee } from "./employee.model";
 import {
   EmployeeCreateType,
@@ -204,6 +205,7 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
       joining_date: joiningDate,
     };
 
+    const leaveAllottedDays = await settingService.getLeaveAllottedDays();
     const createEmployeeLeaveData = {
       employee_id: employeeId,
       years: [

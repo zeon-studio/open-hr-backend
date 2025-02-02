@@ -26,6 +26,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const employee_job_model_1 = require("../employee-job/employee-job.model");
 const employee_onboarding_model_1 = require("../employee-onboarding/employee-onboarding.model");
 const leave_model_1 = require("../leave/leave.model");
+const setting_service_1 = require("../setting/setting.service");
 const employee_model_1 = require("./employee.model");
 // get all employees
 const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -175,17 +176,18 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
             designation: employeeData.designation,
             joining_date: joiningDate,
         };
+        const leaveAllottedDays = yield setting_service_1.settingService.getLeaveAllottedDays();
         const createEmployeeLeaveData = {
             employee_id: employeeId,
             years: [
                 {
                     year: joiningDate.getFullYear(),
                     casual: {
-                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, constants_1.leaveAllottedDays.casual),
+                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, leaveAllottedDays.casual),
                         consumed: 0,
                     },
                     sick: {
-                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, constants_1.leaveAllottedDays.sick),
+                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, leaveAllottedDays.sick),
                         consumed: 0,
                     },
                     earned: {
@@ -193,7 +195,7 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
                         consumed: 0,
                     },
                     without_pay: {
-                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, constants_1.leaveAllottedDays.without_pay),
+                        allotted: (0, leaveHelper_1.calculateRemainingLeave)(joiningDate, leaveAllottedDays.without_pay),
                         consumed: 0,
                     },
                 },

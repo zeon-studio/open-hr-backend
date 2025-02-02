@@ -34,9 +34,22 @@ const getWeekendsService = () => __awaiter(void 0, void 0, void 0, function* () 
         conditionalWeekends: setting.conditional_weekends,
     };
 });
+// get leave allotted days
+const getLeaveAllottedDays = () => __awaiter(void 0, void 0, void 0, function* () {
+    const setting = yield setting_model_1.Setting.findOne().exec();
+    if (!setting) {
+        throw new Error("Settings not found");
+    }
+    const leaveAllottedDays = {};
+    setting.leaves.forEach((leave) => {
+        leaveAllottedDays[leave.name] = leave.days;
+    });
+    return leaveAllottedDays;
+});
 exports.settingService = {
     getSettingService,
     updateSettingService,
     getWeekendsService,
+    getLeaveAllottedDays,
 };
 //# sourceMappingURL=setting.service.js.map
