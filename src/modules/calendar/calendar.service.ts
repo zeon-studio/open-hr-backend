@@ -3,8 +3,14 @@ import { Calendar } from "./calendar.model";
 import { CalendarType } from "./calendar.type";
 
 // get all calendars
-const getAllCalendarService = async (year: number) => {
-  const calendars = await Calendar.find({ year: year });
+const getAllCalendarService = async () => {
+  const calendars = await Calendar.find();
+  return calendars;
+};
+
+const getCalendarService = async (year: number) => {
+  const calendars = await Calendar.findOne({ year: year });
+
   return calendars;
 };
 
@@ -86,6 +92,7 @@ const getUpcomingEventsAndHolidaysService = async (currentDate: Date) => {
 
 export const calendarService = {
   getAllCalendarService,
+  getCalendarService,
   createCalendarService,
   updateCalendarService,
   deleteCalendarService,

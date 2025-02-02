@@ -6,8 +6,7 @@ import { calendarService } from "./calendar.service";
 // get all data
 const getAllCalendarController = catchAsync(
   async (req: Request, res: Response) => {
-    const year = Number(req.params.year);
-    const calendar = await calendarService.getAllCalendarService(year);
+    const calendar = await calendarService.getAllCalendarService();
 
     sendResponse(res, {
       success: true,
@@ -16,6 +15,20 @@ const getAllCalendarController = catchAsync(
       meta: {
         total: calendar.length,
       },
+      message: "data get successfully",
+    });
+  }
+);
+
+const getCalendarController = catchAsync(
+  async (req: Request, res: Response) => {
+    const year = Number(req.params.year);
+    const calendar = await calendarService.getCalendarService(year);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: calendar,
       message: "data get successfully",
     });
   }
@@ -84,6 +97,7 @@ const getUpcomingEventsAndHolidaysController = catchAsync(
 
 export const calendarController = {
   getAllCalendarController,
+  getCalendarController,
   createCalendarController,
   updateCalendarController,
   deleteCalendarController,

@@ -18,8 +18,7 @@ const sendResponse_1 = require("../../lib/sendResponse");
 const calendar_service_1 = require("./calendar.service");
 // get all data
 const getAllCalendarController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const year = Number(req.params.year);
-    const calendar = yield calendar_service_1.calendarService.getAllCalendarService(year);
+    const calendar = yield calendar_service_1.calendarService.getAllCalendarService();
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: 200,
@@ -27,6 +26,16 @@ const getAllCalendarController = (0, catchAsync_1.default)((req, res) => __await
         meta: {
             total: calendar.length,
         },
+        message: "data get successfully",
+    });
+}));
+const getCalendarController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const year = Number(req.params.year);
+    const calendar = yield calendar_service_1.calendarService.getCalendarService(year);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: calendar,
         message: "data get successfully",
     });
 }));
@@ -77,6 +86,7 @@ const getUpcomingEventsAndHolidaysController = (0, catchAsync_1.default)((req, r
 }));
 exports.calendarController = {
     getAllCalendarController,
+    getCalendarController,
     createCalendarController,
     updateCalendarController,
     deleteCalendarController,

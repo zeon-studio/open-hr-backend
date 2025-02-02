@@ -10,11 +10,13 @@ const express_1 = __importDefault(require("express"));
 const calendar_controller_1 = require("./calendar.controller");
 const calendarRouter = express_1.default.Router();
 // get all data
-calendarRouter.get("/:year", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), calendar_controller_1.calendarController.getAllCalendarController);
+calendarRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), calendar_controller_1.calendarController.getAllCalendarController);
 // create data
 calendarRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), calendar_controller_1.calendarController.createCalendarController);
 // get upcoming events and holidays
 calendarRouter.get("/upcoming/:current_date", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), calendar_controller_1.calendarController.getUpcomingEventsAndHolidaysController);
+// get single data
+calendarRouter.get("/:year", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), calendar_controller_1.calendarController.getCalendarController);
 // update data
 calendarRouter.patch("/:year", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), calendar_controller_1.calendarController.updateCalendarController);
 // delete data

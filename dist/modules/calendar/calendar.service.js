@@ -13,8 +13,12 @@ exports.calendarService = void 0;
 const dateConverter_1 = require("../../lib/dateConverter");
 const calendar_model_1 = require("./calendar.model");
 // get all calendars
-const getAllCalendarService = (year) => __awaiter(void 0, void 0, void 0, function* () {
-    const calendars = yield calendar_model_1.Calendar.find({ year: year });
+const getAllCalendarService = () => __awaiter(void 0, void 0, void 0, function* () {
+    const calendars = yield calendar_model_1.Calendar.find();
+    return calendars;
+});
+const getCalendarService = (year) => __awaiter(void 0, void 0, void 0, function* () {
+    const calendars = yield calendar_model_1.Calendar.findOne({ year: year });
     return calendars;
 });
 // create calendar
@@ -59,6 +63,7 @@ const getUpcomingEventsAndHolidaysService = (currentDate) => __awaiter(void 0, v
 });
 exports.calendarService = {
     getAllCalendarService,
+    getCalendarService,
     createCalendarService,
     updateCalendarService,
     deleteCalendarService,
