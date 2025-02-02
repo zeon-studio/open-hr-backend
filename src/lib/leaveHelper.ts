@@ -1,9 +1,9 @@
-import { conditionalWeekendDays, weekendDays } from "@/config/constants";
 import ApiError from "@/errors/ApiError";
 import { Calendar } from "@/modules/calendar/calendar.model";
 import { LeaveRequest } from "@/modules/leave-request/leave-request.model";
 import { LeaveRequestType } from "@/modules/leave-request/leave-request.type";
 import { Leave } from "@/modules/leave/leave.model";
+import { settingService } from "@/modules/setting/setting.service";
 import {
   differenceInDays,
   eachDayOfInterval,
@@ -35,6 +35,10 @@ export const dayCounterWithoutHoliday = async (
   const start = startOfDay(startDate);
   const end = endOfDay(endDate);
   const daysInterval = eachDayOfInterval({ start, end });
+
+  // Fetch weekends and conditional weekends from settings
+  const { weekends, conditionalWeekends } =
+    await settingService.getWeekendsService();
 
   // Modify the holiday filtering logic to handle edge cases
   const holidayDays = holidays.filter((holiday) => {
@@ -80,16 +84,17 @@ export const dayCounterWithoutHoliday = async (
     const dayName = day.toLocaleDateString("en-US", { weekday: "long" });
 
     // Check regular weekend days
-    if (weekendDays.includes(dayName)) {
+    if (weekends.includes(dayName)) {
       return true;
     }
 
     // Check conditional weekend days
-    if (dayName in conditionalWeekendDays) {
+    const conditionalWeekend = conditionalWeekends.find(
+      (cw) => cw.name === dayName
+    );
+    if (conditionalWeekend) {
       const weekNumber = getWeekOfMonth(day);
-      return conditionalWeekendDays[
-        dayName as keyof typeof conditionalWeekendDays
-      ].includes(weekNumber);
+      return conditionalWeekend.pattern.includes(weekNumber);
     }
 
     return false;

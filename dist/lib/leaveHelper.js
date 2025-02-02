@@ -14,11 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.leaveValidator = exports.dayCounterWithoutHoliday = void 0;
 exports.calculateRemainingLeave = calculateRemainingLeave;
-const constants_1 = require("../config/constants");
 const ApiError_1 = __importDefault(require("../errors/ApiError"));
 const calendar_model_1 = require("../modules/calendar/calendar.model");
 const leave_request_model_1 = require("../modules/leave-request/leave-request.model");
 const leave_model_1 = require("../modules/leave/leave.model");
+const setting_service_1 = require("../modules/setting/setting.service");
 const date_fns_1 = require("date-fns");
 // Helper function to get week number of the month (1-based)
 const getWeekOfMonth = (date) => {
@@ -35,6 +35,8 @@ const dayCounterWithoutHoliday = (startDate, endDate) => __awaiter(void 0, void 
     const start = (0, date_fns_1.startOfDay)(startDate);
     const end = (0, date_fns_1.endOfDay)(endDate);
     const daysInterval = (0, date_fns_1.eachDayOfInterval)({ start, end });
+    // Fetch weekends and conditional weekends from settings
+    const { weekends, conditionalWeekends } = yield setting_service_1.settingService.getWeekendsService();
     // Modify the holiday filtering logic to handle edge cases
     const holidayDays = holidays.filter((holiday) => {
         const holidayStart = (0, date_fns_1.startOfDay)((0, date_fns_1.parseISO)(new Date(holiday.start_date).toISOString()));
@@ -63,13 +65,14 @@ const dayCounterWithoutHoliday = (startDate, endDate) => __awaiter(void 0, void 
     const weekendInterval = daysInterval.filter((day) => {
         const dayName = day.toLocaleDateString("en-US", { weekday: "long" });
         // Check regular weekend days
-        if (constants_1.weekendDays.includes(dayName)) {
+        if (weekends.includes(dayName)) {
             return true;
         }
         // Check conditional weekend days
-        if (dayName in constants_1.conditionalWeekendDays) {
+        const conditionalWeekend = conditionalWeekends.find((cw) => cw.name === dayName);
+        if (conditionalWeekend) {
             const weekNumber = getWeekOfMonth(day);
-            return constants_1.conditionalWeekendDays[dayName].includes(weekNumber);
+            return conditionalWeekend.pattern.includes(weekNumber);
         }
         return false;
     });

@@ -1,11 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defaultOffboardingTasks = exports.defaultOnboardingTasks = exports.leaveAllottedDays = exports.conditionalWeekendDays = exports.weekendDays = exports.paginationField = void 0;
+exports.defaultOffboardingTasks = exports.defaultOnboardingTasks = exports.leaveAllottedDays = exports.paginationField = void 0;
 exports.paginationField = ["limit", "page", "sortBy", "sortOrder"];
-exports.weekendDays = ["Friday"];
-exports.conditionalWeekendDays = {
-    Saturday: [1, 3], // Array of week numbers
-};
 exports.leaveAllottedDays = {
     casual: 10,
     sick: 5,

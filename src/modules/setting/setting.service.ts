@@ -19,7 +19,20 @@ const updateSettingService = async (updateData: Partial<SettingType>) => {
   return result;
 };
 
+// get weekends and conditional weekends
+const getWeekendsService = async () => {
+  const setting = await Setting.findOne().exec();
+  if (!setting) {
+    throw new Error("Settings not found");
+  }
+  return {
+    weekends: setting.weekends,
+    conditionalWeekends: setting.conditional_weekends,
+  };
+};
+
 export const settingService = {
   getSettingService,
   updateSettingService,
+  getWeekendsService,
 };
