@@ -101,7 +101,7 @@ const createEmployeeOffboardingService = async (
       { session }
     );
 
-    const offboardingTasks = await settingService.getOnboardingTasksService();
+    const offboardingTasks = await settingService.getOffboardingTasksService();
     const createEmployeeOffboardingData = {
       employee_id: data.employee_id,
       tasks: offboardingTasks.map((task) => ({
