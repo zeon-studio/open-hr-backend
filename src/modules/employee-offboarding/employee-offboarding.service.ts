@@ -117,7 +117,7 @@ const createEmployeeOffboardingService = async (
     );
 
     await mailSender.offboardingInitiate(
-      employeeData?.personal_email! ?? employeeData?.work_email,
+      employeeData?.personal_email! || employeeData?.work_email!,
       employeeData?.name!,
       data.resignation_date
     );
