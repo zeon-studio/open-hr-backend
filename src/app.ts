@@ -1,3 +1,4 @@
+import config from "@/config/variables";
 import { globalErrorhandler } from "@/middlewares/globalErrorHandler";
 import router from "@/routes";
 import cors from "cors";
@@ -15,7 +16,7 @@ const corsProtectedOptions: cors.CorsOptions =
         optionsSuccessStatus: 204,
       }
     : {
-        origin: [String(process.env.CORS_ORIGIN)],
+        origin: [config.cors_origin],
         methods: "GET,PUT,PATCH,POST,DELETE",
         preflightContinue: false,
         optionsSuccessStatus: 204,

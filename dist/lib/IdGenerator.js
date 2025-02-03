@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateAssetId = exports.generateEmployeeId = void 0;
+const variables_1 = __importDefault(require("../config/variables"));
 const departmentGenerator = {
     development: "DEV",
     marketing: "MKT",
@@ -31,7 +35,7 @@ const make3digit = (num) => {
 };
 // employee id generator
 const generateEmployeeId = (department, joining_date, departmentSerial) => {
-    const userId = "TF" +
+    const userId = variables_1.default.id_prefix +
         departmentGenerator[department] +
         findYear(joining_date) +
         make3digit(departmentSerial);
@@ -40,7 +44,11 @@ const generateEmployeeId = (department, joining_date, departmentSerial) => {
 exports.generateEmployeeId = generateEmployeeId;
 // asset id generator
 const generateAssetId = (assetType, assetSerial) => {
-    const assetId = "TF_" + assetTypeGenerator[assetType] + "_" + assetSerial.toString();
+    const assetId = variables_1.default.id_prefix +
+        "_" +
+        assetTypeGenerator[assetType] +
+        "_" +
+        assetSerial.toString();
     return assetId;
 };
 exports.generateAssetId = generateAssetId;

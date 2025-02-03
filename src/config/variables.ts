@@ -19,4 +19,6 @@ export default {
   sender_email: process.env.SENDER_EMAIL,
   sender_password: process.env.EMAIL_PASSWORD,
   discord_webhook_url: process.env.DISCORD_WEBHOOK_URL,
+  id_prefix: process.env.ID_GENERATOR_PREFIX,
+  cors_origin: String(process.env.CORS_ORIGIN),
 };

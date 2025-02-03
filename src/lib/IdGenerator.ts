@@ -1,3 +1,5 @@
+import config from "@/config/variables";
+
 const departmentGenerator: { [key: string]: string } = {
   development: "DEV",
   marketing: "MKT",
@@ -37,7 +39,7 @@ export const generateEmployeeId = (
   departmentSerial: number
 ) => {
   const userId =
-    "TF" +
+    config.id_prefix +
     departmentGenerator[department] +
     findYear(joining_date) +
     make3digit(departmentSerial);
@@ -48,6 +50,10 @@ export const generateEmployeeId = (
 // asset id generator
 export const generateAssetId = (assetType: string, assetSerial: number) => {
   const assetId =
-    "TF_" + assetTypeGenerator[assetType] + "_" + assetSerial.toString();
+    config.id_prefix +
+    "_" +
+    assetTypeGenerator[assetType] +
+    "_" +
+    assetSerial.toString();
   return assetId;
 };

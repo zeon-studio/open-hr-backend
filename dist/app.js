@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const variables_1 = __importDefault(require("./config/variables"));
 const globalErrorHandler_1 = require("./middlewares/globalErrorHandler");
 const routes_1 = __importDefault(require("./routes"));
 const cors_1 = __importDefault(require("cors"));
@@ -26,7 +27,7 @@ const corsProtectedOptions = process.env.NODE_ENV === "development"
         optionsSuccessStatus: 204,
     }
     : {
-        origin: [String(process.env.CORS_ORIGIN)],
+        origin: [variables_1.default.cors_origin],
         methods: "GET,PUT,PATCH,POST,DELETE",
         preflightContinue: false,
         optionsSuccessStatus: 204,

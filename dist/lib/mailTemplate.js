@@ -35,7 +35,7 @@ function invitationTemplate(designation, joining_date, invite_token) {
     <br>
     <br>
     
-    <a href="${settings.company_website}/onboard?token=${invite_token}" style="color: #007bff;">Click here</a> to join the team.
+    <a href="${settings.app_url}/onboard?token=${invite_token}" style="color: #007bff;">Click here</a> to join the team.
     </div>
     `;
     });
@@ -71,7 +71,7 @@ function leaveRequestTemplate(name, leaveType, dayCount, startDate, endDate, rea
       <li style="margin-bottom: 5px;"><strong>Reason:</strong> ${reason}</li>
     </ul>
 
-    <p>To accept or reject the request please visit <a href="${settings.company_website}/request" style="color: #007bff;">${settings.company_name} ERP</a></p>
+    <p>To accept or reject the request please visit <a href="${settings.app_url}/request" style="color: #007bff;">${settings.app_name}</a></p>
   </div>
   `;
     });
