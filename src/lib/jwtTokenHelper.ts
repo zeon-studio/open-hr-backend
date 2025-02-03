@@ -1,4 +1,4 @@
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 
 // create token
 const createToken = (
@@ -10,7 +10,7 @@ const createToken = (
   return jwt.sign(
     { id: payload?.id, role: payload?.role, at: timeStamp },
     secret as Secret,
-    {
+    <SignOptions>{
       expiresIn: expires ? expires : "9999d",
     }
   );
