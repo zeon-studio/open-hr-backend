@@ -12,11 +12,11 @@ const getAllEmployeeController = catchAsync(
     const paginationOptions = pick(req.query, paginationField);
 
     // Extract filter options
-    let filterOptions = pick(req.query, ["search", "country"]);
+    let filterOptions = pick(req.query, ["search", "status"]);
 
-    // Convert 'country' to array if it exists
-    if (filterOptions.country && typeof filterOptions.country === "string") {
-      filterOptions.country = filterOptions.country.split(",");
+    // Convert 'status' to array if it exists
+    if (filterOptions.status && typeof filterOptions.status === "string") {
+      filterOptions.status = filterOptions.status.split(",");
     }
 
     const employee = await employeeService.getAllEmployeeService(

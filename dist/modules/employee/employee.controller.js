@@ -23,10 +23,10 @@ const getAllEmployeeController = (0, catchAsync_1.default)((req, res) => __await
     // Extract pagination options
     const paginationOptions = (0, filterPicker_1.default)(req.query, constants_1.paginationField);
     // Extract filter options
-    let filterOptions = (0, filterPicker_1.default)(req.query, ["search", "country"]);
-    // Convert 'country' to array if it exists
-    if (filterOptions.country && typeof filterOptions.country === "string") {
-        filterOptions.country = filterOptions.country.split(",");
+    let filterOptions = (0, filterPicker_1.default)(req.query, ["search", "status"]);
+    // Convert 'status' to array if it exists
+    if (filterOptions.status && typeof filterOptions.status === "string") {
+        filterOptions.status = filterOptions.status.split(",");
     }
     const employee = yield employee_service_1.employeeService.getAllEmployeeService(paginationOptions, filterOptions);
     (0, sendResponse_1.sendResponse)(res, {

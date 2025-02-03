@@ -29,7 +29,7 @@ const getAllEmployeeService = async (
     paginationHelpers.calculatePagination(paginationOptions);
 
   // Extract search and filter options
-  const { search } = filterOptions;
+  const { search, status } = filterOptions;
 
   // Create a text search stage for multiple fields
   let matchStage: any = {
@@ -49,6 +49,11 @@ const getAllEmployeeService = async (
     matchStage.$match.$or = searchConditions;
   }
 
+  // status condition
+  if (status) {
+    matchStage.$match.status = status;
+  }
+
   let pipeline: PipelineStage[] = [matchStage];
 
   // Sorting stage
@@ -65,15 +70,6 @@ const getAllEmployeeService = async (
   if (limit) {
     pipeline.push({ $limit: limit });
   }
-
-  pipeline.push({
-    $lookup: {
-      from: "employee_jobs",
-      localField: "id",
-      foreignField: "employee_id",
-      as: "job",
-    },
-  });
 
   pipeline.push({
     $project: {
@@ -101,8 +97,6 @@ const getAllEmployeeService = async (
       status: 1,
       note: 1,
       createdAt: 1,
-      department: { $arrayElemAt: ["$job.department", 0] },
-      designation: { $arrayElemAt: ["$job.designation", 0] },
     },
   });
 

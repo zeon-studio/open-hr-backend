@@ -34,4 +34,5 @@ export type EmployeeCreateType = {
 
 export type EmployeeFilterOptions = {
   search?: string | number;
+  status?: "pending" | "active" | "archived";
 };

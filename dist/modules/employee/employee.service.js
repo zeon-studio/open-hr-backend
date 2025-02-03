@@ -31,7 +31,7 @@ const employee_model_1 = require("./employee.model");
 const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { limit, skip, sortBy, sortOrder } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
     // Extract search and filter options
-    const { search } = filterOptions;
+    const { search, status } = filterOptions;
     // Create a text search stage for multiple fields
     let matchStage = {
         $match: {},
@@ -48,6 +48,10 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
         }));
         matchStage.$match.$or = searchConditions;
     }
+    // status condition
+    if (status) {
+        matchStage.$match.status = status;
+    }
     let pipeline = [matchStage];
     // Sorting stage
     pipeline.push({
@@ -62,14 +66,6 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
     if (limit) {
         pipeline.push({ $limit: limit });
     }
-    pipeline.push({
-        $lookup: {
-            from: "employee_jobs",
-            localField: "id",
-            foreignField: "employee_id",
-            as: "job",
-        },
-    });
     pipeline.push({
         $project: {
             _id: 0,
@@ -96,8 +92,6 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
             status: 1,
             note: 1,
             createdAt: 1,
-            department: { $arrayElemAt: ["$job.department", 0] },
-            designation: { $arrayElemAt: ["$job.designation", 0] },
         },
     });
     // Reapply sorting after grouping
