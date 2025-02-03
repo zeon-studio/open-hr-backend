@@ -89,7 +89,7 @@ const createEmployeeOffboardingService = async (
 
     // update employee status
     await Employee.findOneAndUpdate(
-      { employee_id: data.employee_id },
+      { id: data.employee_id },
       { $set: { status: "archived" } },
       { session }
     );
