@@ -80,6 +80,20 @@ const getSingleEmployeeByInviteTokenController = catchAsync(
   }
 );
 
+// get admin and mods
+const getAdminAndModsController = catchAsync(
+  async (req: Request, res: Response) => {
+    const employee = await employeeService.getAdminAndModsService();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: employee,
+      message: "employee get successfully",
+    });
+  }
+);
+
 // insert employee
 const createEmployeeController = catchAsync(
   async (req: Request, res: Response) => {
@@ -166,6 +180,23 @@ const updateEmployeePersonalityController = catchAsync(
   }
 );
 
+// update employee role
+const updateEmployeeRoleController = catchAsync(
+  async (req: Request, res: Response) => {
+    const role = req.body.role;
+    const updateRole = await employeeService.updateEmployeeRoleService(
+      req.params.id,
+      role
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: "data updated successfully",
+      result: updateRole,
+    });
+  }
+);
+
 // delete showcase
 const deleteEmployeeController = catchAsync(
   async (req: Request, res: Response) => {
@@ -185,10 +216,12 @@ export const employeeController = {
   getAllEmployeeBasicsController,
   getSingleEmployeeController,
   getSingleEmployeeByInviteTokenController,
+  getAdminAndModsController,
   createEmployeeController,
   updateEmployeeController,
   updateEmployeeEmailController,
   updateEmployeeDiscordController,
   updateEmployeePersonalityController,
+  updateEmployeeRoleController,
   deleteEmployeeController,
 };

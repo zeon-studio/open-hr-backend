@@ -1,4 +1,5 @@
 import config from "@/config/variables";
+import { ENUM_ROLE } from "@/enums/roles";
 import ApiError from "@/errors/ApiError";
 import { generateEmployeeId } from "@/lib/IdGenerator";
 import { jwtHelpers } from "@/lib/jwtTokenHelper";
@@ -117,6 +118,14 @@ const getAllEmployeeService = async (
       total: total,
     },
   };
+};
+
+// get admin and mods
+const getAdminAndModsService = async () => {
+  const result = await Employee.find({
+    role: { $in: [ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR] },
+  });
+  return result;
 };
 
 // get all employees id
@@ -343,6 +352,18 @@ const updateEmployeePersonalityService = async (
   return result;
 };
 
+// update employee role
+const updateEmployeeRoleService = async (id: string, role: string) => {
+  const result = await Employee.findOneAndUpdate(
+    { id: id },
+    { role },
+    {
+      new: true,
+    }
+  );
+  return result;
+};
+
 // delete employee
 const deleteEmployeeService = async (id: string) => {
   try {
@@ -362,12 +383,14 @@ const deleteEmployeeService = async (id: string) => {
 export const employeeService = {
   getAllEmployeeService,
   getAllEmployeeBasicsService,
-  createEmployeeService,
   getSingleEmployeeService,
   getSingleEmployeeByInviteTokenService,
+  getAdminAndModsService,
+  createEmployeeService,
   updateEmployeeService,
   updateEmployeeEmailService,
   updateEmployeeDiscordService,
   updateEmployeePersonalityService,
+  updateEmployeeRoleService,
   deleteEmployeeService,
 };

@@ -13,6 +13,8 @@ const employeeRouter = express_1.default.Router();
 employeeRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.getAllEmployeeController);
 // get all employee id
 employeeRouter.get("/basics", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.getAllEmployeeBasicsController);
+// get admin and mods
+employeeRouter.get("/admin-and-mods", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_controller_1.employeeController.getAdminAndModsController);
 // get single employee by invite token
 employeeRouter.get("/invite-token/:inviteToken", checkToken_1.checkToken, 
 // auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
@@ -29,6 +31,8 @@ employeeRouter.patch("/email/:id", checkToken_1.checkToken, (0, auth_1.default)(
 employeeRouter.patch("/discord/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeeDiscordController);
 // update employee personality
 employeeRouter.patch("/personality/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeePersonalityController);
+// update employee role
+employeeRouter.patch("/role/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_controller_1.employeeController.updateEmployeeRoleController);
 // delete testimonial
 employeeRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_controller_1.employeeController.deleteEmployeeController);
 exports.default = employeeRouter;

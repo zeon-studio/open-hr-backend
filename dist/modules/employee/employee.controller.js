@@ -67,6 +67,16 @@ const getSingleEmployeeByInviteTokenController = (0, catchAsync_1.default)((req,
         message: "employee get successfully",
     });
 }));
+// get admin and mods
+const getAdminAndModsController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const employee = yield employee_service_1.employeeService.getAdminAndModsService();
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: employee,
+        message: "employee get successfully",
+    });
+}));
 // insert employee
 const createEmployeeController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const employee = req.body;
@@ -122,6 +132,17 @@ const updateEmployeePersonalityController = (0, catchAsync_1.default)((req, res)
         result: updatePersonality,
     });
 }));
+// update employee role
+const updateEmployeeRoleController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const role = req.body.role;
+    const updateRole = yield employee_service_1.employeeService.updateEmployeeRoleService(req.params.id, role);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        message: "data updated successfully",
+        result: updateRole,
+    });
+}));
 // delete showcase
 const deleteEmployeeController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -137,11 +158,13 @@ exports.employeeController = {
     getAllEmployeeBasicsController,
     getSingleEmployeeController,
     getSingleEmployeeByInviteTokenController,
+    getAdminAndModsController,
     createEmployeeController,
     updateEmployeeController,
     updateEmployeeEmailController,
     updateEmployeeDiscordController,
     updateEmployeePersonalityController,
+    updateEmployeeRoleController,
     deleteEmployeeController,
 };
 //# sourceMappingURL=employee.controller.js.map

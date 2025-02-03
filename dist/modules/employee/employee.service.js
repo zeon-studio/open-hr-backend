@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeService = void 0;
 const variables_1 = __importDefault(require("../../config/variables"));
+const roles_1 = require("../../enums/roles");
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const IdGenerator_1 = require("../../lib/IdGenerator");
 const jwtTokenHelper_1 = require("../../lib/jwtTokenHelper");
@@ -109,6 +110,13 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
             total: total,
         },
     };
+});
+// get admin and mods
+const getAdminAndModsService = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield employee_model_1.Employee.find({
+        role: { $in: [roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR] },
+    });
+    return result;
 });
 // get all employees id
 const getAllEmployeeBasicsService = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -261,6 +269,13 @@ const updateEmployeePersonalityService = (personality, id) => __awaiter(void 0, 
     });
     return result;
 });
+// update employee role
+const updateEmployeeRoleService = (id, role) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { role }, {
+        new: true,
+    });
+    return result;
+});
 // delete employee
 const deleteEmployeeService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -276,13 +291,15 @@ const deleteEmployeeService = (id) => __awaiter(void 0, void 0, void 0, function
 exports.employeeService = {
     getAllEmployeeService,
     getAllEmployeeBasicsService,
-    createEmployeeService,
     getSingleEmployeeService,
     getSingleEmployeeByInviteTokenService,
+    getAdminAndModsService,
+    createEmployeeService,
     updateEmployeeService,
     updateEmployeeEmailService,
     updateEmployeeDiscordService,
     updateEmployeePersonalityService,
+    updateEmployeeRoleService,
     deleteEmployeeService,
 };
 //# sourceMappingURL=employee.service.js.map

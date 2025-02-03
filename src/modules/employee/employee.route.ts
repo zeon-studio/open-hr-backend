@@ -22,6 +22,14 @@ employeeRouter.get(
   employeeController.getAllEmployeeBasicsController
 );
 
+// get admin and mods
+employeeRouter.get(
+  "/admin-and-mods",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN),
+  employeeController.getAdminAndModsController
+);
+
 // get single employee by invite token
 employeeRouter.get(
   "/invite-token/:inviteToken",
@@ -76,6 +84,14 @@ employeeRouter.patch(
   checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.updateEmployeePersonalityController
+);
+
+// update employee role
+employeeRouter.patch(
+  "/role/:id",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN),
+  employeeController.updateEmployeeRoleController
 );
 
 // delete testimonial
