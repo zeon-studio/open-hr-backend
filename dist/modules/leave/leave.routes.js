@@ -16,7 +16,7 @@ leaveRouter.patch("/update-year/:year", checkToken_1.checkToken, (0, auth_1.defa
 // get single data
 leaveRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_controller_1.leaveController.getLeaveController);
 // update data
-leaveRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), leave_controller_1.leaveController.updateLeaveController);
+leaveRouter.patch("/:id/:year", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), leave_controller_1.leaveController.updateLeaveController);
 // delete data
 leaveRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), leave_controller_1.leaveController.deleteLeaveController);
 exports.default = leaveRouter;

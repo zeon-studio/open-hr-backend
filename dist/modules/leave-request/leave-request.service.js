@@ -235,7 +235,7 @@ const getUpcomingLeaveRequestService = (current_date) => __awaiter(void 0, void 
     const leaveRequest = yield leave_request_model_1.LeaveRequest.find({
         status: { $in: ["approved", "pending"] },
         start_date: { $gte: current_date },
-    });
+    }).sort({ start_date: 1 });
     return leaveRequest;
 });
 // get upcoming leave request individual date

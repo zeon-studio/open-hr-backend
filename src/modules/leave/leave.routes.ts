@@ -32,7 +32,7 @@ leaveRouter.get(
 
 // update data
 leaveRouter.patch(
-  "/:id",
+  "/:id/:year",
   checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   leaveController.updateLeaveController
