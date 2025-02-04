@@ -33,7 +33,7 @@ const getAllEmployeeEducationService = async (
 
   let pipeline: PipelineStage[] = [matchStage];
 
-  pipeline.push({ $sort: { updatedAt: -1 } });
+  pipeline.push({ $sort: { createdAt: -1 } });
 
   if (skip) {
     pipeline.push({ $skip: skip });

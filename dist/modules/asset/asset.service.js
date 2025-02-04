@@ -39,7 +39,7 @@ const getAllAssetService = (paginationOptions, filterOptions) => __awaiter(void 
         matchStage.$match.user = user;
     }
     let pipeline = [matchStage];
-    pipeline.push({ $sort: { updatedAt: -1 } });
+    pipeline.push({ $sort: { createdAt: -1 } });
     if (skip) {
         pipeline.push({ $skip: skip });
     }

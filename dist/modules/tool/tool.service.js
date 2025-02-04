@@ -37,7 +37,7 @@ const getAllToolService = (paginationOptions, filterOptions) => __awaiter(void 0
         matchStage.$match.platform = platform;
     }
     let pipeline = [matchStage];
-    pipeline.push({ $sort: { updatedAt: -1 } });
+    pipeline.push({ $sort: { createdAt: -1 } });
     if (skip) {
         pipeline.push({ $skip: skip });
     }

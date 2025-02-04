@@ -30,7 +30,7 @@ const getAllEmployeeOnboardingService = (paginationOptions, filterOptions) => __
         matchStage.$match.$or = searchConditions;
     }
     let pipeline = [matchStage];
-    pipeline.push({ $sort: { updatedAt: -1 } });
+    pipeline.push({ $sort: { createdAt: -1 } });
     if (skip) {
         pipeline.push({ $skip: skip });
     }
