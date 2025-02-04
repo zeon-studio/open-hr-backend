@@ -18,7 +18,7 @@ const getAllAssetService = (paginationOptions, filterOptions) => __awaiter(void 
     let matchStage = {
         $match: {},
     };
-    const { limit, skip } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
+    const { limit, skip, sortBy, sortOrder } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
     // Extract search and filter options
     const { search, user } = filterOptions;
     // Search condition
@@ -39,7 +39,13 @@ const getAllAssetService = (paginationOptions, filterOptions) => __awaiter(void 
         matchStage.$match.user = user;
     }
     let pipeline = [matchStage];
-    pipeline.push({ $sort: { createdAt: -1 } });
+    // Sorting stage
+    pipeline.push({
+        $sort: {
+            [sortBy]: sortOrder === "asc" ? 1 : -1,
+            _id: 1,
+        },
+    });
     if (skip) {
         pipeline.push({ $skip: skip });
     }

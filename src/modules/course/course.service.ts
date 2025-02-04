@@ -12,7 +12,7 @@ const getAllCourseService = async (
   let matchStage: any = {
     $match: {},
   };
-  const { limit, skip } =
+  const { limit, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
 
   // Extract search and filter options
@@ -38,7 +38,13 @@ const getAllCourseService = async (
 
   let pipeline: PipelineStage[] = [matchStage];
 
-  pipeline.push({ $sort: { createdAt: -1 } });
+  // Sorting stage
+  pipeline.push({
+    $sort: {
+      [sortBy]: sortOrder === "asc" ? 1 : -1,
+      _id: 1,
+    },
+  });
 
   if (skip) {
     pipeline.push({ $skip: skip });
