@@ -1,5 +1,5 @@
 export type Log = {
-  type: "handover" | "return" | "repair" | "lost" | "damaged";
+  type: "handover" | "repair" | "takeover";
   description: string;
   date: Date;
 };
@@ -26,7 +26,7 @@ export type AssetType = {
   price: number;
   currency: "bdt" | "usd";
   purchase_date: Date;
-  status: "active" | "inactive" | "lost" | "damaged";
+  status: "active" | "inactive" | "lost" | "damaged" | "sold";
   note: string;
   logs: Log[];
 };
