@@ -99,7 +99,6 @@ const getAllLeaveRequestService = (paginationOptions, filterOptions) => __awaite
 // get single employee data
 const getLeaveRequestService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield leave_request_model_1.LeaveRequest.find({ employee_id: id }).sort({
-        isPending: -1,
         createdAt: -1,
     });
     return result;

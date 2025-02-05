@@ -90,7 +90,9 @@ const getAllLeaveService = async (
 
 // get single data
 const getLeaveService = async (id: string) => {
-  const result = await Leave.findOne({ employee_id: id });
+  const result = await Leave.findOne({ employee_id: id }).sort({
+    createdAt: -1,
+  });
   return result;
 };
 

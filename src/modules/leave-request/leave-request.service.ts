@@ -105,7 +105,6 @@ const getAllLeaveRequestService = async (
 // get single employee data
 const getLeaveRequestService = async (id: string) => {
   const result = await LeaveRequest.find({ employee_id: id }).sort({
-    isPending: -1,
     createdAt: -1,
   });
   return result;
