@@ -31,18 +31,17 @@ const settingSchema = new mongoose.Schema<SettingType>(
       type: String,
       required: true,
     },
-    menus: [
+    modules: [
       {
         name: {
           type: String,
           required: true,
         },
-        url: {
+        description: {
           type: String,
-          required: true,
         },
-        access: {
-          type: [String],
+        enable: {
+          type: Boolean,
           required: true,
         },
       },

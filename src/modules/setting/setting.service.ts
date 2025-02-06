@@ -19,6 +19,21 @@ const updateSettingService = async (updateData: Partial<SettingType>) => {
   return result;
 };
 
+// update module
+const updateModuleStatusService = async (name: string, enable: boolean) => {
+  const setting = await Setting.findOne().exec();
+  if (!setting) {
+    throw new Error("Settings not found");
+  }
+  const module = setting.modules.find((mod) => mod.name === name);
+  if (!module) {
+    throw new Error("Module not found");
+  }
+  module.enable = enable;
+  await setting.save();
+  return module;
+};
+
 // get weekends and conditional weekends
 const getWeekendsService = async () => {
   const setting = await Setting.findOne().exec();
@@ -65,6 +80,7 @@ const getOffboardingTasksService = async () => {
 export const settingService = {
   getSettingService,
   updateSettingService,
+  updateModuleStatusService,
   getWeekendsService,
   getLeaveAllottedDays,
   getOnboardingTasksService,

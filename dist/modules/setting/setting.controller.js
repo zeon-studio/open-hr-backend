@@ -36,8 +36,20 @@ const updateSettingController = (0, catchAsync_1.default)((req, res) => __awaite
         message: "data updated successfully",
     });
 }));
+// update module status
+const updateModuleStatusController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, enable } = req.body;
+    const updatedModule = yield setting_service_1.settingService.updateModuleStatusService(name, enable);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: updatedModule,
+        message: "Module status updated successfully",
+    });
+}));
 exports.settingController = {
     getSettingController,
     updateSettingController,
+    updateModuleStatusController,
 };
 //# sourceMappingURL=setting.controller.js.map

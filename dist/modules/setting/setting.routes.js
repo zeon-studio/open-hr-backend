@@ -12,6 +12,8 @@ const settingRouter = express_1.default.Router();
 // get single data
 settingRouter.get("/", checkToken_1.checkToken, setting_controller_1.settingController.getSettingController);
 // update data
-settingRouter.patch("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), setting_controller_1.settingController.updateSettingController);
+settingRouter.patch("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), setting_controller_1.settingController.updateSettingController);
+// update module status
+settingRouter.patch("/update-module", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), setting_controller_1.settingController.updateModuleStatusController);
 exports.default = settingRouter;
 //# sourceMappingURL=setting.routes.js.map

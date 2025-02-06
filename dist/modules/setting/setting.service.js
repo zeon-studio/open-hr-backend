@@ -23,6 +23,20 @@ const updateSettingService = (updateData) => __awaiter(void 0, void 0, void 0, f
     });
     return result;
 });
+// update module
+const updateModuleStatusService = (name, enable) => __awaiter(void 0, void 0, void 0, function* () {
+    const setting = yield setting_model_1.Setting.findOne().exec();
+    if (!setting) {
+        throw new Error("Settings not found");
+    }
+    const module = setting.modules.find((mod) => mod.name === name);
+    if (!module) {
+        throw new Error("Module not found");
+    }
+    module.enable = enable;
+    yield setting.save();
+    return module;
+});
 // get weekends and conditional weekends
 const getWeekendsService = () => __awaiter(void 0, void 0, void 0, function* () {
     const setting = yield setting_model_1.Setting.findOne().exec();
@@ -65,6 +79,7 @@ const getOffboardingTasksService = () => __awaiter(void 0, void 0, void 0, funct
 exports.settingService = {
     getSettingService,
     updateSettingService,
+    updateModuleStatusService,
     getWeekendsService,
     getLeaveAllottedDays,
     getOnboardingTasksService,

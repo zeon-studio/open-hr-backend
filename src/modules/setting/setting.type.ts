@@ -1,7 +1,19 @@
-export type MenuItem = {
-  name: string;
-  url: string;
-  access: ("admin" | "user" | "moderator")[];
+export type ModuleItem = {
+  name:
+    | "tool"
+    | "course"
+    | "asset"
+    | "leave"
+    | "calendar"
+    | "employee-bank"
+    | "employee-payroll"
+    | "employee-contact"
+    | "employee-document"
+    | "employee-boarding"
+    | "employee-education"
+    | "employee-achievement";
+  description: string;
+  enable: boolean;
 };
 
 export type LeaveItem = {
@@ -28,7 +40,7 @@ export type SettingType = {
   logo_height: number;
   company_name: string;
   company_website: string;
-  menus: MenuItem[];
+  modules: ModuleItem[];
   weekends: string[];
   conditional_weekends: ConditionalWeekend[];
   leaves: LeaveItem[];

@@ -29,7 +29,26 @@ const updateSettingController = catchAsync(
   }
 );
 
+// update module status
+const updateModuleStatusController = catchAsync(
+  async (req: Request, res: Response) => {
+    const { name, enable } = req.body;
+    const updatedModule = await settingService.updateModuleStatusService(
+      name,
+      enable
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: updatedModule,
+      message: "Module status updated successfully",
+    });
+  }
+);
+
 export const settingController = {
   getSettingController,
   updateSettingController,
+  updateModuleStatusController,
 };

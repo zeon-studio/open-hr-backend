@@ -13,8 +13,16 @@ settingRouter.get("/", checkToken, settingController.getSettingController);
 settingRouter.patch(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  auth(ENUM_ROLE.ADMIN),
   settingController.updateSettingController
+);
+
+// update module status
+settingRouter.patch(
+  "/update-module",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN),
+  settingController.updateModuleStatusController
 );
 
 export default settingRouter;
