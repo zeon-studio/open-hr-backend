@@ -9,7 +9,7 @@ export type ModuleItem = {
     | "employee-payroll"
     | "employee-contact"
     | "employee-document"
-    | "employee-boarding"
+    | "employee-lifecycle"
     | "employee-education"
     | "employee-achievement";
   description: string;
