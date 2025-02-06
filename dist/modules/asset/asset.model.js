@@ -73,7 +73,7 @@ const assetSchema = new mongoose_1.default.Schema({
     status: {
         type: String,
         required: true,
-        default: "active",
+        default: "archived",
     },
     note: {
         type: String,

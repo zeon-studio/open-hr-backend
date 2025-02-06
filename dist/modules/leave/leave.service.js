@@ -81,9 +81,7 @@ const getAllLeaveService = (paginationOptions, filterOptions) => __awaiter(void 
 });
 // get single data
 const getLeaveService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield leave_model_1.Leave.findOne({ employee_id: id }).sort({
-        createdAt: -1,
-    });
+    const result = yield leave_model_1.Leave.findOne({ employee_id: id });
     return result;
 });
 // add new year data

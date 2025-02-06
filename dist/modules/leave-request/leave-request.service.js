@@ -88,7 +88,7 @@ const getAllLeaveRequestService = (paginationOptions, filterOptions) => __awaite
         },
     });
     const result = yield leave_request_model_1.LeaveRequest.aggregate(pipeline);
-    const total = yield leave_request_model_1.LeaveRequest.countDocuments();
+    const total = yield leave_request_model_1.LeaveRequest.countDocuments(matchStage.$match);
     return {
         result: result,
         meta: {

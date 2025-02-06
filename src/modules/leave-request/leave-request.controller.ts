@@ -9,7 +9,7 @@ import { leaveRequestService } from "./leave-request.service";
 const getAllLeaveRequestController = catchAsync(
   async (req: Request, res: Response) => {
     const paginationOptions = pick(req.query, paginationField);
-    const filterOption = pick(req.query, ["search"]);
+    const filterOption = pick(req.query, ["search", "employee_id"]);
 
     const leave = await leaveRequestService.getAllLeaveRequestService(
       paginationOptions,

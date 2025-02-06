@@ -40,7 +40,7 @@ const assetSchema = new mongoose.Schema<AssetType>(
     status: {
       type: String,
       required: true,
-      default: "active",
+      default: "archived",
     },
     note: {
       type: String,

@@ -93,7 +93,7 @@ const getAllLeaveRequestService = async (
   });
 
   const result = await LeaveRequest.aggregate(pipeline);
-  const total = await LeaveRequest.countDocuments();
+  const total = await LeaveRequest.countDocuments(matchStage.$match);
   return {
     result: result,
     meta: {

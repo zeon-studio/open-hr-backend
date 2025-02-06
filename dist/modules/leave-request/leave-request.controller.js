@@ -21,7 +21,7 @@ const leave_request_service_1 = require("./leave-request.service");
 // get all data
 const getAllLeaveRequestController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const paginationOptions = (0, filterPicker_1.default)(req.query, constants_1.paginationField);
-    const filterOption = (0, filterPicker_1.default)(req.query, ["search"]);
+    const filterOption = (0, filterPicker_1.default)(req.query, ["search", "employee_id"]);
     const leave = yield leave_request_service_1.leaveRequestService.getAllLeaveRequestService(paginationOptions, filterOption);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
