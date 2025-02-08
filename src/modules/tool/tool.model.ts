@@ -1,6 +1,5 @@
-import { EBilling, ECurrency } from "@/types";
 import mongoose, { model } from "mongoose";
-import { ToolType } from "./tool.type";
+import { EBilling, ECurrency, ToolType } from "./tool.type";
 
 const toolSchema = new mongoose.Schema<ToolType>(
   {

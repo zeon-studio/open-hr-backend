@@ -1,4 +1,7 @@
-import { ECurrency } from "@/types";
+export enum ECurrency {
+  BDT = "bdt",
+  USD = "usd",
+}
 
 export type Course = {
   _id: string;

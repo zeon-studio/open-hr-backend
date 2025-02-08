@@ -1,6 +1,5 @@
-import { ECurrency } from "@/types";
 import mongoose, { model } from "mongoose";
-import { AssetType, EAssetStatus } from "./asset.type";
+import { AssetType, EAssetStatus, ECurrency } from "./asset.type";
 
 const assetSchema = new mongoose.Schema<AssetType>(
   {

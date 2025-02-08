@@ -34,8 +34,8 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Tool = void 0;
-const types_1 = require("@/types");
 const mongoose_1 = __importStar(require("mongoose"));
+const tool_type_1 = require("./tool.type");
 const toolSchema = new mongoose_1.default.Schema({
     platform: {
         type: String,
@@ -68,12 +68,12 @@ const toolSchema = new mongoose_1.default.Schema({
             currency: {
                 type: String,
                 required: true,
-                enum: types_1.ECurrency,
+                enum: tool_type_1.ECurrency,
             },
             billing: {
                 type: String,
                 required: true,
-                enum: types_1.EBilling,
+                enum: tool_type_1.EBilling,
             },
             users: [
                 {

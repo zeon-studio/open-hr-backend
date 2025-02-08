@@ -34,8 +34,8 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Course = void 0;
-const types_1 = require("@/types");
 const mongoose_1 = __importStar(require("mongoose"));
+const course_type_1 = require("./course.type");
 const courseSchema = new mongoose_1.default.Schema({
     platform: {
         type: String,
@@ -67,7 +67,7 @@ const courseSchema = new mongoose_1.default.Schema({
             currency: {
                 type: String,
                 required: true,
-                enum: types_1.ECurrency,
+                enum: course_type_1.ECurrency,
             },
             users: [
                 {

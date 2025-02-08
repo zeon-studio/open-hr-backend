@@ -1,5 +1,13 @@
-import { EBilling, ECurrency } from "@/types";
+export enum ECurrency {
+  BDT = "bdt",
+  USD = "usd",
+}
 
+export enum EBilling {
+  MONTHLY = "monthly",
+  YEARLY = "yearly",
+  ONETIME = "onetime",
+}
 export type Organization = {
   _id: string;
   name: string;

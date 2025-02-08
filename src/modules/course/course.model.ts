@@ -1,6 +1,5 @@
-import { ECurrency } from "@/types";
 import mongoose, { model } from "mongoose";
-import { CourseType } from "./course.type";
+import { CourseType, ECurrency } from "./course.type";
 
 const courseSchema = new mongoose.Schema<CourseType>(
   {

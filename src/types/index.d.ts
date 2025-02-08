@@ -1,17 +1,6 @@
 import { JwtPayload } from "jsonwebtoken";
 import { SortOrder } from "mongoose";
 
-export enum ECurrency {
-  BDT = "bdt",
-  USD = "usd",
-}
-
-export enum EBilling {
-  MONTHLY = "monthly",
-  YEARLY = "yearly",
-  ONETIME = "onetime",
-}
-
 export type ErrorMessageType = {
   message: string;
   path: string;

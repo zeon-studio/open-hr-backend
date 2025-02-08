@@ -1,6 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EAssetStatus = exports.EAssetType = exports.EAssetLogType = void 0;
+exports.EAssetStatus = exports.EAssetType = exports.EAssetLogType = exports.ECurrency = void 0;
+var ECurrency;
+(function (ECurrency) {
+    ECurrency["BDT"] = "bdt";
+    ECurrency["USD"] = "usd";
+})(ECurrency || (exports.ECurrency = ECurrency = {}));
 var EAssetLogType;
 (function (EAssetLogType) {
     EAssetLogType["HANDOVER"] = "handover";
