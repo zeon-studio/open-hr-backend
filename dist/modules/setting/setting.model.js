@@ -109,6 +109,24 @@ const settingSchema = new mongoose_1.default.Schema({
             },
         },
     ],
+    payroll: {
+        basic: {
+            type: String,
+            required: true,
+        },
+        house_rent: {
+            type: String,
+            required: true,
+        },
+        conveyance: {
+            type: String,
+            required: true,
+        },
+        medical: {
+            type: String,
+            required: true,
+        },
+    },
     onboarding_tasks: [
         {
             name: {

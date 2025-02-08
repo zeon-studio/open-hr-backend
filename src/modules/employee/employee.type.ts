@@ -64,6 +64,7 @@ export type EmployeeCreateType = {
   personal_email: string;
   department: EDepartment;
   job_type: EJobType;
+  gross_salary: number;
   joining_date: Date;
   designation: string;
   manager_id: string;

@@ -26,6 +26,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const employee_job_model_1 = require("../employee-job/employee-job.model");
 const employee_onboarding_model_1 = require("../employee-onboarding/employee-onboarding.model");
 const leave_model_1 = require("../leave/leave.model");
+const payroll_model_1 = require("../payroll/payroll.model");
 const setting_service_1 = require("../setting/setting.service");
 const employee_model_1 = require("./employee.model");
 // get all employees
@@ -165,10 +166,12 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
         })) + 1;
         const joiningDate = new Date(employeeData.joining_date);
         const employeeId = (0, IdGenerator_1.generateEmployeeId)(employeeData.department, joiningDate, departmentSerial);
+        // employee data
         const createEmployeeData = {
             id: employeeId,
             personal_email: employeeData.personal_email,
         };
+        // job data
         const createEmployeeJobData = {
             employee_id: employeeId,
             department: employeeData.department,
@@ -177,6 +180,13 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
             designation: employeeData.designation,
             joining_date: joiningDate,
         };
+        // payroll data
+        const createPayrollData = {
+            employee_id: employeeId,
+            gross_salary: employeeData.gross_salary,
+            status: "active",
+        };
+        // leave data
         const leaveAllottedDays = yield setting_service_1.settingService.getLeaveAllottedDays();
         const createEmployeeLeaveData = {
             employee_id: employeeId,
@@ -202,6 +212,7 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
                 },
             ],
         };
+        // onboarding data
         const onboardingTasks = yield setting_service_1.settingService.getOnboardingTasksService();
         const createEmployeeOnboardingData = {
             employee_id: employeeId,
@@ -211,12 +222,19 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
                 status: "pending",
             })),
         };
+        // insert employee
         const newEmployeeData = new employee_model_1.Employee(createEmployeeData);
         const insertedEmployee = yield newEmployeeData.save({ session });
+        // insert employee job
         const newEmployeeJobData = new employee_job_model_1.EmployeeJob(createEmployeeJobData);
         yield newEmployeeJobData.save({ session });
+        // insert employee payroll
+        const newPayrollData = new payroll_model_1.Payroll(createPayrollData);
+        yield newPayrollData.save({ session });
+        // insert employee leave
         const newEmployeeLeaveData = new leave_model_1.Leave(createEmployeeLeaveData);
         yield newEmployeeLeaveData.save({ session });
+        // insert employee onboarding
         const newEmployeeOnboardingData = new employee_onboarding_model_1.EmployeeOnboarding(createEmployeeOnboardingData);
         yield newEmployeeOnboardingData.save({ session });
         const invite_token = jwtTokenHelper_1.jwtHelpers.createToken({ id: employeeId, role: "user" }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);

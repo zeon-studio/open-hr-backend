@@ -9,11 +9,11 @@ var EModule;
     EModule["COURSE"] = "course";
     EModule["PAYROLL"] = "payroll";
     EModule["CALENDAR"] = "calendar";
-    EModule["EMPLOYEE_BANK"] = "employee_bank";
-    EModule["EMPLOYEE_CONTACT"] = "employee_contact";
-    EModule["EMPLOYEE_DOCUMENT"] = "employee_document";
-    EModule["EMPLOYEE_LIFECYCLE"] = "employee_lifecycle";
-    EModule["EMPLOYEE_EDUCATION"] = "employee_education";
-    EModule["EMPLOYEE_ACHIEVEMENT"] = "employee_achievement";
+    EModule["EMPLOYEE_BANK"] = "employee-bank";
+    EModule["EMPLOYEE_CONTACT"] = "employee-contact";
+    EModule["EMPLOYEE_DOCUMENT"] = "employee-document";
+    EModule["EMPLOYEE_LIFECYCLE"] = "employee-lifecycle";
+    EModule["EMPLOYEE_EDUCATION"] = "employee-education";
+    EModule["EMPLOYEE_ACHIEVEMENT"] = "employee-achievement";
 })(EModule || (exports.EModule = EModule = {}));
 //# sourceMappingURL=setting.type.js.map

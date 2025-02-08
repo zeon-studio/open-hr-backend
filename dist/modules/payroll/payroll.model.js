@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Payroll = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const payroll_type_1 = require("./payroll.type");
 const payrollSchema = new mongoose_1.default.Schema({
     employee_id: {
         type: String,
@@ -80,6 +81,12 @@ const payrollSchema = new mongoose_1.default.Schema({
             },
         },
     ],
+    status: {
+        type: String,
+        required: true,
+        enum: payroll_type_1.EPayrollStatus,
+        default: payroll_type_1.EPayrollStatus.ACTIVE,
+    },
 }, {
     timestamps: true,
 });

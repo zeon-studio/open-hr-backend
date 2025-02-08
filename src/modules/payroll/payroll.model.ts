@@ -1,5 +1,5 @@
 import mongoose, { model } from "mongoose";
-import { PayrollType } from "./payroll.type";
+import { EPayrollStatus, PayrollType } from "./payroll.type";
 
 const payrollSchema = new mongoose.Schema<PayrollType>(
   {
@@ -47,6 +47,12 @@ const payrollSchema = new mongoose.Schema<PayrollType>(
         },
       },
     ],
+    status: {
+      type: String,
+      required: true,
+      enum: EPayrollStatus,
+      default: EPayrollStatus.ACTIVE,
+    },
   },
   {
     timestamps: true,

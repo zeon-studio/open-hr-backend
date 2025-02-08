@@ -5,6 +5,7 @@ import { PaginationType } from "@/types";
 import mongoose, { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
 import { Employee } from "../employee/employee.model";
+import { Payroll } from "../payroll/payroll.model";
 import { settingService } from "../setting/setting.service";
 import { EmployeeOffboarding } from "./employee-offboarding.model";
 import {
@@ -98,6 +99,13 @@ const createEmployeeOffboardingService = async (
     await EmployeeJob.findOneAndUpdate(
       { employee_id: data.employee_id },
       { $set: { resignation_date: data.resignation_date } },
+      { session }
+    );
+
+    // update payroll status
+    await Payroll.findOneAndUpdate(
+      { employee_id: data.employee_id },
+      { $set: { status: "archived" } },
       { session }
     );
 

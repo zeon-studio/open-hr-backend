@@ -13,6 +13,7 @@ import mongoose, { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
 import { EmployeeOnboarding } from "../employee-onboarding/employee-onboarding.model";
 import { Leave } from "../leave/leave.model";
+import { Payroll } from "../payroll/payroll.model";
 import { settingService } from "../setting/setting.service";
 import { Employee } from "./employee.model";
 import {
@@ -193,11 +194,13 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
       departmentSerial
     );
 
+    // employee data
     const createEmployeeData = {
       id: employeeId,
       personal_email: employeeData.personal_email,
     };
 
+    // job data
     const createEmployeeJobData = {
       employee_id: employeeId,
       department: employeeData.department,
@@ -207,6 +210,14 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
       joining_date: joiningDate,
     };
 
+    // payroll data
+    const createPayrollData = {
+      employee_id: employeeId,
+      gross_salary: employeeData.gross_salary,
+      status: "active",
+    };
+
+    // leave data
     const leaveAllottedDays = await settingService.getLeaveAllottedDays();
     const createEmployeeLeaveData = {
       employee_id: employeeId,
@@ -242,6 +253,7 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
       ],
     };
 
+    // onboarding data
     const onboardingTasks = await settingService.getOnboardingTasksService();
     const createEmployeeOnboardingData = {
       employee_id: employeeId,
@@ -252,15 +264,23 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
       })),
     };
 
+    // insert employee
     const newEmployeeData = new Employee(createEmployeeData);
     const insertedEmployee = await newEmployeeData.save({ session });
 
+    // insert employee job
     const newEmployeeJobData = new EmployeeJob(createEmployeeJobData);
     await newEmployeeJobData.save({ session });
 
+    // insert employee payroll
+    const newPayrollData = new Payroll(createPayrollData);
+    await newPayrollData.save({ session });
+
+    // insert employee leave
     const newEmployeeLeaveData = new Leave(createEmployeeLeaveData);
     await newEmployeeLeaveData.save({ session });
 
+    // insert employee onboarding
     const newEmployeeOnboardingData = new EmployeeOnboarding(
       createEmployeeOnboardingData
     );

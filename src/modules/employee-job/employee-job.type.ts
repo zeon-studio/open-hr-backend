@@ -35,8 +35,6 @@ export type EmployeeJobType = {
   manager_id: string;
   department: EDepartment;
   permanent_date: Date;
-  company_name: string;
-  company_website: string;
   resignation_date: Date;
   promotions: Promotion[];
   prev_jobs: PrevJob[];

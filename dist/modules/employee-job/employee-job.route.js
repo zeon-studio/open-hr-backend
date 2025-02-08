@@ -10,11 +10,11 @@ const express_1 = __importDefault(require("express"));
 const employee_job_controller_1 = require("./employee-job.controller");
 const employeeJobRouter = express_1.default.Router();
 // get all data
-employeeJobRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_job_controller_1.employeeJobController.getAllEmployeeJobController);
+employeeJobRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_job_controller_1.employeeJobController.getAllEmployeeJobController);
 // get single data
 employeeJobRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_job_controller_1.employeeJobController.getEmployeeJobController);
 // update data
-employeeJobRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_job_controller_1.employeeJobController.updateEmployeeJobController);
+employeeJobRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_job_controller_1.employeeJobController.updateEmployeeJobController);
 // delete data
 employeeJobRouter.delete("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_job_controller_1.employeeJobController.deleteEmployeeJobController);
 exports.default = employeeJobRouter;

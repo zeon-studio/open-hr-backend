@@ -7,12 +7,12 @@ export enum EModule {
   COURSE = "course",
   PAYROLL = "payroll",
   CALENDAR = "calendar",
-  EMPLOYEE_BANK = "employee_bank",
-  EMPLOYEE_CONTACT = "employee_contact",
-  EMPLOYEE_DOCUMENT = "employee_document",
-  EMPLOYEE_LIFECYCLE = "employee_lifecycle",
-  EMPLOYEE_EDUCATION = "employee_education",
-  EMPLOYEE_ACHIEVEMENT = "employee_achievement",
+  EMPLOYEE_BANK = "employee-bank",
+  EMPLOYEE_CONTACT = "employee-contact",
+  EMPLOYEE_DOCUMENT = "employee-document",
+  EMPLOYEE_LIFECYCLE = "employee-lifecycle",
+  EMPLOYEE_EDUCATION = "employee-education",
+  EMPLOYEE_ACHIEVEMENT = "employee-achievement",
 }
 
 export type ModuleItem = {
@@ -36,6 +36,13 @@ export type ConditionalWeekend = {
   pattern: number[];
 };
 
+export type Payroll = {
+  basic: string;
+  house_rent: string;
+  conveyance: string;
+  medical: string;
+};
+
 export type SettingType = {
   app_name: string;
   app_url: string;
@@ -49,6 +56,7 @@ export type SettingType = {
   weekends: string[];
   conditional_weekends: ConditionalWeekend[];
   leaves: LeaveItem[];
+  payroll: Payroll;
   onboarding_tasks: TaskItem[];
   offboarding_tasks: TaskItem[];
 };
