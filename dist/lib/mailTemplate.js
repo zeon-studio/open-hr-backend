@@ -15,6 +15,7 @@ exports.leaveRequestTemplate = leaveRequestTemplate;
 exports.leaveRequestDiscordTemplate = leaveRequestDiscordTemplate;
 exports.leaveRequestApprovedTemplate = leaveRequestApprovedTemplate;
 exports.leaveRequestRejectedTemplate = leaveRequestRejectedTemplate;
+exports.salarySheetTemplate = salarySheetTemplate;
 const setting_model_1 = require("../modules/setting/setting.model");
 const dateConverter_1 = require("./dateConverter");
 // invitation template
@@ -123,5 +124,97 @@ function leaveRequestRejectedTemplate(name, leaveType, dayCount, startDate, endD
     <p>Best Regards,<br>Admin Team</p>
   </div>
   `;
+}
+// salary sheet template
+function salarySheetTemplate(name, date, gross_salary, bonus_type, bonus_amount) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const settings = yield setting_model_1.Setting.findOne().exec();
+        if (!settings) {
+            throw new Error("Settings not found");
+        }
+        // basic salary
+        const basicAllotment = Number(settings.payroll.basic.replace("%", ""));
+        const basicSalary = gross_salary * (basicAllotment / 100);
+        const houseRentAllotment = Number(settings.payroll.house_rent.replace("%", ""));
+        const houseRent = basicSalary * (houseRentAllotment / 100);
+        const medicalAllotment = Number(settings.payroll.medical.replace("%", ""));
+        const medical = basicSalary * (medicalAllotment / 100);
+        const conveyanceAllotment = Number(settings.payroll.conveyance.replace("%", ""));
+        const conveyance = basicSalary * (conveyanceAllotment / 100);
+        return `
+  <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+    <!-- Logo -->
+    <div style="margin-bottom: 30px;">
+      <img src="${settings.logo_url}" alt="${settings.company_name}" style="width: ${settings.logo_width}px; height: ${settings.logo_height}px;">
+    </div>
+
+    <!-- Date -->
+    <div style="margin-bottom: 20px;">
+      <p style="margin: 0;">Date: ${(0, dateConverter_1.formatDate)(date)}</p>
+    </div>
+
+    <!-- Employee Details -->
+    <div style="margin-bottom: 20px;">
+      <p style="margin: 0;">To</p>
+      <p style="margin: 5px 0; font-weight: bold;">${name}</p>
+      <p style="margin: 0;">${settings.company_name}</p>
+    </div>
+
+    <!-- Title -->
+    <div style="margin-bottom: 20px; text-align: center;">
+      <h2 style="margin: 0;">Payslip for the month of ${new Date(date).toLocaleString("en-US", { month: "long", year: "numeric" })}</h2>
+    </div>
+
+    <!-- Message -->
+    <div style="margin-bottom: 20px;">
+      <p>Dear ${name}, your salary for the month of ${new Date(date).toLocaleString("en-US", { month: "long", year: "numeric" })} has been deposited to your Account as per the below breakdown.</p>
+    </div>
+
+    <!-- Salary Table -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+      <tr>
+        <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f8f8f8;">Particulars</th>
+        <th style="border: 1px solid #ddd; padding: 8px; text-align: right; background-color: #f8f8f8;">Amount (BDT)</th>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #ddd; padding: 8px;">Basic Salary</td>
+        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${basicSalary}</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #ddd; padding: 8px;">House Rent Allowance (${houseRentAllotment}% of Basic)</td>
+        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${houseRent}</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #ddd; padding: 8px;">Medical Allowance (${medicalAllotment}% of Basic)</td>
+        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${medical}</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #ddd; padding: 8px;">Conveyance Allowance (${conveyanceAllotment}% of Basic)</td>
+        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${conveyance}</td>
+      </tr>
+      ${bonus_amount
+            ? `<tr>
+        <td style="border: 1px solid #ddd; padding: 8px; text-transform: capitalize;">${bonus_type} Bonus</td>
+        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${bonus_amount}</td>
+      </tr>`
+            : ""}
+      <tr style="font-weight: bold;">
+        <td style="border: 1px solid #ddd; padding: 8px;">Total</td>
+        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${gross_salary + (bonus_amount || 0)}</td>
+      </tr>
+    </table>
+
+    <!-- Tax Note -->
+    <div style="margin-bottom: 30px;">
+      <p>No tax was deducted at source from your salary.</p>
+    </div>
+
+    <!-- Signature -->
+    <div style="margin-top: 40px;">
+      <p style="margin: 0;">Regards,<br>Finance Team, ${settings.company_name}</p>
+    </div>
+  </div>
+`;
+    });
 }
 //# sourceMappingURL=mailTemplate.js.map

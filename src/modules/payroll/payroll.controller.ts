@@ -38,6 +38,19 @@ const getPayrollController = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// create data
+const createMonthlyPayrollController = catchAsync(
+  async (req: Request, res: Response) => {
+    const payData = req.body;
+    await payrollService.createMonthlyPayrollService(payData);
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: "data created successfully",
+    });
+  }
+);
+
 // update data
 const updatePayrollController = catchAsync(
   async (req: Request, res: Response) => {
@@ -70,6 +83,7 @@ const deletePayrollController = catchAsync(
 export const payrollController = {
   getAllPayrollController,
   getPayrollController,
-  deletePayrollController,
+  createMonthlyPayrollController,
   updatePayrollController,
+  deletePayrollController,
 };

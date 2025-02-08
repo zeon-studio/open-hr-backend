@@ -47,36 +47,48 @@ const payrollSchema = new mongoose_1.default.Schema({
     },
     salary: [
         {
-            name: {
-                type: String,
-                required: true,
-            },
             amount: {
                 type: Number,
+                required: true,
+            },
+            date: {
+                type: Date,
                 required: true,
             },
         },
     ],
     bonus: [
         {
-            name: {
+            type: {
                 type: String,
                 required: true,
+                enum: payroll_type_1.EBonusType,
+            },
+            reason: {
+                type: String,
             },
             amount: {
                 type: Number,
+                required: true,
+            },
+            date: {
+                type: Date,
                 required: true,
             },
         },
     ],
     increments: [
         {
-            name: {
+            reason: {
                 type: String,
                 required: true,
             },
             amount: {
                 type: Number,
+                required: true,
+            },
+            date: {
+                type: Date,
                 required: true,
             },
         },

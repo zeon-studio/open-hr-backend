@@ -20,6 +20,7 @@ const employee_onboarding_route_1 = __importDefault(require("./modules/employee-
 const employee_route_1 = __importDefault(require("./modules/employee/employee.route"));
 const leave_request_routes_1 = __importDefault(require("./modules/leave-request/leave-request.routes"));
 const leave_routes_1 = __importDefault(require("./modules/leave/leave.routes"));
+const payroll_route_1 = __importDefault(require("./modules/payroll/payroll.route"));
 const setting_routes_1 = __importDefault(require("./modules/setting/setting.routes"));
 const tool_routes_1 = __importDefault(require("./modules/tool/tool.routes"));
 const router = express_1.default.Router();
@@ -63,6 +64,10 @@ const moduleRoutes = [
     {
         path: "/leave",
         route: leave_routes_1.default,
+    },
+    {
+        path: "/payroll",
+        route: payroll_route_1.default,
     },
     {
         path: "/leave-request",

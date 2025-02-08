@@ -65,10 +65,21 @@ const leaveRequestResponse = (email, name, leaveType, dayCount, startDate, endDa
     };
     yield mailTransporter.sendMail(mailDetails);
 });
+// salary sheet
+const salarySheet = (email, name, date, gross_salary, bonus_type, bonus_amount) => __awaiter(void 0, void 0, void 0, function* () {
+    let mailDetails = {
+        from: variables_1.default.sender_email,
+        to: email,
+        subject: `Payslip for the month of ${new Intl.DateTimeFormat("en-US", { month: "long" }).format(new Date(date))} ${new Date(date).getFullYear()}`,
+        html: yield (0, mailTemplate_1.salarySheetTemplate)(name, date, gross_salary, bonus_type, bonus_amount),
+    };
+    yield mailTransporter.sendMail(mailDetails);
+});
 exports.mailSender = {
     invitationRequest,
     offboardingInitiate,
     leaveRequest,
     leaveRequestResponse,
+    salarySheet,
 };
 //# sourceMappingURL=mailSender.js.map

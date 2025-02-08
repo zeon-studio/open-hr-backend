@@ -6,6 +6,7 @@ import {
   leaveRequestRejectedTemplate,
   leaveRequestTemplate,
   offboardingTemplate,
+  salarySheetTemplate,
 } from "./mailTemplate";
 
 let mailTransporter = nodemailer.createTransport({
@@ -110,9 +111,34 @@ const leaveRequestResponse = async (
   await mailTransporter.sendMail(mailDetails);
 };
 
+// salary sheet
+const salarySheet = async (
+  email: string,
+  name: string,
+  date: Date,
+  gross_salary: number,
+  bonus_type: string,
+  bonus_amount: number
+) => {
+  let mailDetails = {
+    from: config.sender_email,
+    to: email,
+    subject: `Payslip for the month of ${new Intl.DateTimeFormat("en-US", { month: "long" }).format(new Date(date))} ${new Date(date).getFullYear()}`,
+    html: await salarySheetTemplate(
+      name,
+      date,
+      gross_salary,
+      bonus_type,
+      bonus_amount
+    ),
+  };
+  await mailTransporter.sendMail(mailDetails);
+};
+
 export const mailSender = {
   invitationRequest,
   offboardingInitiate,
   leaveRequest,
   leaveRequestResponse,
+  salarySheet,
 };

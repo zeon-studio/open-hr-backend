@@ -1,8 +1,15 @@
+import { localDate } from "@/lib/dateConverter";
+import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
-import { PipelineStage } from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
+import { Employee } from "../employee/employee.model";
 import { Payroll } from "./payroll.model";
-import { PayrollFilterOptions, PayrollType } from "./payroll.type";
+import {
+  CreateMonthlySalary,
+  PayrollFilterOptions,
+  PayrollType,
+} from "./payroll.type";
 
 // get all data
 const getAllPayrollService = async (
@@ -74,6 +81,80 @@ const getPayrollService = async (id: string) => {
   return result;
 };
 
+// create monthly data
+const createMonthlyPayrollService = async (payData: CreateMonthlySalary) => {
+  const salaryDate = localDate(new Date(payData.salary_date));
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // Check if salaryDate already exists
+    const existingPayroll = await Payroll.findOne({
+      "salary.date": salaryDate,
+    }).session(session);
+
+    if (existingPayroll) {
+      throw new Error("Payroll data for this salary date already exists.");
+    }
+
+    const bulkOperations = payData.employees.map((data) => {
+      const update: any = {
+        $push: {
+          salary: {
+            amount: data.gross_salary,
+            date: salaryDate,
+          },
+        },
+      };
+
+      if (data.bonus_amount) {
+        update.$push.bonus = {
+          amount: data.bonus_amount,
+          type: data.bonus_type,
+          reason: data.bonus_reason,
+          date: salaryDate,
+        };
+      }
+
+      return {
+        updateOne: {
+          filter: { employee_id: data.employee_id },
+          update,
+          upsert: true,
+          new: true,
+        },
+      };
+    });
+
+    const result = await Payroll.bulkWrite(bulkOperations, { session });
+
+    // Send email to each employee
+    for (const data of payData.employees) {
+      const employee = await Employee.findOne({ id: data.employee_id }).session(
+        session
+      );
+      if (employee) {
+        await mailSender.salarySheet(
+          employee.work_email,
+          employee.name,
+          payData.salary_date,
+          data.gross_salary,
+          data.bonus_type,
+          data.bonus_amount
+        );
+      }
+    }
+
+    await session.commitTransaction();
+    return result;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+};
+
 // update
 const updatePayrollService = async (id: string, updateData: PayrollType) => {
   const result = await Payroll.findOneAndUpdate(
@@ -95,6 +176,7 @@ const deletePayrollService = async (id: string) => {
 export const payrollService = {
   getAllPayrollService,
   getPayrollService,
-  deletePayrollService,
+  createMonthlyPayrollService,
   updatePayrollService,
+  deletePayrollService,
 };

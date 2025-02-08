@@ -11,6 +11,8 @@ const payroll_controller_1 = require("./payroll.controller");
 const payrollRouter = express_1.default.Router();
 // get all data
 payrollRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), payroll_controller_1.payrollController.getAllPayrollController);
+// create monthly data
+payrollRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), payroll_controller_1.payrollController.createMonthlyPayrollController);
 // get single data
 payrollRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), payroll_controller_1.payrollController.getPayrollController);
 // update data

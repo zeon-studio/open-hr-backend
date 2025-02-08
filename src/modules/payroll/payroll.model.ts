@@ -1,5 +1,5 @@
 import mongoose, { model } from "mongoose";
-import { EPayrollStatus, PayrollType } from "./payroll.type";
+import { EBonusType, EPayrollStatus, PayrollType } from "./payroll.type";
 
 const payrollSchema = new mongoose.Schema<PayrollType>(
   {
@@ -13,36 +13,48 @@ const payrollSchema = new mongoose.Schema<PayrollType>(
     },
     salary: [
       {
-        name: {
-          type: String,
-          required: true,
-        },
         amount: {
           type: Number,
+          required: true,
+        },
+        date: {
+          type: Date,
           required: true,
         },
       },
     ],
     bonus: [
       {
-        name: {
+        type: {
           type: String,
           required: true,
+          enum: EBonusType,
+        },
+        reason: {
+          type: String,
         },
         amount: {
           type: Number,
+          required: true,
+        },
+        date: {
+          type: Date,
           required: true,
         },
       },
     ],
     increments: [
       {
-        name: {
+        reason: {
           type: String,
           required: true,
         },
         amount: {
           type: Number,
+          required: true,
+        },
+        date: {
+          type: Date,
           required: true,
         },
       },
