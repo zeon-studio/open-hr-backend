@@ -1,11 +1,17 @@
 import mongoose, { model } from "mongoose";
-import { LeaveType } from "./leave.type";
+import { ELeaveStatus, LeaveType } from "./leave.type";
 
 const leaveSchema = new mongoose.Schema<LeaveType>(
   {
     employee_id: {
       type: String,
       required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+      default: ELeaveStatus.ACTIVE,
+      enum: Object.values(ELeaveStatus),
     },
     years: [
       {

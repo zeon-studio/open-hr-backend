@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Employee = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const employee_type_1 = require("./employee.type");
 const employeeSchema = new mongoose_1.default.Schema({
     id: {
         type: String,
@@ -67,12 +68,15 @@ const employeeSchema = new mongoose_1.default.Schema({
     },
     gender: {
         type: String,
+        enum: employee_type_1.EGender,
     },
     blood_group: {
         type: String,
+        enum: employee_type_1.EBloodGroup,
     },
     marital_status: {
         type: String,
+        enum: employee_type_1.EMaritalStatus,
     },
     present_address: {
         type: String,
@@ -100,12 +104,14 @@ const employeeSchema = new mongoose_1.default.Schema({
     },
     status: {
         type: String,
-        default: "pending",
+        enum: employee_type_1.EEmployeeStatus,
+        default: employee_type_1.EEmployeeStatus.ACTIVE,
     },
     role: {
         type: String,
         required: true,
-        default: "user",
+        enum: employee_type_1.ERole,
+        default: employee_type_1.ERole.USER,
     },
 }, {
     timestamps: true,

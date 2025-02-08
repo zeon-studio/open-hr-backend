@@ -1,5 +1,9 @@
 import mongoose, { model } from "mongoose";
-import { LeaveRequestType } from "./leave-request.type";
+import {
+  ELeaveRequestStatus,
+  ELeaveRequestType,
+  LeaveRequestType,
+} from "./leave-request.type";
 
 const leaveSchema = new mongoose.Schema<LeaveRequestType>(
   {
@@ -10,6 +14,7 @@ const leaveSchema = new mongoose.Schema<LeaveRequestType>(
     leave_type: {
       type: String,
       required: true,
+      enum: ELeaveRequestType,
     },
     start_date: {
       type: Date,
@@ -29,7 +34,8 @@ const leaveSchema = new mongoose.Schema<LeaveRequestType>(
     status: {
       type: String,
       required: true,
-      default: "pending",
+      enum: ELeaveRequestStatus,
+      default: ELeaveRequestStatus.PENDING,
     },
     response_date: {
       type: Date,

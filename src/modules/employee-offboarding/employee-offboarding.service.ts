@@ -101,6 +101,13 @@ const createEmployeeOffboardingService = async (
       { session }
     );
 
+    // update employee leave status
+    await Employee.findOneAndUpdate(
+      { employee_id: data.employee_id },
+      { $set: { status: "archived" } },
+      { session }
+    );
+
     const offboardingTasks = await settingService.getOffboardingTasksService();
     const createEmployeeOffboardingData = {
       employee_id: data.employee_id,

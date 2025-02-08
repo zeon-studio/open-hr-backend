@@ -1,5 +1,5 @@
 import mongoose, { model } from "mongoose";
-import { EmployeeJobType } from "./employee-job.type";
+import { EDepartment, EJobType, EmployeeJobType } from "./employee-job.type";
 
 const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
   {
@@ -10,6 +10,7 @@ const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
     job_type: {
       type: String,
       required: true,
+      enum: EJobType,
     },
     joining_date: {
       type: Date,
@@ -17,6 +18,7 @@ const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
     },
     department: {
       type: String,
+      enum: EDepartment,
     },
     manager_id: {
       type: String,
@@ -69,6 +71,7 @@ const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
           job_type: {
             type: String,
             required: true,
+            enum: EJobType,
           },
         },
       ],

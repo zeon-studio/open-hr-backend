@@ -1,3 +1,40 @@
+import { EDepartment, EJobType } from "../employee-job/employee-job.type";
+
+export enum EGender {
+  MALE = "male",
+  FEMALE = "female",
+}
+
+export enum EMaritalStatus {
+  MARRIED = "married",
+  UNMARRIED = "unmarried",
+  DIVORCED = "divorced",
+  WIDOWED = "widowed",
+}
+
+export enum EBloodGroup {
+  O_POSITIVE = "O+",
+  O_NEGATIVE = "O-",
+  A_POSITIVE = "A+",
+  A_NEGATIVE = "A-",
+  B_POSITIVE = "B+",
+  B_NEGATIVE = "B-",
+  AB_POSITIVE = "AB+",
+  AB_NEGATIVE = "AB-",
+}
+
+export enum ERole {
+  USER = "user",
+  MODERATOR = "moderator",
+  ADMIN = "admin",
+}
+
+export enum EEmployeeStatus {
+  PENDING = "pending",
+  ACTIVE = "active",
+  ARCHIVED = "archived",
+}
+
 export type EmployeeType = {
   id: string;
   name: string;
@@ -8,9 +45,9 @@ export type EmployeeType = {
   nid: string;
   tin: string;
   phone: string;
-  gender: "male" | "female";
-  blood_group: "O+" | "O-" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-";
-  marital_status: "married" | "unmarried" | "divorced" | "widowed";
+  gender: EGender;
+  blood_group: EBloodGroup;
+  marital_status: EMaritalStatus;
   present_address: string;
   permanent_address: string;
   facebook: string;
@@ -19,14 +56,14 @@ export type EmployeeType = {
   discord: string;
   personality: string;
   note: string;
-  status: "pending" | "active" | "archived";
-  role: "user" | "moderator" | "admin";
+  status: EEmployeeStatus;
+  role: ERole;
 };
 
 export type EmployeeCreateType = {
   personal_email: string;
-  department: "development" | "design" | "marketing" | "admin";
-  job_type: "full_time" | "part_time" | "remote" | "contractual" | "internship";
+  department: EDepartment;
+  job_type: EJobType;
   joining_date: Date;
   designation: string;
   manager_id: string;
@@ -34,5 +71,5 @@ export type EmployeeCreateType = {
 
 export type EmployeeFilterOptions = {
   search?: string | number;
-  status?: "pending" | "active" | "archived";
+  status?: EEmployeeStatus;
 };

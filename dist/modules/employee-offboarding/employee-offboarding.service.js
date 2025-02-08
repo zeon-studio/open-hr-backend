@@ -79,6 +79,8 @@ const createEmployeeOffboardingService = (data) => __awaiter(void 0, void 0, voi
         yield employee_model_1.Employee.findOneAndUpdate({ id: data.employee_id }, { $set: { status: "archived" } }, { session });
         // update resignation date on employee job
         yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { resignation_date: data.resignation_date } }, { session });
+        // update employee leave status
+        yield employee_model_1.Employee.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { status: "archived" } }, { session });
         const offboardingTasks = yield setting_service_1.settingService.getOffboardingTasksService();
         const createEmployeeOffboardingData = {
             employee_id: data.employee_id,

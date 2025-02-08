@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LeaveRequest = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const leave_request_type_1 = require("./leave-request.type");
 const leaveSchema = new mongoose_1.default.Schema({
     employee_id: {
         type: String,
@@ -43,6 +44,7 @@ const leaveSchema = new mongoose_1.default.Schema({
     leave_type: {
         type: String,
         required: true,
+        enum: leave_request_type_1.ELeaveRequestType,
     },
     start_date: {
         type: Date,
@@ -62,7 +64,8 @@ const leaveSchema = new mongoose_1.default.Schema({
     status: {
         type: String,
         required: true,
-        default: "pending",
+        enum: leave_request_type_1.ELeaveRequestStatus,
+        default: leave_request_type_1.ELeaveRequestStatus.PENDING,
     },
     response_date: {
         type: Date,

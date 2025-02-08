@@ -1,8 +1,10 @@
+import { ECurrency } from "@/types";
+
 export type Course = {
   _id: string;
   name: string;
   price: number;
-  currency: string;
+  currency: ECurrency;
   users: string[];
   purchase_date: Date;
   expire_date?: Date;

@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmployeeJob = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const employee_job_type_1 = require("./employee-job.type");
 const employeeJobSchema = new mongoose_1.default.Schema({
     employee_id: {
         type: String,
@@ -43,6 +44,7 @@ const employeeJobSchema = new mongoose_1.default.Schema({
     job_type: {
         type: String,
         required: true,
+        enum: employee_job_type_1.EJobType,
     },
     joining_date: {
         type: Date,
@@ -50,6 +52,7 @@ const employeeJobSchema = new mongoose_1.default.Schema({
     },
     department: {
         type: String,
+        enum: employee_job_type_1.EDepartment,
     },
     manager_id: {
         type: String,
@@ -102,6 +105,7 @@ const employeeJobSchema = new mongoose_1.default.Schema({
                 job_type: {
                     type: String,
                     required: true,
+                    enum: employee_job_type_1.EJobType,
                 },
             },
         ],

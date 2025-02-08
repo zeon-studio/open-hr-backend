@@ -1,23 +1,28 @@
+import { ELeaveRequestType } from "../leave-request/leave-request.type";
+
+export enum EModule {
+  TOOL = "tool",
+  ASSET = "asset",
+  LEAVE = "leave",
+  COURSE = "course",
+  PAYROLL = "payroll",
+  CALENDAR = "calendar",
+  EMPLOYEE_BANK = "employee_bank",
+  EMPLOYEE_CONTACT = "employee_contact",
+  EMPLOYEE_DOCUMENT = "employee_document",
+  EMPLOYEE_LIFECYCLE = "employee_lifecycle",
+  EMPLOYEE_EDUCATION = "employee_education",
+  EMPLOYEE_ACHIEVEMENT = "employee_achievement",
+}
+
 export type ModuleItem = {
-  name:
-    | "tool"
-    | "course"
-    | "asset"
-    | "leave"
-    | "calendar"
-    | "employee-bank"
-    | "employee-payroll"
-    | "employee-contact"
-    | "employee-document"
-    | "employee-lifecycle"
-    | "employee-education"
-    | "employee-achievement";
+  name: EModule;
   description: string;
   enable: boolean;
 };
 
 export type LeaveItem = {
-  name: "earned" | "sick" | "casual" | "without_pay";
+  name: ELeaveRequestType;
   days: number;
 };
 

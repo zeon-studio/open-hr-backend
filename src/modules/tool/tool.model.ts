@@ -1,3 +1,4 @@
+import { EBilling, ECurrency } from "@/types";
 import mongoose, { model } from "mongoose";
 import { ToolType } from "./tool.type";
 
@@ -34,12 +35,12 @@ const toolSchema = new mongoose.Schema<ToolType>(
         currency: {
           type: String,
           required: true,
-          default: "bdt",
+          enum: ECurrency,
         },
         billing: {
           type: String,
           required: true,
-          default: "onetime",
+          enum: EBilling,
         },
         users: [
           {

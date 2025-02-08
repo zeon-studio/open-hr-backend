@@ -35,10 +35,17 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Leave = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const leave_type_1 = require("./leave.type");
 const leaveSchema = new mongoose_1.default.Schema({
     employee_id: {
         type: String,
         required: true,
+    },
+    status: {
+        type: String,
+        required: true,
+        default: leave_type_1.ELeaveStatus.ACTIVE,
+        enum: Object.values(leave_type_1.ELeaveStatus),
     },
     years: [
         {

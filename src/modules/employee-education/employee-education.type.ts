@@ -1,9 +1,15 @@
+export enum EResultType {
+  GPA = "gpa",
+  CGPA = "cgpa",
+  PERCENTAGE = "percentage",
+}
+
 export type Education = {
   degree: string;
   institute: string;
   passing_year: number;
   result: number;
-  result_type: "gpa" | "cgpa" | "percentage";
+  result_type: EResultType;
   major: string;
 };
 

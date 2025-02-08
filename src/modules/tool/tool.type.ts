@@ -1,11 +1,13 @@
+import { EBilling, ECurrency } from "@/types";
+
 export type Organization = {
   _id: string;
   name: string;
   login_id: string;
   password: string;
   price: number;
-  currency: string;
-  billing: "monthly" | "yearly" | "onetime";
+  currency: ECurrency;
+  billing: EBilling;
   users: string[];
   purchase_date: Date;
   expire_date: Date;

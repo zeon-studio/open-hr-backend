@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmployeeEducation = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const employee_education_type_1 = require("./employee-education.type");
 const employeeEducationSchema = new mongoose_1.default.Schema({
     employee_id: {
         type: String,
@@ -61,6 +62,7 @@ const employeeEducationSchema = new mongoose_1.default.Schema({
             result_type: {
                 type: String,
                 required: true,
+                enum: employee_education_type_1.EResultType,
             },
             major: {
                 type: String,

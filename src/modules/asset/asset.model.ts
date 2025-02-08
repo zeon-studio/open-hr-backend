@@ -1,5 +1,6 @@
+import { ECurrency } from "@/types";
 import mongoose, { model } from "mongoose";
-import { AssetType } from "./asset.type";
+import { AssetType, EAssetStatus } from "./asset.type";
 
 const assetSchema = new mongoose.Schema<AssetType>(
   {
@@ -30,8 +31,8 @@ const assetSchema = new mongoose.Schema<AssetType>(
     },
     currency: {
       type: String,
+      enum: ECurrency,
       required: true,
-      default: "bdt",
     },
     purchase_date: {
       type: Date,
@@ -40,7 +41,7 @@ const assetSchema = new mongoose.Schema<AssetType>(
     status: {
       type: String,
       required: true,
-      default: "archived",
+      enum: EAssetStatus,
     },
     note: {
       type: String,

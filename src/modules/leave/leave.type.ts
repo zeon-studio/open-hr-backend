@@ -1,3 +1,8 @@
+export enum ELeaveStatus {
+  ACTIVE = "active",
+  ARCHIVED = "archived",
+}
+
 export type LeaveYear = {
   year: number;
   casual: {
@@ -21,6 +26,7 @@ export type LeaveYear = {
 export type LeaveType = {
   employee_id: string;
   years: LeaveYear[];
+  status: ELeaveStatus;
 };
 
 export type LeaveFilterOptions = {

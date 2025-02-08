@@ -1,5 +1,5 @@
 import mongoose, { model } from "mongoose";
-import { EmployeeEducationType } from "./employee-education.type";
+import { EmployeeEducationType, EResultType } from "./employee-education.type";
 
 const employeeEducationSchema = new mongoose.Schema<EmployeeEducationType>(
   {
@@ -28,6 +28,7 @@ const employeeEducationSchema = new mongoose.Schema<EmployeeEducationType>(
         result_type: {
           type: String,
           required: true,
+          enum: EResultType,
         },
         major: {
           type: String,

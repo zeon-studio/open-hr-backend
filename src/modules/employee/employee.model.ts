@@ -1,5 +1,12 @@
 import mongoose, { model } from "mongoose";
-import { EmployeeType } from "./employee.type";
+import {
+  EBloodGroup,
+  EEmployeeStatus,
+  EGender,
+  EMaritalStatus,
+  EmployeeType,
+  ERole,
+} from "./employee.type";
 
 const employeeSchema = new mongoose.Schema<EmployeeType>(
   {
@@ -34,12 +41,15 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     },
     gender: {
       type: String,
+      enum: EGender,
     },
     blood_group: {
       type: String,
+      enum: EBloodGroup,
     },
     marital_status: {
       type: String,
+      enum: EMaritalStatus,
     },
     present_address: {
       type: String,
@@ -67,12 +77,14 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     },
     status: {
       type: String,
-      default: "pending",
+      enum: EEmployeeStatus,
+      default: EEmployeeStatus.ACTIVE,
     },
     role: {
       type: String,
       required: true,
-      default: "user",
+      enum: ERole,
+      default: ERole.USER,
     },
   },
   {

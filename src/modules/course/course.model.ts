@@ -1,3 +1,4 @@
+import { ECurrency } from "@/types";
 import mongoose, { model } from "mongoose";
 import { CourseType } from "./course.type";
 
@@ -33,7 +34,7 @@ const courseSchema = new mongoose.Schema<CourseType>(
         currency: {
           type: String,
           required: true,
-          default: "bdt",
+          enum: ECurrency,
         },
         users: [
           {
