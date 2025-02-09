@@ -31,6 +31,16 @@ const getAllPayrollController = (0, catchAsync_1.default)((req, res) => __awaite
         message: "data get successfully",
     });
 }));
+// get payroll basic data
+const getPayrollBasicsController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const payroll = yield payroll_service_1.payrollService.getPayrollBasicsService();
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: payroll,
+        message: "data get successfully",
+    });
+}));
 // get single data
 const getPayrollController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -76,6 +86,7 @@ const deletePayrollController = (0, catchAsync_1.default)((req, res) => __awaite
 exports.payrollController = {
     getAllPayrollController,
     getPayrollController,
+    getPayrollBasicsController,
     createMonthlyPayrollController,
     updatePayrollController,
     deletePayrollController,

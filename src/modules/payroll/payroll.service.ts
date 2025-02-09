@@ -68,6 +68,15 @@ const getAllPayrollService = async (
   };
 };
 
+// get payroll basic data
+const getPayrollBasicsService = async () => {
+  const result = await Payroll.find(
+    {},
+    { _id: 0, employee_id: 1, gross_salary: 1 }
+  );
+  return result;
+};
+
 // get single data
 const getPayrollService = async (id: string) => {
   const result = await Payroll.findOne({ employee_id: id });
@@ -168,6 +177,7 @@ const deletePayrollService = async (id: string) => {
 
 export const payrollService = {
   getAllPayrollService,
+  getPayrollBasicsService,
   getPayrollService,
   createMonthlyPayrollService,
   updatePayrollService,

@@ -14,6 +14,14 @@ payrollRouter.get(
   payrollController.getAllPayrollController
 );
 
+// get payroll basics
+payrollRouter.get(
+  "/basics",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN),
+  payrollController.getPayrollBasicsController
+);
+
 // create monthly data
 payrollRouter.post(
   "/",

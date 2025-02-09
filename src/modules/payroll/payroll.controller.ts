@@ -26,6 +26,19 @@ const getAllPayrollController = catchAsync(
   }
 );
 
+// get payroll basic data
+const getPayrollBasicsController = catchAsync(
+  async (req: Request, res: Response) => {
+    const payroll = await payrollService.getPayrollBasicsService();
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      result: payroll,
+      message: "data get successfully",
+    });
+  }
+);
+
 // get single data
 const getPayrollController = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
@@ -83,6 +96,7 @@ const deletePayrollController = catchAsync(
 export const payrollController = {
   getAllPayrollController,
   getPayrollController,
+  getPayrollBasicsController,
   createMonthlyPayrollController,
   updatePayrollController,
   deletePayrollController,

@@ -64,6 +64,11 @@ const getAllPayrollService = (paginationOptions, filterOptions) => __awaiter(voi
         },
     };
 });
+// get payroll basic data
+const getPayrollBasicsService = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield payroll_model_1.Payroll.find({}, { _id: 0, employee_id: 1, gross_salary: 1 });
+    return result;
+});
 // get single data
 const getPayrollService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield payroll_model_1.Payroll.findOne({ employee_id: id });
@@ -141,6 +146,7 @@ const deletePayrollService = (id) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.payrollService = {
     getAllPayrollService,
+    getPayrollBasicsService,
     getPayrollService,
     createMonthlyPayrollService,
     updatePayrollService,
