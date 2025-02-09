@@ -71,7 +71,7 @@ const getAllPayrollService = async (
 // get payroll basic data
 const getPayrollBasicsService = async () => {
   const result = await Payroll.find(
-    {},
+    { status: "active" },
     { _id: 0, employee_id: 1, gross_salary: 1 }
   );
   return result;
