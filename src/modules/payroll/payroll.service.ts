@@ -50,18 +50,11 @@ const getAllPayrollService = async (
     $project: {
       _id: 0,
       employee_id: 1,
-      job_type: 1,
-      joining_date: 1,
-      designation: 1,
-      department: 1,
-      manager_id: 1,
-      permanent_date: 1,
-      company_name: 1,
-      company_website: 1,
-      resignation_date: 1,
-      prev_jobs: 1,
-      promotions: 1,
-      note: 1,
+      gross_salary: 1,
+      salary: 1,
+      bonus: 1,
+      increments: 1,
+      status: 1,
     },
   });
 
