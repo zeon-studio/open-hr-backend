@@ -1,4 +1,4 @@
-import config from "@/config/variables";
+import { default as config, default as variables } from "@/config/variables";
 import { ENUM_ROLE } from "@/enums/roles";
 import ApiError from "@/errors/ApiError";
 import { generateEmployeeId } from "@/lib/IdGenerator";
@@ -7,6 +7,7 @@ import { calculateRemainingLeave } from "@/lib/leaveHelper";
 import { mailSender } from "@/lib/mailSender";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
+import bcrypt from "bcrypt";
 import httpStatus from "http-status";
 import { Secret } from "jsonwebtoken";
 import mongoose, { PipelineStage } from "mongoose";
@@ -345,6 +346,20 @@ const updateEmployeeEmailService = async (work_email: string, id: string) => {
   return result;
 };
 
+// update employee password
+const updateEmployeePasswordService = async (password: string, id: string) => {
+  const hashedPassword = await bcrypt.hash(password, variables.salt);
+
+  const result = await Employee.findOneAndUpdate(
+    { id: id },
+    { password: hashedPassword },
+    {
+      new: true,
+    }
+  );
+  return result;
+};
+
 // update employee discord
 const updateEmployeeDiscordService = async (discord: string, id: string) => {
   const result = await Employee.findOneAndUpdate(
@@ -409,6 +424,7 @@ export const employeeService = {
   createEmployeeService,
   updateEmployeeService,
   updateEmployeeEmailService,
+  updateEmployeePasswordService,
   updateEmployeeDiscordService,
   updateEmployeePersonalityService,
   updateEmployeeRoleService,

@@ -21,6 +21,7 @@ const jwtTokenHelper_1 = require("../../lib/jwtTokenHelper");
 const leaveHelper_1 = require("../../lib/leaveHelper");
 const mailSender_1 = require("../../lib/mailSender");
 const paginationHelper_1 = require("../../lib/paginationHelper");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const http_status_1 = __importDefault(require("http-status"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const employee_job_model_1 = require("../employee-job/employee-job.model");
@@ -273,6 +274,14 @@ const updateEmployeeEmailService = (work_email, id) => __awaiter(void 0, void 0,
     });
     return result;
 });
+// update employee password
+const updateEmployeePasswordService = (password, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const hashedPassword = yield bcrypt_1.default.hash(password, variables_1.default.salt);
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { password: hashedPassword }, {
+        new: true,
+    });
+    return result;
+});
 // update employee discord
 const updateEmployeeDiscordService = (discord, id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { discord }, {
@@ -315,6 +324,7 @@ exports.employeeService = {
     createEmployeeService,
     updateEmployeeService,
     updateEmployeeEmailService,
+    updateEmployeePasswordService,
     updateEmployeeDiscordService,
     updateEmployeePersonalityService,
     updateEmployeeRoleService,

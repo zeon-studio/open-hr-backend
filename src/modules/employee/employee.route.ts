@@ -70,6 +70,14 @@ employeeRouter.patch(
   employeeController.updateEmployeeEmailController
 );
 
+// update employee password
+employeeRouter.patch(
+  "/password/:id",
+  checkToken,
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  employeeController.updateEmployeePasswordController
+);
+
 // update employee discord
 employeeRouter.patch(
   "/discord/:id",

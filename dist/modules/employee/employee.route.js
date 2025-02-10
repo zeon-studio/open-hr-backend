@@ -27,6 +27,8 @@ employeeRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.EN
 employeeRouter.patch("/update/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeeController);
 // update employee email
 employeeRouter.patch("/email/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeeEmailController);
+// update employee password
+employeeRouter.patch("/password/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeePasswordController);
 // update employee discord
 employeeRouter.patch("/discord/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_controller_1.employeeController.updateEmployeeDiscordController);
 // update employee personality

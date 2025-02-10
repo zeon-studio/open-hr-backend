@@ -110,6 +110,17 @@ const updateEmployeeEmailController = (0, catchAsync_1.default)((req, res) => __
         result: updateEmail,
     });
 }));
+// update employee password
+const updateEmployeePasswordController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const password = req.body.password;
+    const updatePassword = yield employee_service_1.employeeService.updateEmployeePasswordService(password, req.params.id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        message: "data updated successfully",
+        result: updatePassword,
+    });
+}));
 // update employee discord
 const updateEmployeeDiscordController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const discord = req.body.discord;
@@ -162,6 +173,7 @@ exports.employeeController = {
     createEmployeeController,
     updateEmployeeController,
     updateEmployeeEmailController,
+    updateEmployeePasswordController,
     updateEmployeeDiscordController,
     updateEmployeePersonalityController,
     updateEmployeeRoleController,
