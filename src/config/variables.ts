@@ -8,7 +8,7 @@ export default {
   database_uri: process.env.MONGO_URI,
   port: process.env.PORT,
   bearer_token: process.env.BEARER_TOKEN,
-  salt: Number(process.env.SALT),
+  salt: Number(process.env.SALT_ROUND),
   secret: process.env.SECRET,
   jwt_secret: process.env.JWT_SECRET,
   jwt_expire: process.env.JWT_TOKEN_EXPIRE,

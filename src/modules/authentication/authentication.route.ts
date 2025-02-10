@@ -55,7 +55,7 @@ authenticationRouter.post(
 authenticationRouter.patch(
   "/update-password",
   checkToken,
-  auth(ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   authenticationController.updatePasswordController
 );
 

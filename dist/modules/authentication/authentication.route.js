@@ -20,6 +20,6 @@ authenticationRouter.post("/verify-user", checkToken_1.checkToken, authenticatio
 authenticationRouter.patch("/recovery-password", checkToken_1.checkToken, authentication_controller_1.authenticationController.resetPasswordController);
 authenticationRouter.post("/verify-otp", checkToken_1.checkToken, authentication_controller_1.authenticationController.verifyTokenController);
 authenticationRouter.post("/resend-otp", checkToken_1.checkToken, authentication_controller_1.authenticationController.resendOtpController);
-authenticationRouter.patch("/update-password", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.USER), authentication_controller_1.authenticationController.updatePasswordController);
+authenticationRouter.patch("/update-password", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), authentication_controller_1.authenticationController.updatePasswordController);
 exports.default = authenticationRouter;
 //# sourceMappingURL=authentication.route.js.map

@@ -86,11 +86,11 @@ const resetPasswordController = catchAsync(async (req, res) => {
 
 // update password
 const updatePasswordController = catchAsync(async (req, res) => {
-  const { user_id, currentPassword, newPassword } = req.body;
+  const { id, current_password, new_password } = req.body;
   await authenticationService.updatePasswordService(
-    user_id,
-    currentPassword,
-    newPassword
+    id,
+    current_password,
+    new_password
   );
 
   sendResponse(res, {

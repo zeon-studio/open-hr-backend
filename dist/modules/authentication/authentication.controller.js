@@ -80,8 +80,8 @@ const resetPasswordController = (0, catchAsync_1.default)((req, res) => __awaite
 }));
 // update password
 const updatePasswordController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user_id, currentPassword, newPassword } = req.body;
-    yield authentication_service_1.authenticationService.updatePasswordService(user_id, currentPassword, newPassword);
+    const { id, current_password, new_password } = req.body;
+    yield authentication_service_1.authenticationService.updatePasswordService(id, current_password, new_password);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

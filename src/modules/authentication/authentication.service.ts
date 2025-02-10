@@ -202,21 +202,24 @@ const resetPasswordService = async (email: string, password: string) => {
 // update password
 const updatePasswordService = async (
   id: string,
-  currentPassword: string,
-  newPassword: string
+  current_password: string,
+  new_password: string
 ) => {
   const user = await Employee.findOne({ id: id });
 
   if (!user) {
     throw new Error("Something went wrong");
   }
-  const isMatch = await bcrypt.compare(currentPassword, user.password);
 
-  if (!isMatch) {
-    throw new Error("Incorrect password");
+  if (user.password) {
+    const isMatch = await bcrypt.compare(current_password, user.password);
+
+    if (!isMatch) {
+      throw new Error("Incorrect password");
+    }
   }
 
-  const hashedPassword = await bcrypt.hash(newPassword, variables.salt);
+  const hashedPassword = await bcrypt.hash(new_password, variables.salt);
 
   await Employee.updateOne(
     { id: user.id },

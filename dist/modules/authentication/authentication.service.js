@@ -162,16 +162,18 @@ const resetPasswordService = (email, password) => __awaiter(void 0, void 0, void
     }
 });
 // update password
-const updatePasswordService = (id, currentPassword, newPassword) => __awaiter(void 0, void 0, void 0, function* () {
+const updatePasswordService = (id, current_password, new_password) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield employee_model_1.Employee.findOne({ id: id });
     if (!user) {
         throw new Error("Something went wrong");
     }
-    const isMatch = yield bcrypt_1.default.compare(currentPassword, user.password);
-    if (!isMatch) {
-        throw new Error("Incorrect password");
+    if (user.password) {
+        const isMatch = yield bcrypt_1.default.compare(current_password, user.password);
+        if (!isMatch) {
+            throw new Error("Incorrect password");
+        }
     }
-    const hashedPassword = yield bcrypt_1.default.hash(newPassword, variables_1.default.salt);
+    const hashedPassword = yield bcrypt_1.default.hash(new_password, variables_1.default.salt);
     yield employee_model_1.Employee.updateOne({ id: user.id }, {
         $set: {
             password: hashedPassword,
