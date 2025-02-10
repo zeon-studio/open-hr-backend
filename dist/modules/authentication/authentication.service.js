@@ -174,11 +174,11 @@ const updatePasswordService = (id, current_password, new_password) => __awaiter(
         }
     }
     const hashedPassword = yield bcrypt_1.default.hash(new_password, variables_1.default.salt);
-    yield employee_model_1.Employee.updateOne({ id: user.id }, {
+    yield employee_model_1.Employee.updateOne({ id: id }, {
         $set: {
             password: hashedPassword,
         },
-    });
+    }, { new: true, upsert: true });
 });
 // reset password otp
 const resetPasswordOtpService = (id) => __awaiter(void 0, void 0, void 0, function* () {

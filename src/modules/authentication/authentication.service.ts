@@ -222,12 +222,13 @@ const updatePasswordService = async (
   const hashedPassword = await bcrypt.hash(new_password, variables.salt);
 
   await Employee.updateOne(
-    { id: user.id },
+    { id: id },
     {
       $set: {
         password: hashedPassword,
       },
-    }
+    },
+    { new: true, upsert: true }
   );
 };
 
