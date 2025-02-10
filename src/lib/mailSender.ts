@@ -6,6 +6,7 @@ import {
   leaveRequestRejectedTemplate,
   leaveRequestTemplate,
   offboardingTemplate,
+  otpSenderTemplate,
   salarySheetTemplate,
 } from "./mailTemplate";
 
@@ -16,6 +17,17 @@ let mailTransporter = nodemailer.createTransport({
     pass: config.sender_password,
   },
 });
+
+// send OTP
+const otpSender = async (email: string, otp: string) => {
+  let mailDetails = {
+    from: config.sender_email,
+    to: email,
+    subject: "ERP Solution Verification",
+    html: otpSenderTemplate(otp),
+  };
+  await mailTransporter.sendMail(mailDetails);
+};
 
 // invitation
 const invitationRequest = async (
@@ -136,6 +148,7 @@ const salarySheet = async (
 };
 
 export const mailSender = {
+  otpSender,
   invitationRequest,
   offboardingInitiate,
   leaveRequest,

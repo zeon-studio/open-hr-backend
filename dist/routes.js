@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const asset_routes_1 = __importDefault(require("./modules/asset/asset.routes"));
+const authentication_route_1 = __importDefault(require("./modules/authentication/authentication.route"));
 const calendar_routes_1 = __importDefault(require("./modules/calendar/calendar.routes"));
-const authentication_route_1 = __importDefault(require("./modules/common/authentication.route"));
 const bucket_route_1 = __importDefault(require("./modules/common/bucket.route"));
 const course_routes_1 = __importDefault(require("./modules/course/course.routes"));
 const employee_achievement_route_1 = __importDefault(require("./modules/employee-achievement/employee-achievement.route"));

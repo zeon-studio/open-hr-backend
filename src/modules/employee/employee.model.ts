@@ -33,6 +33,9 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     personal_email: {
       type: String,
     },
+    password: {
+      type: String,
+    },
     nid: {
       type: String,
     },

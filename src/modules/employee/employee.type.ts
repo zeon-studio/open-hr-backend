@@ -41,6 +41,7 @@ export type EmployeeType = {
   image: string;
   work_email: string;
   personal_email: string;
+  password: string;
   dob: Date;
   nid: string;
   tin: string;

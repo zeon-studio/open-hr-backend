@@ -23,6 +23,16 @@ let mailTransporter = nodemailer_1.default.createTransport({
         pass: variables_1.default.sender_password,
     },
 });
+// send OTP
+const otpSender = (email, otp) => __awaiter(void 0, void 0, void 0, function* () {
+    let mailDetails = {
+        from: variables_1.default.sender_email,
+        to: email,
+        subject: "ERP Solution Verification",
+        html: (0, mailTemplate_1.otpSenderTemplate)(otp),
+    };
+    yield mailTransporter.sendMail(mailDetails);
+});
 // invitation
 const invitationRequest = (email, designation, invite_token, joining_date) => __awaiter(void 0, void 0, void 0, function* () {
     let mailDetails = {
@@ -76,6 +86,7 @@ const salarySheet = (email, name, date, gross_salary, bonus_type, bonus_amount) 
     yield mailTransporter.sendMail(mailDetails);
 });
 exports.mailSender = {
+    otpSender,
     invitationRequest,
     offboardingInitiate,
     leaveRequest,

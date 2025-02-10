@@ -1,6 +1,25 @@
 import { Setting } from "../modules/setting/setting.model";
 import { formatDate } from "./dateConverter";
 
+// otp sender template
+export function otpSenderTemplate(otp: string): string {
+  return `<div style="text-align: center; font-family: Arial, sans-serif; color: #333;">
+    <h1 style="color: #007bff;">OTP Verification</h1>
+    <br>
+    <br>
+    <br>
+    <p>Use this OTP to verify your account</p>
+    <div style="border: 1px solid #ccc; padding: 4px 20px; border-radius: 5px; display: inline-block;">
+    <h2>${otp}</h2>
+    </div>
+    <br>
+    <br>
+    <br>
+    <p>If you encounter any issues or have questions, please contact your administrator.</p>
+    </div>
+    `;
+}
+
 // invitation template
 export async function invitationTemplate(
   designation: string,

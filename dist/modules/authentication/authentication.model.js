@@ -33,91 +33,25 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Employee = void 0;
+exports.Authentication = exports.authenticationSchema = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const employee_type_1 = require("./employee.type");
-const employeeSchema = new mongoose_1.default.Schema({
-    id: {
+// password verification token model
+exports.authenticationSchema = new mongoose_1.default.Schema({
+    user_id: {
         type: String,
         required: true,
         unique: true,
     },
-    name: {
-        type: String,
-    },
-    image: {
-        type: String,
-    },
-    dob: {
-        type: Date,
-    },
-    phone: {
-        type: String,
-    },
-    work_email: {
-        type: String,
-    },
-    personal_email: {
-        type: String,
-    },
-    password: {
-        type: String,
-    },
-    nid: {
-        type: String,
-    },
-    tin: {
-        type: String,
-    },
-    gender: {
-        type: String,
-        enum: employee_type_1.EGender,
-    },
-    blood_group: {
-        type: String,
-        enum: employee_type_1.EBloodGroup,
-    },
-    marital_status: {
-        type: String,
-        enum: employee_type_1.EMaritalStatus,
-    },
-    present_address: {
-        type: String,
-    },
-    permanent_address: {
-        type: String,
-    },
-    facebook: {
-        type: String,
-    },
-    twitter: {
-        type: String,
-    },
-    linkedin: {
-        type: String,
-    },
-    discord: {
-        type: String,
-    },
-    personality: {
-        type: String,
-    },
-    note: {
-        type: String,
-    },
-    status: {
-        type: String,
-        enum: employee_type_1.EEmployeeStatus,
-        default: employee_type_1.EEmployeeStatus.ACTIVE,
-    },
-    role: {
+    token: {
         type: String,
         required: true,
-        enum: employee_type_1.ERole,
-        default: employee_type_1.ERole.USER,
+        unique: true,
+    },
+    expires: {
+        type: String,
     },
 }, {
     timestamps: true,
 });
-exports.Employee = (0, mongoose_1.model)("employee", employeeSchema);
-//# sourceMappingURL=employee.model.js.map
+exports.Authentication = (0, mongoose_1.model)("authentication", exports.authenticationSchema);
+//# sourceMappingURL=authentication.model.js.map

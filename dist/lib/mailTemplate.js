@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.otpSenderTemplate = otpSenderTemplate;
 exports.invitationTemplate = invitationTemplate;
 exports.offboardingTemplate = offboardingTemplate;
 exports.leaveRequestTemplate = leaveRequestTemplate;
@@ -18,6 +19,24 @@ exports.leaveRequestRejectedTemplate = leaveRequestRejectedTemplate;
 exports.salarySheetTemplate = salarySheetTemplate;
 const setting_model_1 = require("../modules/setting/setting.model");
 const dateConverter_1 = require("./dateConverter");
+// otp sender template
+function otpSenderTemplate(otp) {
+    return `<div style="text-align: center; font-family: Arial, sans-serif; color: #333;">
+    <h1 style="color: #007bff;">OTP Verification</h1>
+    <br>
+    <br>
+    <br>
+    <p>Use this OTP to verify your account</p>
+    <div style="border: 1px solid #ccc; padding: 4px 20px; border-radius: 5px; display: inline-block;">
+    <h2>${otp}</h2>
+    </div>
+    <br>
+    <br>
+    <br>
+    <p>If you encounter any issues or have questions, please contact your administrator.</p>
+    </div>
+    `;
+}
 // invitation template
 function invitationTemplate(designation, joining_date, invite_token) {
     return __awaiter(this, void 0, void 0, function* () {
