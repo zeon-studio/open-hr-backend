@@ -19,7 +19,7 @@ const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
 // Define CORS options for specific origins
-const corsProtectedOptions = process.env.NODE_ENV === "development"
+const corsOptions = process.env.NODE_ENV === "development"
     ? {
         origin: "*",
         methods: "GET,PUT,PATCH,POST,DELETE",
@@ -32,25 +32,7 @@ const corsProtectedOptions = process.env.NODE_ENV === "development"
         preflightContinue: false,
         optionsSuccessStatus: 204,
     };
-// Define CORS for all origin
-const corsUnprotectedOptions = {
-    origin: "*",
-    methods: "GET,PUT,PATCH,POST,DELETE",
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-};
-// Middleware to conditionally apply CORS
-const conditionalCors = (req, res, next) => {
-    const unprotectedPaths = ["/api/v1/test/public"];
-    if (unprotectedPaths.some((path) => req.path.startsWith(path))) {
-        (0, cors_1.default)(corsUnprotectedOptions)(req, res, next);
-    }
-    else {
-        (0, cors_1.default)(corsProtectedOptions)(req, res, next);
-    }
-};
-// Use the CORS middleware conditionally
-app.use(conditionalCors);
+app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

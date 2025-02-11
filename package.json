@@ -1,9 +1,9 @@
 {
-  "name": "erp-backend",
-  "description": "backend for erp",
-  "version": "2.0.0",
-  "private": true,
-  "license": "UNLICENSED",
+  "name": "erp-solution-backend",
+  "version": "1.0.0",
+  "author": "zeon.studio",
+  "license": "MIT",
+  "description": "backend for erp-solution",
   "main": "server.ts",
   "scripts": {
     "start": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only ./src/server.ts",
