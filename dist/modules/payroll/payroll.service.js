@@ -134,6 +134,16 @@ const createMonthlyPayrollService = (payData) => __awaiter(void 0, void 0, void 
 });
 // update
 const updatePayrollService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    // Convert dates to local dates
+    if (updateData.salary) {
+        updateData.salary = updateData.salary.map((salary) => (Object.assign(Object.assign({}, salary), { date: (0, dateConverter_1.localDate)(new Date(salary.date)) })));
+    }
+    if (updateData.bonus) {
+        updateData.bonus = updateData.bonus.map((bonus) => (Object.assign(Object.assign({}, bonus), { date: (0, dateConverter_1.localDate)(new Date(bonus.date)) })));
+    }
+    if (updateData.increments) {
+        updateData.increments = updateData.increments.map((increment) => (Object.assign(Object.assign({}, increment), { date: (0, dateConverter_1.localDate)(new Date(increment.date)) })));
+    }
     const result = yield payroll_model_1.Payroll.findOneAndUpdate({ employee_id: id }, updateData, {
         new: true,
         upsert: true,

@@ -1,3 +1,4 @@
+import { localDate } from "@/lib/dateConverter";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import { PipelineStage } from "mongoose";
@@ -84,6 +85,32 @@ const updateEmployeeJobService = async (
   id: string,
   updateData: EmployeeJobType
 ) => {
+  // Convert dates to local dates
+  if (updateData.joining_date) {
+    updateData.joining_date = localDate(new Date(updateData.joining_date));
+  }
+  if (updateData.permanent_date) {
+    updateData.permanent_date = localDate(new Date(updateData.permanent_date));
+  }
+  if (updateData.resignation_date) {
+    updateData.resignation_date = localDate(
+      new Date(updateData.resignation_date)
+    );
+  }
+  if (updateData.promotions) {
+    updateData.promotions = updateData.promotions.map((promotion) => ({
+      ...promotion,
+      promotion_date: localDate(new Date(promotion.promotion_date)),
+    }));
+  }
+  if (updateData.prev_jobs) {
+    updateData.prev_jobs = updateData.prev_jobs.map((prevJob) => ({
+      ...prevJob,
+      start_date: localDate(new Date(prevJob.start_date)),
+      end_date: localDate(new Date(prevJob.end_date)),
+    }));
+  }
+
   const result = await EmployeeJob.findOneAndUpdate(
     { employee_id: id },
     updateData,

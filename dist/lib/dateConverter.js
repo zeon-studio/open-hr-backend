@@ -12,8 +12,8 @@ const formatDate = (date, pattern = "EEEE, dd MMMM, yyyy") => {
 exports.formatDate = formatDate;
 const localDate = (date) => {
     const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const dhakaTime = (0, date_fns_1.add)(utcDate, { hours: 6 });
-    return dhakaTime;
+    const resetTime = (0, date_fns_1.add)(utcDate, { hours: 0 });
+    return resetTime;
 };
 exports.localDate = localDate;
 const isOneYearPassed = (prevDate, currentDate) => {

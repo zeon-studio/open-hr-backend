@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeJobService = void 0;
+const dateConverter_1 = require("../../lib/dateConverter");
 const paginationHelper_1 = require("../../lib/paginationHelper");
 const employee_job_model_1 = require("./employee-job.model");
 // get all data
@@ -75,6 +76,22 @@ const getEmployeeJobService = (id) => __awaiter(void 0, void 0, void 0, function
 });
 // update
 const updateEmployeeJobService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    // Convert dates to local dates
+    if (updateData.joining_date) {
+        updateData.joining_date = (0, dateConverter_1.localDate)(new Date(updateData.joining_date));
+    }
+    if (updateData.permanent_date) {
+        updateData.permanent_date = (0, dateConverter_1.localDate)(new Date(updateData.permanent_date));
+    }
+    if (updateData.resignation_date) {
+        updateData.resignation_date = (0, dateConverter_1.localDate)(new Date(updateData.resignation_date));
+    }
+    if (updateData.promotions) {
+        updateData.promotions = updateData.promotions.map((promotion) => (Object.assign(Object.assign({}, promotion), { promotion_date: (0, dateConverter_1.localDate)(new Date(promotion.promotion_date)) })));
+    }
+    if (updateData.prev_jobs) {
+        updateData.prev_jobs = updateData.prev_jobs.map((prevJob) => (Object.assign(Object.assign({}, prevJob), { start_date: (0, dateConverter_1.localDate)(new Date(prevJob.start_date)), end_date: (0, dateConverter_1.localDate)(new Date(prevJob.end_date)) })));
+    }
     const result = yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: id }, updateData, {
         new: true,
         upsert: true,

@@ -159,6 +159,26 @@ const createMonthlyPayrollService = async (payData: CreateMonthlySalary) => {
 
 // update
 const updatePayrollService = async (id: string, updateData: PayrollType) => {
+  // Convert dates to local dates
+  if (updateData.salary) {
+    updateData.salary = updateData.salary.map((salary) => ({
+      ...salary,
+      date: localDate(new Date(salary.date)),
+    }));
+  }
+  if (updateData.bonus) {
+    updateData.bonus = updateData.bonus.map((bonus) => ({
+      ...bonus,
+      date: localDate(new Date(bonus.date)),
+    }));
+  }
+  if (updateData.increments) {
+    updateData.increments = updateData.increments.map((increment) => ({
+      ...increment,
+      date: localDate(new Date(increment.date)),
+    }));
+  }
+
   const result = await Payroll.findOneAndUpdate(
     { employee_id: id },
     updateData,
