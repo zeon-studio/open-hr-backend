@@ -21,7 +21,7 @@ if (variables_1.default.env !== "development") {
     process.on("uncaughtException", (err) => {
         console.log(err);
     });
-    // create signal when server is close
+    // create signal when server is closed
     process.on("SIGTERM", () => {
         console.log("SIGTERM is received");
         if (server) {
@@ -33,13 +33,11 @@ const dbConnect = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield mongoose_1.default.connect(variables_1.default.database_uri);
         server = app_1.default.listen(variables_1.default.port, () => {
-            variables_1.default.env !== "production"
-                ? console.log(`Server running on port ${variables_1.default.port}`)
-                : console.log(`Server running on port ${variables_1.default.port}`);
+            console.log(`Server running on port ${variables_1.default.port}`);
         });
     }
     catch (error) {
-        console.log("error occurs in db connection", error);
+        console.log("error occurred in db connection", error);
     }
     if (variables_1.default.env !== "development") {
         // stop server when unhandled promise rejections occur
@@ -58,4 +56,5 @@ const dbConnect = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 dbConnect();
+exports.default = app_1.default;
 //# sourceMappingURL=server.js.map

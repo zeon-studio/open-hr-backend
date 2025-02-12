@@ -11,7 +11,7 @@ if (config.env !== "development") {
     console.log(err);
   });
 
-  // create signal when server is close
+  // create signal when server is closed
   process.on("SIGTERM", () => {
     console.log("SIGTERM is received");
     if (server) {
@@ -24,12 +24,10 @@ const dbConnect = async () => {
   try {
     await mongoose.connect(config.database_uri as string);
     server = app.listen(config.port, () => {
-      config.env !== "production"
-        ? console.log(`Server running on port ${config.port}`)
-        : console.log(`Server running on port ${config.port}`);
+      console.log(`Server running on port ${config.port}`);
     });
   } catch (error) {
-    console.log("error occurs in db connection", error);
+    console.log("error occurred in db connection", error);
   }
   if (config.env !== "development") {
     // stop server when unhandled promise rejections occur
@@ -48,3 +46,5 @@ const dbConnect = async () => {
 };
 
 dbConnect();
+
+export default app;
