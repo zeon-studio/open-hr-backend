@@ -1,3 +1,3 @@
-# ERP Solution Backend
+# Minimal HR Backend
 
-Please visit [ERP Solution](https://github.com/zeon-studio/erp-solution) for more details
+Please visit [Minimal HR](https://github.com/zeon-studio/minimal-hr) for more details
