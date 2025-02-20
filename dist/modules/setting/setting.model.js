@@ -66,6 +66,14 @@ const settingSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
+    communication_platform: {
+        type: String,
+        required: true,
+    },
+    communication_platform_url: {
+        type: String,
+        required: true,
+    },
     modules: [
         {
             name: {

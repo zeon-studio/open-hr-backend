@@ -187,16 +187,18 @@ const createLeaveRequestService = async (data: LeaveRequestType) => {
       );
 
       // send discord message
-      await axios.post(config.discord_webhook_url!, {
-        content: leaveRequestDiscordTemplate(
-          employeeData?.name!,
-          data.leave_type,
-          dayCount,
-          startDate,
-          endDate,
-          data.reason
-        ),
-      });
+      if (config.discord_webhook_url) {
+        await axios.post(config.discord_webhook_url!, {
+          content: leaveRequestDiscordTemplate(
+            employeeData?.name!,
+            data.leave_type,
+            dayCount,
+            startDate,
+            endDate,
+            data.reason
+          ),
+        });
+      }
 
       await session.commitTransaction();
       return postData;

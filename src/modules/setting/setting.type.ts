@@ -52,6 +52,8 @@ export type SettingType = {
   logo_height: number;
   company_name: string;
   company_website: string;
+  communication_platform: string;
+  communication_platform_url: string;
   modules: ModuleItem[];
   weekends: string[];
   conditional_weekends: ConditionalWeekend[];

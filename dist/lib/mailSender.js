@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mailSender = void 0;
 const variables_1 = __importDefault(require("../config/variables"));
+const setting_model_1 = require("../modules/setting/setting.model");
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const mailTemplate_1 = require("./mailTemplate");
 let mailTransporter = nodemailer_1.default.createTransport({
@@ -35,21 +36,29 @@ const otpSender = (email, otp) => __awaiter(void 0, void 0, void 0, function* ()
 });
 // invitation
 const invitationRequest = (email, designation, invite_token, joining_date) => __awaiter(void 0, void 0, void 0, function* () {
+    const settings = yield setting_model_1.Setting.findOne().exec();
+    if (!settings) {
+        throw new Error("Settings not found");
+    }
     let mailDetails = {
         from: variables_1.default.sender_email,
         to: email,
-        subject: "Invitation from Themefisher",
+        subject: `Invitation to join ${settings.company_name}`,
         html: yield (0, mailTemplate_1.invitationTemplate)(designation, joining_date, invite_token),
     };
     yield mailTransporter.sendMail(mailDetails);
 });
 // offboarding
 const offboardingInitiate = (email, name, resignation_date) => __awaiter(void 0, void 0, void 0, function* () {
+    const settings = yield setting_model_1.Setting.findOne().exec();
+    if (!settings) {
+        throw new Error("Settings not found");
+    }
     let mailDetails = {
         from: variables_1.default.sender_email,
         to: email,
-        subject: "Invitation from Themefisher",
-        html: yield (0, mailTemplate_1.offboardingTemplate)(name, resignation_date),
+        subject: `Offboarding Initiated from ${settings.company_name}`,
+        html: (0, mailTemplate_1.offboardingTemplate)(name, resignation_date),
     };
     yield mailTransporter.sendMail(mailDetails);
 });

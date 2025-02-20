@@ -1,4 +1,5 @@
 import config from "@/config/variables";
+import { Setting } from "@/modules/setting/setting.model";
 import nodemailer from "nodemailer";
 import {
   invitationTemplate,
@@ -36,10 +37,14 @@ const invitationRequest = async (
   invite_token: string,
   joining_date: Date
 ) => {
+  const settings = await Setting.findOne().exec();
+  if (!settings) {
+    throw new Error("Settings not found");
+  }
   let mailDetails = {
     from: config.sender_email,
     to: email,
-    subject: "Invitation from Themefisher",
+    subject: `Invitation to join ${settings.company_name}`,
     html: await invitationTemplate(designation, joining_date, invite_token),
   };
   await mailTransporter.sendMail(mailDetails);
@@ -51,11 +56,15 @@ const offboardingInitiate = async (
   name: string,
   resignation_date: Date
 ) => {
+  const settings = await Setting.findOne().exec();
+  if (!settings) {
+    throw new Error("Settings not found");
+  }
   let mailDetails = {
     from: config.sender_email,
     to: email,
-    subject: "Invitation from Themefisher",
-    html: await offboardingTemplate(name, resignation_date),
+    subject: `Offboarding Initiated from ${settings.company_name}`,
+    html: offboardingTemplate(name, resignation_date),
   };
   await mailTransporter.sendMail(mailDetails);
 };

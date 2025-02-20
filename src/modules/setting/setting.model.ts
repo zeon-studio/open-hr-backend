@@ -32,6 +32,14 @@ const settingSchema = new mongoose.Schema<SettingType>(
       type: String,
       required: true,
     },
+    communication_platform: {
+      type: String,
+      required: true,
+    },
+    communication_platform_url: {
+      type: String,
+      required: true,
+    },
     modules: [
       {
         name: {
