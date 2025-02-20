@@ -34,6 +34,7 @@ const getAllLeaveService = (paginationOptions, filterOptions) => __awaiter(void 
     matchStage.$match.years = {
         $elemMatch: { year: parsedYear },
     };
+    matchStage.$match.status = { $ne: "archived" };
     let pipeline = [matchStage];
     // Sorting stage
     pipeline.push({

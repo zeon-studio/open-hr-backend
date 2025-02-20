@@ -34,6 +34,8 @@ const getAllLeaveService = async (
     $elemMatch: { year: parsedYear },
   };
 
+  matchStage.$match.status = { $ne: "archived" };
+
   let pipeline: PipelineStage[] = [matchStage];
 
   // Sorting stage

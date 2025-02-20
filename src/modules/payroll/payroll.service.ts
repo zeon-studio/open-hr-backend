@@ -35,6 +35,8 @@ const getAllPayrollService = async (
     matchStage.$match.$or = searchConditions;
   }
 
+  matchStage.$match.status = { $ne: "archived" };
+
   let pipeline: PipelineStage[] = [matchStage];
 
   pipeline.push({ $sort: { createdAt: -1 } });

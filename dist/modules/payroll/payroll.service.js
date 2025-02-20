@@ -36,6 +36,7 @@ const getAllPayrollService = (paginationOptions, filterOptions) => __awaiter(voi
         }));
         matchStage.$match.$or = searchConditions;
     }
+    matchStage.$match.status = { $ne: "archived" };
     let pipeline = [matchStage];
     pipeline.push({ $sort: { createdAt: -1 } });
     if (skip) {
