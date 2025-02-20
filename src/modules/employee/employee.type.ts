@@ -41,6 +41,7 @@ export type EmployeeType = {
   image: string;
   work_email: string;
   personal_email: string;
+  communication_id: string;
   password: string;
   dob: Date;
   nid: string;
@@ -54,7 +55,6 @@ export type EmployeeType = {
   facebook: string;
   twitter: string;
   linkedin: string;
-  discord: string;
   personality: string;
   note: string;
   status: EEmployeeStatus;

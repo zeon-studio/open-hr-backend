@@ -95,7 +95,7 @@ const getAllEmployeeService = async (
       facebook: 1,
       twitter: 1,
       linkedin: 1,
-      discord: 1,
+      communication_id: 1,
       personality: 1,
       status: 1,
       note: 1,
@@ -360,11 +360,14 @@ const updateEmployeePasswordService = async (password: string, id: string) => {
   return result;
 };
 
-// update employee discord
-const updateEmployeeDiscordService = async (discord: string, id: string) => {
+// update employee communication_id
+const updateEmployeeCommunicationIdService = async (
+  communication_id: string,
+  id: string
+) => {
   const result = await Employee.findOneAndUpdate(
     { id: id },
-    { discord },
+    { communication_id },
     {
       new: true,
     }
@@ -425,7 +428,7 @@ export const employeeService = {
   updateEmployeeService,
   updateEmployeeEmailService,
   updateEmployeePasswordService,
-  updateEmployeeDiscordService,
+  updateEmployeeCommunicationIdService,
   updateEmployeePersonalityService,
   updateEmployeeRoleService,
   deleteEmployeeService,

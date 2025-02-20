@@ -90,7 +90,7 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
             facebook: 1,
             twitter: 1,
             linkedin: 1,
-            discord: 1,
+            communication_id: 1,
             personality: 1,
             status: 1,
             note: 1,
@@ -282,9 +282,9 @@ const updateEmployeePasswordService = (password, id) => __awaiter(void 0, void 0
     });
     return result;
 });
-// update employee discord
-const updateEmployeeDiscordService = (discord, id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { discord }, {
+// update employee communication_id
+const updateEmployeeCommunicationIdService = (communication_id, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { communication_id }, {
         new: true,
     });
     return result;
@@ -325,7 +325,7 @@ exports.employeeService = {
     updateEmployeeService,
     updateEmployeeEmailService,
     updateEmployeePasswordService,
-    updateEmployeeDiscordService,
+    updateEmployeeCommunicationIdService,
     updateEmployeePersonalityService,
     updateEmployeeRoleService,
     deleteEmployeeService,

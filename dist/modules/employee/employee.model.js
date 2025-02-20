@@ -60,6 +60,9 @@ const employeeSchema = new mongoose_1.default.Schema({
     personal_email: {
         type: String,
     },
+    communication_id: {
+        type: String,
+    },
     password: {
         type: String,
     },
@@ -94,9 +97,6 @@ const employeeSchema = new mongoose_1.default.Schema({
         type: String,
     },
     linkedin: {
-        type: String,
-    },
-    discord: {
         type: String,
     },
     personality: {

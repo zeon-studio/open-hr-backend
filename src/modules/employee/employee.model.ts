@@ -33,6 +33,9 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     personal_email: {
       type: String,
     },
+    communication_id: {
+      type: String,
+    },
     password: {
       type: String,
     },
@@ -67,9 +70,6 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
       type: String,
     },
     linkedin: {
-      type: String,
-    },
-    discord: {
       type: String,
     },
     personality: {

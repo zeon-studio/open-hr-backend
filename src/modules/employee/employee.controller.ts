@@ -163,19 +163,20 @@ const updateEmployeePasswordController = catchAsync(
   }
 );
 
-// update employee discord
-const updateEmployeeDiscordController = catchAsync(
+// update employee communication_id
+const updateEmployeeCommunicationIdController = catchAsync(
   async (req: Request, res: Response) => {
-    const discord = req.body.discord;
-    const updateDiscord = await employeeService.updateEmployeeDiscordService(
-      discord,
-      req.params.id
-    );
+    const communication_id = req.body.communication_id;
+    const updateCommunicationId =
+      await employeeService.updateEmployeeCommunicationIdService(
+        communication_id,
+        req.params.id
+      );
     sendResponse(res, {
       success: true,
       statusCode: 200,
       message: "data updated successfully",
-      result: updateDiscord,
+      result: updateCommunicationId,
     });
   }
 );
@@ -239,7 +240,7 @@ export const employeeController = {
   updateEmployeeController,
   updateEmployeeEmailController,
   updateEmployeePasswordController,
-  updateEmployeeDiscordController,
+  updateEmployeeCommunicationIdController,
   updateEmployeePersonalityController,
   updateEmployeeRoleController,
   deleteEmployeeController,

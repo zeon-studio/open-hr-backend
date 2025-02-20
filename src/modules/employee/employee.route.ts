@@ -78,12 +78,12 @@ employeeRouter.patch(
   employeeController.updateEmployeePasswordController
 );
 
-// update employee discord
+// update employee communication_id
 employeeRouter.patch(
-  "/discord/:id",
+  "/communication_id/:id",
   checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
-  employeeController.updateEmployeeDiscordController
+  employeeController.updateEmployeeCommunicationIdController
 );
 
 // update employee personality
