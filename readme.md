@@ -1,3 +1,3 @@
-# Minimal HR Backend
+# Open HR Backend
 
-Please visit [Minimal HR](https://github.com/zeon-studio/minimal-hr) for more details
+Please visit [Open HR](https://github.com/zeon-studio/open-hr) for more details
