@@ -28,7 +28,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", async (req, res) => {
-  res.send("Welcome to the backend of Minimal HR");
+  res.send("Welcome to the backend of Open HR");
 });
 
 app.use("/api/v1", router);

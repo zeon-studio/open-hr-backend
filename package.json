@@ -1,9 +1,9 @@
 {
-  "name": "erp-solution-backend",
+  "name": "open-hr-backend",
   "version": "1.0.0",
   "author": "zeon.studio",
   "license": "MIT",
-  "description": "backend for erp-solution",
+  "description": "backend for open-hr",
   "main": "server.ts",
   "scripts": {
     "start": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only ./src/server.ts",
