@@ -40,6 +40,14 @@ const settingSchema = new mongoose.Schema<SettingType>(
       type: String,
       required: true,
     },
+    max_leave_per_day: {
+      type: Number,
+      required: true,
+    },
+    leave_threshold_days: {
+      type: Number,
+      required: true,
+    },
     modules: [
       {
         name: {
