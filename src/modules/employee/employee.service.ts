@@ -134,10 +134,15 @@ const getAdminAndModsService = async () => {
 const getAllEmployeeBasicsService = async () => {
   const result = await Employee.aggregate([
     {
+      // Optimized $lookup using pipeline form
       $lookup: {
         from: "employee_jobs",
-        localField: "id",
-        foreignField: "employee_id",
+        let: { empId: "$id" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$employee_id", "$$empId"] } } },
+          { $project: { department: 1, designation: 1, _id: 0 } },
+          { $limit: 1 },
+        ],
         as: "job",
       },
     },

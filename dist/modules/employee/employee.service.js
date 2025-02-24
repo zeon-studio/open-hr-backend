@@ -124,10 +124,15 @@ const getAdminAndModsService = () => __awaiter(void 0, void 0, void 0, function*
 const getAllEmployeeBasicsService = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield employee_model_1.Employee.aggregate([
         {
+            // Optimized $lookup using pipeline form
             $lookup: {
                 from: "employee_jobs",
-                localField: "id",
-                foreignField: "employee_id",
+                let: { empId: "$id" },
+                pipeline: [
+                    { $match: { $expr: { $eq: ["$employee_id", "$$empId"] } } },
+                    { $project: { department: 1, designation: 1, _id: 0 } },
+                    { $limit: 1 },
+                ],
                 as: "job",
             },
         },
