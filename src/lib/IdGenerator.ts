@@ -5,6 +5,9 @@ const departmentGenerator: { [key: string]: string } = {
   marketing: "MKT",
   design: "DGN",
   admin: "ADM",
+  production: "PDC",
+  hr_finance: "HRF",
+  other: "OTH",
 };
 
 const assetTypeGenerator: { [key: string]: string } = {

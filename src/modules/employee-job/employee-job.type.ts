@@ -11,6 +11,9 @@ export enum EDepartment {
   DESIGN = "design",
   MARKETING = "marketing",
   ADMIN = "admin",
+  PRODUCTION = "production",
+  HR_FINANCE = "hr_finance",
+  OTHER = "other",
 }
 
 export type PrevJob = {

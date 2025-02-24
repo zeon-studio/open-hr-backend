@@ -15,5 +15,8 @@ var EDepartment;
     EDepartment["DESIGN"] = "design";
     EDepartment["MARKETING"] = "marketing";
     EDepartment["ADMIN"] = "admin";
+    EDepartment["PRODUCTION"] = "production";
+    EDepartment["HR_FINANCE"] = "hr_finance";
+    EDepartment["OTHER"] = "other";
 })(EDepartment || (exports.EDepartment = EDepartment = {}));
 //# sourceMappingURL=employee-job.type.js.map

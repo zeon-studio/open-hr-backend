@@ -10,6 +10,9 @@ const departmentGenerator = {
     marketing: "MKT",
     design: "DGN",
     admin: "ADM",
+    production: "PDC",
+    hr_finance: "HRF",
+    other: "OTH",
 };
 const assetTypeGenerator = {
     macbook: "MBK",
