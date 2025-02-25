@@ -1,5 +1,8 @@
 import mongoose, { model } from "mongoose";
-import { EmployeeAchievementType } from "./employee-achievement.type";
+import {
+  EAchievementType,
+  EmployeeAchievementType,
+} from "./employee-achievement.type";
 
 const employeeAchievementSchema = new mongoose.Schema<EmployeeAchievementType>(
   {
@@ -9,13 +12,13 @@ const employeeAchievementSchema = new mongoose.Schema<EmployeeAchievementType>(
     },
     achievements: [
       {
-        name: {
-          type: String,
-          required: true,
-        },
         type: {
           type: String,
           required: true,
+          enum: EAchievementType,
+        },
+        description: {
+          type: String,
         },
         date: {
           type: Date,

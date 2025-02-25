@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmployeeAchievement = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const employee_achievement_type_1 = require("./employee-achievement.type");
 const employeeAchievementSchema = new mongoose_1.default.Schema({
     employee_id: {
         type: String,
@@ -42,13 +43,13 @@ const employeeAchievementSchema = new mongoose_1.default.Schema({
     },
     achievements: [
         {
-            name: {
-                type: String,
-                required: true,
-            },
             type: {
                 type: String,
                 required: true,
+                enum: employee_achievement_type_1.EAchievementType,
+            },
+            description: {
+                type: String,
             },
             date: {
                 type: Date,
