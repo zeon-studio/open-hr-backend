@@ -24,7 +24,13 @@ const paginationHelper_1 = require("../../lib/paginationHelper");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const http_status_1 = __importDefault(require("http-status"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const employee_achievement_model_1 = require("../employee-achievement/employee-achievement.model");
+const employee_bank_model_1 = require("../employee-bank/employee-bank.model");
+const employee_contact_model_1 = require("../employee-contact/employee-contact.model");
+const employee_document_model_1 = require("../employee-document/employee-document.model");
+const employee_education_model_1 = require("../employee-education/employee-education.model");
 const employee_job_model_1 = require("../employee-job/employee-job.model");
+const employee_offboarding_model_1 = require("../employee-offboarding/employee-offboarding.model");
 const employee_onboarding_model_1 = require("../employee-onboarding/employee-onboarding.model");
 const leave_model_1 = require("../leave/leave.model");
 const payroll_model_1 = require("../payroll/payroll.model");
@@ -310,13 +316,40 @@ const updateEmployeeRoleService = (id, role) => __awaiter(void 0, void 0, void 0
 });
 // delete employee
 const deleteEmployeeService = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
     try {
-        const deleteEmployee = yield employee_model_1.Employee.findOneAndDelete({ id: id }, { new: true });
-        if (!deleteEmployee) {
-            throw new ApiError_1.default("employee is not delete", http_status_1.default.FORBIDDEN);
-        }
+        // delete employee
+        const deleteEmployee = yield employee_model_1.Employee.findOneAndDelete({ id: id }, { session });
+        // delete employee job
+        yield employee_job_model_1.EmployeeJob.findOneAndDelete({ employee_id: id }, { session });
+        // delete employee payroll
+        yield payroll_model_1.Payroll.findOneAndDelete({ employee_id: id }, { session });
+        // delete employee leave
+        yield leave_model_1.Leave.findOneAndDelete({ employee_id: id }, { session });
+        // delete employee onboarding
+        yield employee_onboarding_model_1.EmployeeOnboarding.findOneAndDelete({ employee_id: id }, { session });
+        // delete employee offboarding
+        yield employee_offboarding_model_1.EmployeeOffboarding.findOneAndDelete({ employee_id: id }, { session });
+        // delete employee achievements
+        yield employee_achievement_model_1.EmployeeAchievement.findOneAndDelete({ employee_id: id }, { session });
+        // delete employee bank
+        yield employee_bank_model_1.EmployeeBank.findOneAndDelete({ employee_id: id }, { session });
+        // delete employee education
+        yield employee_education_model_1.EmployeeEducation.findOneAndDelete({ employee_id: id }, { session });
+        // delete employee contact
+        yield employee_contact_model_1.EmployeeContact.findOneAndDelete({ employee_id: id }, { session });
+        // delete employee document
+        yield employee_document_model_1.EmployeeDocument.findOneAndDelete({ employee_id: id }, { session });
+        // delete employee leave requests
+        yield leave_model_1.Leave.deleteMany({ employee_id: id }, { session });
+        yield session.commitTransaction();
+        session.endSession();
+        return deleteEmployee;
     }
     catch (error) {
+        yield session.abortTransaction();
+        session.endSession();
         throw new ApiError_1.default("employee is not delete", http_status_1.default.FORBIDDEN);
     }
 });

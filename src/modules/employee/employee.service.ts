@@ -11,7 +11,13 @@ import bcrypt from "bcrypt";
 import httpStatus from "http-status";
 import { Secret } from "jsonwebtoken";
 import mongoose, { PipelineStage } from "mongoose";
+import { EmployeeAchievement } from "../employee-achievement/employee-achievement.model";
+import { EmployeeBank } from "../employee-bank/employee-bank.model";
+import { EmployeeContact } from "../employee-contact/employee-contact.model";
+import { EmployeeDocument } from "../employee-document/employee-document.model";
+import { EmployeeEducation } from "../employee-education/employee-education.model";
 import { EmployeeJob } from "../employee-job/employee-job.model";
+import { EmployeeOffboarding } from "../employee-offboarding/employee-offboarding.model";
 import { EmployeeOnboarding } from "../employee-onboarding/employee-onboarding.model";
 import { Leave } from "../leave/leave.model";
 import { Payroll } from "../payroll/payroll.model";
@@ -409,16 +415,49 @@ const updateEmployeeRoleService = async (id: string, role: string) => {
 
 // delete employee
 const deleteEmployeeService = async (id: string) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
+    // delete employee
     const deleteEmployee = await Employee.findOneAndDelete(
       { id: id },
-      { new: true }
+      { session }
     );
+    // delete employee job
+    await EmployeeJob.findOneAndDelete({ employee_id: id }, { session });
+    // delete employee payroll
+    await Payroll.findOneAndDelete({ employee_id: id }, { session });
+    // delete employee leave
+    await Leave.findOneAndDelete({ employee_id: id }, { session });
+    // delete employee onboarding
+    await EmployeeOnboarding.findOneAndDelete({ employee_id: id }, { session });
+    // delete employee offboarding
+    await EmployeeOffboarding.findOneAndDelete(
+      { employee_id: id },
+      { session }
+    );
+    // delete employee achievements
+    await EmployeeAchievement.findOneAndDelete(
+      { employee_id: id },
+      { session }
+    );
+    // delete employee bank
+    await EmployeeBank.findOneAndDelete({ employee_id: id }, { session });
+    // delete employee education
+    await EmployeeEducation.findOneAndDelete({ employee_id: id }, { session });
+    // delete employee contact
+    await EmployeeContact.findOneAndDelete({ employee_id: id }, { session });
+    // delete employee document
+    await EmployeeDocument.findOneAndDelete({ employee_id: id }, { session });
+    // delete employee leave requests
+    await Leave.deleteMany({ employee_id: id }, { session });
 
-    if (!deleteEmployee) {
-      throw new ApiError("employee is not delete", httpStatus.FORBIDDEN);
-    }
+    await session.commitTransaction();
+    session.endSession();
+    return deleteEmployee;
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     throw new ApiError("employee is not delete", httpStatus.FORBIDDEN);
   }
 };
