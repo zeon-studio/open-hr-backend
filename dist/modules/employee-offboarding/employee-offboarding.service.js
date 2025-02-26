@@ -19,6 +19,7 @@ const paginationHelper_1 = require("../../lib/paginationHelper");
 const mongoose_1 = __importDefault(require("mongoose"));
 const employee_job_model_1 = require("../employee-job/employee-job.model");
 const employee_model_1 = require("../employee/employee.model");
+const leave_model_1 = require("../leave/leave.model");
 const payroll_model_1 = require("../payroll/payroll.model");
 const setting_service_1 = require("../setting/setting.service");
 const employee_offboarding_model_1 = require("./employee-offboarding.model");
@@ -83,7 +84,7 @@ const createEmployeeOffboardingService = (data) => __awaiter(void 0, void 0, voi
         // update payroll status
         yield payroll_model_1.Payroll.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { status: "archived" } }, { session });
         // update employee leave status
-        yield employee_model_1.Employee.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { status: "archived" } }, { session });
+        yield leave_model_1.Leave.findOneAndUpdate({ employee_id: data.employee_id }, { $set: { status: "archived" } }, { session });
         const offboardingTasks = yield setting_service_1.settingService.getOffboardingTasksService();
         const createEmployeeOffboardingData = {
             employee_id: data.employee_id,

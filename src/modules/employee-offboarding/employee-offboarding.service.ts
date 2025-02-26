@@ -5,6 +5,7 @@ import { PaginationType } from "@/types";
 import mongoose, { PipelineStage } from "mongoose";
 import { EmployeeJob } from "../employee-job/employee-job.model";
 import { Employee } from "../employee/employee.model";
+import { Leave } from "../leave/leave.model";
 import { Payroll } from "../payroll/payroll.model";
 import { settingService } from "../setting/setting.service";
 import { EmployeeOffboarding } from "./employee-offboarding.model";
@@ -110,7 +111,7 @@ const createEmployeeOffboardingService = async (
     );
 
     // update employee leave status
-    await Employee.findOneAndUpdate(
+    await Leave.findOneAndUpdate(
       { employee_id: data.employee_id },
       { $set: { status: "archived" } },
       { session }
