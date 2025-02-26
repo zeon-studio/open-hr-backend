@@ -23,14 +23,14 @@ export enum EMaritalStatus {
 }
 
 export enum EBloodGroup {
-  O_POSITIVE = "O+",
-  O_NEGATIVE = "O-",
-  A_POSITIVE = "A+",
-  A_NEGATIVE = "A-",
-  B_POSITIVE = "B+",
-  B_NEGATIVE = "B-",
-  AB_POSITIVE = "AB+",
-  AB_NEGATIVE = "AB-",
+  O_POSITIVE = "o+",
+  O_NEGATIVE = "o-",
+  A_POSITIVE = "a+",
+  A_NEGATIVE = "a-",
+  B_POSITIVE = "b+",
+  B_NEGATIVE = "b-",
+  AB_POSITIVE = "ab+",
+  AB_NEGATIVE = "ab-",
 }
 
 export enum ERole {

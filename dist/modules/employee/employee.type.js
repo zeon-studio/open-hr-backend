@@ -25,14 +25,14 @@ var EMaritalStatus;
 })(EMaritalStatus || (exports.EMaritalStatus = EMaritalStatus = {}));
 var EBloodGroup;
 (function (EBloodGroup) {
-    EBloodGroup["O_POSITIVE"] = "O+";
-    EBloodGroup["O_NEGATIVE"] = "O-";
-    EBloodGroup["A_POSITIVE"] = "A+";
-    EBloodGroup["A_NEGATIVE"] = "A-";
-    EBloodGroup["B_POSITIVE"] = "B+";
-    EBloodGroup["B_NEGATIVE"] = "B-";
-    EBloodGroup["AB_POSITIVE"] = "AB+";
-    EBloodGroup["AB_NEGATIVE"] = "AB-";
+    EBloodGroup["O_POSITIVE"] = "o+";
+    EBloodGroup["O_NEGATIVE"] = "o-";
+    EBloodGroup["A_POSITIVE"] = "a+";
+    EBloodGroup["A_NEGATIVE"] = "a-";
+    EBloodGroup["B_POSITIVE"] = "b+";
+    EBloodGroup["B_NEGATIVE"] = "b-";
+    EBloodGroup["AB_POSITIVE"] = "ab+";
+    EBloodGroup["AB_NEGATIVE"] = "ab-";
 })(EBloodGroup || (exports.EBloodGroup = EBloodGroup = {}));
 var ERole;
 (function (ERole) {

@@ -77,7 +77,7 @@ const getEmployeeJobService = async (id: string) => {
 // update
 const updateEmployeeJobService = async (
   id: string,
-  updateData: EmployeeJobType & { designation: string }
+  updateData: EmployeeJobType
 ) => {
   // Convert dates to local dates
   if (updateData.joining_date) {
@@ -107,8 +107,15 @@ const updateEmployeeJobService = async (
 
   // update employee designation on employee data
   const employee = await Employee.findOne({ id });
-  if (employee) {
-    employee.designation = updateData.designation;
+  if (employee && updateData.promotions && updateData.promotions.length > 0) {
+    // Find the latest promotion by date
+    const latestPromotion = updateData.promotions.reduce((latest, current) => {
+      const latestDate = new Date(latest.promotion_date);
+      const currentDate = new Date(current.promotion_date);
+      return currentDate > latestDate ? current : latest;
+    });
+
+    employee.designation = latestPromotion.designation;
     await employee.save();
   }
 

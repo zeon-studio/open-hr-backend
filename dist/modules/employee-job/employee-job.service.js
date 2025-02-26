@@ -89,8 +89,14 @@ const updateEmployeeJobService = (id, updateData) => __awaiter(void 0, void 0, v
     }
     // update employee designation on employee data
     const employee = yield employee_model_1.Employee.findOne({ id });
-    if (employee) {
-        employee.designation = updateData.designation;
+    if (employee && updateData.promotions && updateData.promotions.length > 0) {
+        // Find the latest promotion by date
+        const latestPromotion = updateData.promotions.reduce((latest, current) => {
+            const latestDate = new Date(latest.promotion_date);
+            const currentDate = new Date(current.promotion_date);
+            return currentDate > latestDate ? current : latest;
+        });
+        employee.designation = latestPromotion.designation;
         yield employee.save();
     }
     // update employee job data

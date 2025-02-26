@@ -78,9 +78,6 @@ const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
   }
 );
 
-// Add index on employee_id field for optimization
-employeeJobSchema.index({ employee_id: 1 });
-
 export const EmployeeJob = model<EmployeeJobType>(
   "employee_job",
   employeeJobSchema
