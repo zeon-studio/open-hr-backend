@@ -36,7 +36,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Setting = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const leave_request_type_1 = require("../leave-request/leave-request.type");
-const setting_type_1 = require("./setting.type");
 const settingSchema = new mongoose_1.default.Schema({
     app_name: {
         type: String,
@@ -87,10 +86,6 @@ const settingSchema = new mongoose_1.default.Schema({
             name: {
                 type: String,
                 required: true,
-                enum: setting_type_1.EModule,
-            },
-            description: {
-                type: String,
             },
             enable: {
                 type: Boolean,

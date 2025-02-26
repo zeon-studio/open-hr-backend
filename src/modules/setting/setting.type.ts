@@ -1,23 +1,7 @@
 import { ELeaveRequestType } from "../leave-request/leave-request.type";
 
-export enum EModule {
-  TOOL = "tool",
-  ASSET = "asset",
-  LEAVE = "leave",
-  COURSE = "course",
-  PAYROLL = "payroll",
-  CALENDAR = "calendar",
-  EMPLOYEE_BANK = "employee-bank",
-  EMPLOYEE_CONTACT = "employee-contact",
-  EMPLOYEE_DOCUMENT = "employee-document",
-  EMPLOYEE_LIFECYCLE = "employee-lifecycle",
-  EMPLOYEE_EDUCATION = "employee-education",
-  EMPLOYEE_ACHIEVEMENT = "employee-achievement",
-}
-
 export type ModuleItem = {
-  name: EModule;
-  description: string;
+  name: string;
   enable: boolean;
 };
 

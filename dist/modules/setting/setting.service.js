@@ -31,9 +31,11 @@ const updateModuleStatusService = (name, enable) => __awaiter(void 0, void 0, vo
     }
     const module = setting.modules.find((mod) => mod.name === name);
     if (!module) {
-        throw new Error("Module not found");
+        setting.modules.push({ name, enable });
     }
-    module.enable = enable;
+    else {
+        module.enable = enable;
+    }
     yield setting.save();
     return module;
 });

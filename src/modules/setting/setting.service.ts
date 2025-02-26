@@ -27,9 +27,10 @@ const updateModuleStatusService = async (name: string, enable: boolean) => {
   }
   const module = setting.modules.find((mod) => mod.name === name);
   if (!module) {
-    throw new Error("Module not found");
+    setting.modules.push({ name, enable });
+  } else {
+    module.enable = enable;
   }
-  module.enable = enable;
   await setting.save();
   return module;
 };

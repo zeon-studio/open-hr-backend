@@ -1,6 +1,6 @@
 import mongoose, { model } from "mongoose";
 import { ELeaveRequestType } from "../leave-request/leave-request.type";
-import { EModule, SettingType } from "./setting.type";
+import { SettingType } from "./setting.type";
 
 const settingSchema = new mongoose.Schema<SettingType>(
   {
@@ -53,10 +53,6 @@ const settingSchema = new mongoose.Schema<SettingType>(
         name: {
           type: String,
           required: true,
-          enum: EModule,
-        },
-        description: {
-          type: String,
         },
         enable: {
           type: Boolean,
