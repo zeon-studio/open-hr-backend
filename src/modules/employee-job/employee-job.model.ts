@@ -1,5 +1,5 @@
 import mongoose, { model } from "mongoose";
-import { EDepartment, EJobType, EmployeeJobType } from "./employee-job.type";
+import { EJobType, EmployeeJobType } from "./employee-job.type";
 
 const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
   {
@@ -16,16 +16,8 @@ const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
       type: Date,
       required: true,
     },
-    department: {
-      type: String,
-      enum: EDepartment,
-    },
     manager_id: {
       type: String,
-    },
-    designation: {
-      type: String,
-      required: true,
     },
     permanent_date: {
       type: Date,

@@ -1,6 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EEmployeeStatus = exports.ERole = exports.EBloodGroup = exports.EMaritalStatus = exports.EGender = void 0;
+exports.EEmployeeStatus = exports.ERole = exports.EBloodGroup = exports.EMaritalStatus = exports.EGender = exports.EDepartment = void 0;
+var EDepartment;
+(function (EDepartment) {
+    EDepartment["DEVELOPMENT"] = "development";
+    EDepartment["DESIGN"] = "design";
+    EDepartment["MARKETING"] = "marketing";
+    EDepartment["ADMIN"] = "admin";
+    EDepartment["PRODUCTION"] = "production";
+    EDepartment["HR_FINANCE"] = "hr_finance";
+    EDepartment["OTHER"] = "other";
+})(EDepartment || (exports.EDepartment = EDepartment = {}));
 var EGender;
 (function (EGender) {
     EGender["MALE"] = "male";

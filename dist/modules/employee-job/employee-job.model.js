@@ -50,16 +50,8 @@ const employeeJobSchema = new mongoose_1.default.Schema({
         type: Date,
         required: true,
     },
-    department: {
-        type: String,
-        enum: employee_job_type_1.EDepartment,
-    },
     manager_id: {
         type: String,
-    },
-    designation: {
-        type: String,
-        required: true,
     },
     permanent_date: {
         type: Date,

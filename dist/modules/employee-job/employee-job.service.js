@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeJobService = void 0;
 const dateConverter_1 = require("../../lib/dateConverter");
 const paginationHelper_1 = require("../../lib/paginationHelper");
+const employee_model_1 = require("../employee/employee.model");
 const employee_job_model_1 = require("./employee-job.model");
 // get all data
 const getAllEmployeeJobService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -20,7 +21,7 @@ const getAllEmployeeJobService = (paginationOptions, filterOptions) => __awaiter
     };
     const { limit, skip } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
     // Extract search and filter options
-    const { search, designation } = filterOptions;
+    const { search } = filterOptions;
     // Search condition
     if (search) {
         const searchKeyword = String(search).replace(/\+/g, " ");
@@ -29,10 +30,6 @@ const getAllEmployeeJobService = (paginationOptions, filterOptions) => __awaiter
             $or: [{ employee_id: { $regex: keyword, $options: "i" } }],
         }));
         matchStage.$match.$or = searchConditions;
-    }
-    // designation condition
-    if (designation) {
-        matchStage.$match.designation = designation;
     }
     let pipeline = [matchStage];
     pipeline.push({ $sort: { createdAt: -1 } });
@@ -48,8 +45,6 @@ const getAllEmployeeJobService = (paginationOptions, filterOptions) => __awaiter
             employee_id: 1,
             job_type: 1,
             joining_date: 1,
-            designation: 1,
-            department: 1,
             manager_id: 1,
             permanent_date: 1,
             company_name: 1,
@@ -92,6 +87,13 @@ const updateEmployeeJobService = (id, updateData) => __awaiter(void 0, void 0, v
     if (updateData.prev_jobs) {
         updateData.prev_jobs = updateData.prev_jobs.map((prevJob) => (Object.assign(Object.assign({}, prevJob), { start_date: (0, dateConverter_1.localDate)(new Date(prevJob.start_date)), end_date: (0, dateConverter_1.localDate)(new Date(prevJob.end_date)) })));
     }
+    // update employee designation on employee data
+    const employee = yield employee_model_1.Employee.findOne({ id });
+    if (employee) {
+        employee.designation = updateData.designation;
+        yield employee.save();
+    }
+    // update employee job data
     const result = yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: id }, updateData, {
         new: true,
         upsert: true,

@@ -40,7 +40,7 @@ const employee_model_1 = require("./employee.model");
 const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { limit, skip, sortBy, sortOrder } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
     // Extract search and filter options
-    const { search, status } = filterOptions;
+    const { search, status, department } = filterOptions;
     // Create a text search stage for multiple fields
     let matchStage = {
         $match: {},
@@ -60,6 +60,10 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
     // status condition
     if (status) {
         matchStage.$match.status = status;
+    }
+    // department condition
+    if (department) {
+        matchStage.$match.department = department;
     }
     let pipeline = [matchStage];
     // Sorting stage
@@ -83,6 +87,8 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
             image: 1,
             work_email: 1,
             personal_email: 1,
+            department: 1,
+            designation: 1,
             role: 1,
             dob: 1,
             nid: 1,
@@ -128,31 +134,14 @@ const getAdminAndModsService = () => __awaiter(void 0, void 0, void 0, function*
 });
 // get all employees id
 const getAllEmployeeBasicsService = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_model_1.Employee.aggregate([
-        {
-            // Optimized $lookup using pipeline form
-            $lookup: {
-                from: "employee_jobs",
-                let: { empId: "$id" },
-                pipeline: [
-                    { $match: { $expr: { $eq: ["$employee_id", "$$empId"] } } },
-                    { $project: { department: 1, designation: 1, _id: 0 } },
-                    { $limit: 1 },
-                ],
-                as: "job",
-            },
-        },
-        {
-            $project: {
-                _id: 0,
-                id: 1,
-                name: 1,
-                work_email: 1,
-                department: { $arrayElemAt: ["$job.department", 0] },
-                designation: { $arrayElemAt: ["$job.designation", 0] },
-            },
-        },
-    ]);
+    const result = yield employee_model_1.Employee.find({}, {
+        _id: 0,
+        id: 1,
+        name: 1,
+        work_email: 1,
+        department: 1,
+        designation: 1,
+    }).exec();
     return result;
 });
 // get single employee
@@ -173,7 +162,7 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
     session.startTransaction();
     try {
         // count data by department
-        const departmentSerial = (yield employee_job_model_1.EmployeeJob.countDocuments({
+        const departmentSerial = (yield employee_model_1.Employee.countDocuments({
             department: employeeData.department,
         })) + 1;
         const joiningDate = new Date(employeeData.joining_date);
@@ -182,14 +171,14 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
         const createEmployeeData = {
             id: employeeId,
             personal_email: employeeData.personal_email,
+            department: employeeData.department,
+            designation: employeeData.designation,
         };
         // job data
         const createEmployeeJobData = {
             employee_id: employeeId,
-            department: employeeData.department,
             manager_id: employeeData.manager_id,
             job_type: employeeData.job_type,
-            designation: employeeData.designation,
             joining_date: joiningDate,
         };
         // payroll data

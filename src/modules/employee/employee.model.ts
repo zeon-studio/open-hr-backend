@@ -1,6 +1,7 @@
 import mongoose, { model } from "mongoose";
 import {
   EBloodGroup,
+  EDepartment,
   EEmployeeStatus,
   EGender,
   EMaritalStatus,
@@ -32,6 +33,14 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     },
     personal_email: {
       type: String,
+    },
+    department: {
+      type: String,
+      enum: EDepartment,
+    },
+    designation: {
+      type: String,
+      required: true,
     },
     communication_id: {
       type: String,

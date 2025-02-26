@@ -2,6 +2,7 @@ import { localDate } from "@/lib/dateConverter";
 import { paginationHelpers } from "@/lib/paginationHelper";
 import { PaginationType } from "@/types";
 import { PipelineStage } from "mongoose";
+import { Employee } from "../employee/employee.model";
 import { EmployeeJob } from "./employee-job.model";
 import { EmployeeJobFilterOptions, EmployeeJobType } from "./employee-job.type";
 
@@ -17,7 +18,7 @@ const getAllEmployeeJobService = async (
     paginationHelpers.calculatePagination(paginationOptions);
 
   // Extract search and filter options
-  const { search, designation } = filterOptions;
+  const { search } = filterOptions;
 
   // Search condition
   if (search) {
@@ -27,11 +28,6 @@ const getAllEmployeeJobService = async (
       $or: [{ employee_id: { $regex: keyword, $options: "i" } }],
     }));
     matchStage.$match.$or = searchConditions;
-  }
-
-  // designation condition
-  if (designation) {
-    matchStage.$match.designation = designation;
   }
 
   let pipeline: PipelineStage[] = [matchStage];
@@ -51,8 +47,6 @@ const getAllEmployeeJobService = async (
       employee_id: 1,
       job_type: 1,
       joining_date: 1,
-      designation: 1,
-      department: 1,
       manager_id: 1,
       permanent_date: 1,
       company_name: 1,
@@ -83,7 +77,7 @@ const getEmployeeJobService = async (id: string) => {
 // update
 const updateEmployeeJobService = async (
   id: string,
-  updateData: EmployeeJobType
+  updateData: EmployeeJobType & { designation: string }
 ) => {
   // Convert dates to local dates
   if (updateData.joining_date) {
@@ -111,6 +105,14 @@ const updateEmployeeJobService = async (
     }));
   }
 
+  // update employee designation on employee data
+  const employee = await Employee.findOne({ id });
+  if (employee) {
+    employee.designation = updateData.designation;
+    await employee.save();
+  }
+
+  // update employee job data
   const result = await EmployeeJob.findOneAndUpdate(
     { employee_id: id },
     updateData,

@@ -1,4 +1,14 @@
-import { EDepartment, EJobType } from "../employee-job/employee-job.type";
+import { EJobType } from "../employee-job/employee-job.type";
+
+export enum EDepartment {
+  DEVELOPMENT = "development",
+  DESIGN = "design",
+  MARKETING = "marketing",
+  ADMIN = "admin",
+  PRODUCTION = "production",
+  HR_FINANCE = "hr_finance",
+  OTHER = "other",
+}
 
 export enum EGender {
   MALE = "male",
@@ -40,6 +50,8 @@ export type EmployeeType = {
   name: string;
   image: string;
   work_email: string;
+  department: EDepartment;
+  designation: string;
   personal_email: string;
   communication_id: string;
   password: string;
@@ -74,4 +86,5 @@ export type EmployeeCreateType = {
 export type EmployeeFilterOptions = {
   search?: string | number;
   status?: EEmployeeStatus;
+  department?: EDepartment;
 };

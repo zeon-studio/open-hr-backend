@@ -6,16 +6,6 @@ export enum EJobType {
   INTERNSHIP = "internship",
 }
 
-export enum EDepartment {
-  DEVELOPMENT = "development",
-  DESIGN = "design",
-  MARKETING = "marketing",
-  ADMIN = "admin",
-  PRODUCTION = "production",
-  HR_FINANCE = "hr_finance",
-  OTHER = "other",
-}
-
 export type PrevJob = {
   company_name: string;
   company_website: string;
@@ -34,9 +24,7 @@ export type EmployeeJobType = {
   employee_id: string;
   job_type: EJobType;
   joining_date: Date;
-  designation: string;
   manager_id: string;
-  department: EDepartment;
   permanent_date: Date;
   resignation_date: Date;
   promotions: Promotion[];
@@ -46,5 +34,4 @@ export type EmployeeJobType = {
 
 export type EmployeeJobFilterOptions = {
   search?: string;
-  designation?: string;
 };

@@ -60,6 +60,14 @@ const employeeSchema = new mongoose_1.default.Schema({
     personal_email: {
         type: String,
     },
+    department: {
+        type: String,
+        enum: employee_type_1.EDepartment,
+    },
+    designation: {
+        type: String,
+        required: true,
+    },
     communication_id: {
         type: String,
     },
