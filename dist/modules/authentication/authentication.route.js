@@ -21,5 +21,7 @@ authenticationRouter.patch("/recovery-password", checkToken_1.checkToken, authen
 authenticationRouter.post("/verify-otp", checkToken_1.checkToken, authentication_controller_1.authenticationController.verifyTokenController);
 authenticationRouter.post("/resend-otp", checkToken_1.checkToken, authentication_controller_1.authenticationController.resendOtpController);
 authenticationRouter.patch("/update-password", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), authentication_controller_1.authenticationController.updatePasswordController);
+// refresh token
+authenticationRouter.post("/refresh-token", authentication_controller_1.authenticationController.refreshTokenController);
 exports.default = authenticationRouter;
 //# sourceMappingURL=authentication.route.js.map

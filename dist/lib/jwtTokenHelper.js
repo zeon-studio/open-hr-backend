@@ -21,9 +21,21 @@ const deleteToken = (token, secret) => {
 const verifyToken = (token, secret) => {
     return jsonwebtoken_1.default.verify(token, secret);
 };
+// create refresh token
+const createRefreshToken = (payload, secret, expires) => {
+    return jsonwebtoken_1.default.sign({ id: payload === null || payload === void 0 ? void 0 : payload.id, role: payload === null || payload === void 0 ? void 0 : payload.role }, secret, {
+        expiresIn: expires ? expires : "30d",
+    });
+};
+// verify refresh token
+const verifyRefreshToken = (token, secret) => {
+    return jsonwebtoken_1.default.verify(token, secret);
+};
 exports.jwtHelpers = {
     createToken,
     deleteToken,
     verifyToken,
+    createRefreshToken,
+    verifyRefreshToken,
 };
 //# sourceMappingURL=jwtTokenHelper.js.map

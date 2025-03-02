@@ -32,8 +32,25 @@ const passwordLoginService = async (email: string, password: string) => {
     variables.jwt_expire as string
   );
 
+  const refreshToken = jwtHelpers.createRefreshToken(
+    {
+      id: isUserExist.id,
+      role: isUserExist.role,
+    },
+    variables.jwt_refresh_secret as Secret,
+    variables.jwt_refresh_expire as string
+  );
+
+  // save refresh token to database
+  await Authentication.updateOne(
+    { user_id: isUserExist.id },
+    { $set: { refresh_token: refreshToken } },
+    { upsert: true, new: true }
+  );
+
   return {
     accessToken,
+    refreshToken,
     userId: isUserExist.id as string,
     name: isUserExist.name as string,
     email: isUserExist.work_email as string,
@@ -57,14 +74,30 @@ const oauthLoginService = async (email: string) => {
     image: loginUser.image,
     role: loginUser.role || "user",
     accessToken: "",
+    refreshToken: "",
   };
-  const token = jwtHelpers.createToken(
+
+  const accessToken = jwtHelpers.createToken(
     { user_id: loginUser.id, role: loginUser.role },
     variables.jwt_secret as Secret,
     variables.jwt_expire as string
   );
 
-  userDetails.accessToken = token;
+  const refreshToken = jwtHelpers.createRefreshToken(
+    { user_id: loginUser.id, role: loginUser.role },
+    variables.jwt_refresh_secret as Secret,
+    variables.jwt_refresh_expire as string
+  );
+
+  // save refresh token to database
+  await Authentication.updateOne(
+    { user_id: loginUser.id },
+    { $set: { refresh_token: refreshToken } },
+    { upsert: true, new: true }
+  );
+
+  userDetails.accessToken = accessToken;
+  userDetails.refreshToken = refreshToken;
 
   return userDetails;
 };
@@ -90,6 +123,7 @@ const tokenLoginService = async (token: string) => {
     image: employee.image,
     role: employee.role || "user",
     accessToken: "",
+    refreshToken: "",
   };
 
   const accessToken = jwtHelpers.createToken(
@@ -98,7 +132,22 @@ const tokenLoginService = async (token: string) => {
     variables.jwt_expire as string
   );
 
+  const refreshToken = jwtHelpers.createRefreshToken(
+    { user_id: employee.id, role: employee.role },
+    variables.jwt_refresh_secret as Secret,
+    variables.jwt_refresh_expire as string
+  );
+
+  // save refresh token to database
+  await Authentication.updateOne(
+    { user_id: employee.id },
+    { $set: { refresh_token: refreshToken } },
+    { upsert: true, new: true }
+  );
+
   userDetails.accessToken = accessToken;
+  userDetails.refreshToken = refreshToken;
+
   return userDetails;
 };
 
@@ -108,7 +157,6 @@ const verifyUserService = async (email: string, currentTime: string) => {
   if (!isUserExist) {
     throw Error("Something went wrong Try again");
   } else {
-    await Authentication.deleteOne({ user_id: isUserExist.id });
     await sendVerificationOtp(isUserExist.id!, email, currentTime);
     return isUserExist;
   }
@@ -126,12 +174,19 @@ const sendVerificationOtp = async (
     getCurrentTime.setMinutes(getCurrentTime.getMinutes() + 5)
   ).toISOString();
 
-  const userVerification = new Authentication({
-    user_id: id,
-    token: await bcrypt.hash(otp, variables.salt),
-    expires: expiringTime,
-  });
-  await userVerification.save();
+  const userVerification = {
+    pass_reset_token: {
+      token: await bcrypt.hash(otp, variables.salt),
+      expires: expiringTime,
+    },
+  };
+
+  await Authentication.updateOne(
+    { user_id: id },
+    { $set: userVerification },
+    { upsert: true, new: true }
+  );
+
   await mailSender.otpSender(email, otp);
 };
 
@@ -152,17 +207,20 @@ const verifyOtpService = async (
       throw Error("OTP not found");
     } else {
       const userId = verificationToken.user_id;
-      const { token: hashedOtp, expires } = verificationToken;
+      const { token: hashedOtp, expires } = verificationToken.pass_reset_token;
+
+      // Check if the OTP is still valid
       if (new Date(expires) > new Date(currentTime)) {
         const compareOtp = await bcrypt.compare(otp, hashedOtp);
         await Employee.updateOne({ id: userId }, { $set: { verified: true } });
+
+        // Check if the OTP is correct
         if (!compareOtp) {
           throw Error("Incorrect OTP!");
-        } else {
-          await Authentication.deleteOne({ user_id: userId });
         }
+
+        // Check if the OTP has expired
       } else {
-        await Authentication.deleteOne({ user_id: userId });
         throw Error("OTP Expired");
       }
     }
@@ -188,8 +246,6 @@ const resetPasswordService = async (email: string, password: string) => {
     if (!resetPassword) {
       throw new Error("Something went wrong");
     }
-
-    await Authentication.deleteOne({ user_id: resetPassword.id });
 
     await session.commitTransaction();
     await session.endSession();
@@ -258,11 +314,59 @@ const resendOtpService = async (email: string, currentTime: string) => {
   if (!email) {
     throw Error("Empty user information");
   } else {
-    await Authentication.deleteMany({ user_id });
     await sendVerificationOtp(user_id, email, currentTime);
   }
 };
 
+// create refresh token
+const createRefreshToken = (id: string, role: string) => {
+  return jwtHelpers.createRefreshToken(
+    { id, role },
+    variables.jwt_refresh_secret as Secret,
+    variables.jwt_refresh_expire
+  );
+};
+
+// verify refresh token
+const verifyRefreshToken = (token: string) => {
+  return jwtHelpers.verifyRefreshToken(
+    token,
+    variables.jwt_refresh_secret as Secret
+  );
+};
+
+// refresh token service
+const refreshTokenService = async (refreshToken: string) => {
+  const decodedToken = verifyRefreshToken(refreshToken);
+  const { id, role } = decodedToken;
+
+  const storedToken = await Authentication.findOne({ user_id: id });
+
+  if (!storedToken || storedToken.refresh_token !== refreshToken) {
+    throw new Error("Invalid refresh token");
+  }
+
+  const newAccessToken = jwtHelpers.createToken(
+    { id, role },
+    variables.jwt_secret as Secret,
+    variables.jwt_expire as string
+  );
+
+  const newRefreshToken = createRefreshToken(id, role);
+
+  // Replace the old refresh token with the new one in the database
+  await Authentication.updateOne(
+    { user_id: id },
+    { $set: { refresh_token: newRefreshToken } }
+  );
+
+  return {
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  };
+};
+
+// export services
 export const authenticationService = {
   passwordLoginService,
   oauthLoginService,
@@ -273,4 +377,7 @@ export const authenticationService = {
   resetPasswordService,
   updatePasswordService,
   resetPasswordOtpService,
+  createRefreshToken,
+  verifyRefreshToken,
+  refreshTokenService,
 };

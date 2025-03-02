@@ -33,8 +33,15 @@ const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void
         id: isUserExist.id,
         role: isUserExist.role,
     }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+    const refreshToken = jwtTokenHelper_1.jwtHelpers.createRefreshToken({
+        id: isUserExist.id,
+        role: isUserExist.role,
+    }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
+    // save refresh token to database
+    yield authentication_model_1.Authentication.updateOne({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     return {
         accessToken,
+        refreshToken,
         userId: isUserExist.id,
         name: isUserExist.name,
         email: isUserExist.work_email,
@@ -55,9 +62,14 @@ const oauthLoginService = (email) => __awaiter(void 0, void 0, void 0, function*
         image: loginUser.image,
         role: loginUser.role || "user",
         accessToken: "",
+        refreshToken: "",
     };
-    const token = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: loginUser.id, role: loginUser.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    userDetails.accessToken = token;
+    const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: loginUser.id, role: loginUser.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+    const refreshToken = jwtTokenHelper_1.jwtHelpers.createRefreshToken({ user_id: loginUser.id, role: loginUser.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
+    // save refresh token to database
+    yield authentication_model_1.Authentication.updateOne({ user_id: loginUser.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
+    userDetails.accessToken = accessToken;
+    userDetails.refreshToken = refreshToken;
     return userDetails;
 });
 // token login
@@ -75,9 +87,14 @@ const tokenLoginService = (token) => __awaiter(void 0, void 0, void 0, function*
         image: employee.image,
         role: employee.role || "user",
         accessToken: "",
+        refreshToken: "",
     };
     const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employee.id, role: employee.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+    const refreshToken = jwtTokenHelper_1.jwtHelpers.createRefreshToken({ user_id: employee.id, role: employee.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
+    // save refresh token to database
+    yield authentication_model_1.Authentication.updateOne({ user_id: employee.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     userDetails.accessToken = accessToken;
+    userDetails.refreshToken = refreshToken;
     return userDetails;
 });
 // user verification for password recovery
@@ -87,7 +104,6 @@ const verifyUserService = (email, currentTime) => __awaiter(void 0, void 0, void
         throw Error("Something went wrong Try again");
     }
     else {
-        yield authentication_model_1.Authentication.deleteOne({ user_id: isUserExist.id });
         yield sendVerificationOtp(isUserExist.id, email, currentTime);
         return isUserExist;
     }
@@ -97,12 +113,13 @@ const sendVerificationOtp = (id, email, currentTime) => __awaiter(void 0, void 0
     const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
     const getCurrentTime = new Date(currentTime);
     const expiringTime = new Date(getCurrentTime.setMinutes(getCurrentTime.getMinutes() + 5)).toISOString();
-    const userVerification = new authentication_model_1.Authentication({
-        user_id: id,
-        token: yield bcrypt_1.default.hash(otp, variables_1.default.salt),
-        expires: expiringTime,
-    });
-    yield userVerification.save();
+    const userVerification = {
+        pass_reset_token: {
+            token: yield bcrypt_1.default.hash(otp, variables_1.default.salt),
+            expires: expiringTime,
+        },
+    };
+    yield authentication_model_1.Authentication.updateOne({ user_id: id }, { $set: userVerification }, { upsert: true, new: true });
     yield mailSender_1.mailSender.otpSender(email, otp);
 });
 // verify otp
@@ -120,19 +137,18 @@ const verifyOtpService = (email, otp, currentTime) => __awaiter(void 0, void 0, 
         }
         else {
             const userId = verificationToken.user_id;
-            const { token: hashedOtp, expires } = verificationToken;
+            const { token: hashedOtp, expires } = verificationToken.pass_reset_token;
+            // Check if the OTP is still valid
             if (new Date(expires) > new Date(currentTime)) {
                 const compareOtp = yield bcrypt_1.default.compare(otp, hashedOtp);
                 yield employee_model_1.Employee.updateOne({ id: userId }, { $set: { verified: true } });
+                // Check if the OTP is correct
                 if (!compareOtp) {
                     throw Error("Incorrect OTP!");
                 }
-                else {
-                    yield authentication_model_1.Authentication.deleteOne({ user_id: userId });
-                }
+                // Check if the OTP has expired
             }
             else {
-                yield authentication_model_1.Authentication.deleteOne({ user_id: userId });
                 throw Error("OTP Expired");
             }
         }
@@ -152,7 +168,6 @@ const resetPasswordService = (email, password) => __awaiter(void 0, void 0, void
         if (!resetPassword) {
             throw new Error("Something went wrong");
         }
-        yield authentication_model_1.Authentication.deleteOne({ user_id: resetPassword.id });
         yield session.commitTransaction();
         yield session.endSession();
     }
@@ -205,10 +220,35 @@ const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 
         throw Error("Empty user information");
     }
     else {
-        yield authentication_model_1.Authentication.deleteMany({ user_id });
         yield sendVerificationOtp(user_id, email, currentTime);
     }
 });
+// create refresh token
+const createRefreshToken = (id, role) => {
+    return jwtTokenHelper_1.jwtHelpers.createRefreshToken({ id, role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
+};
+// verify refresh token
+const verifyRefreshToken = (token) => {
+    return jwtTokenHelper_1.jwtHelpers.verifyRefreshToken(token, variables_1.default.jwt_refresh_secret);
+};
+// refresh token service
+const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = verifyRefreshToken(refreshToken);
+    const { id, role } = decodedToken;
+    const storedToken = yield authentication_model_1.Authentication.findOne({ user_id: id });
+    if (!storedToken || storedToken.refresh_token !== refreshToken) {
+        throw new Error("Invalid refresh token");
+    }
+    const newAccessToken = jwtTokenHelper_1.jwtHelpers.createToken({ id, role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+    const newRefreshToken = createRefreshToken(id, role);
+    // Replace the old refresh token with the new one in the database
+    yield authentication_model_1.Authentication.updateOne({ user_id: id }, { $set: { refresh_token: newRefreshToken } });
+    return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+    };
+});
+// export services
 exports.authenticationService = {
     passwordLoginService,
     oauthLoginService,
@@ -219,5 +259,8 @@ exports.authenticationService = {
     resetPasswordService,
     updatePasswordService,
     resetPasswordOtpService,
+    createRefreshToken,
+    verifyRefreshToken,
+    refreshTokenService,
 };
 //# sourceMappingURL=authentication.service.js.map
