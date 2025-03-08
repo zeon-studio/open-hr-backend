@@ -91,7 +91,7 @@ function leaveRequestTemplate(name, leaveType, dayCount, startDate, endDate, rea
       <li style="margin-bottom: 5px;"><strong>Reason:</strong> ${reason}</li>
     </ul>
 
-    <p>To accept or reject the request please visit <a href="${settings.app_url}/request" style="color: #007bff;">${settings.app_name}</a></p>
+    <p>To accept or reject the request please visit <a href="${settings.app_url}/leave-requests" style="color: #007bff;">${settings.app_name}</a></p>
   </div>
   `;
     });
