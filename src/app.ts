@@ -3,8 +3,20 @@ import { globalErrorhandler } from "@/middlewares/globalErrorHandler";
 import router from "@/routes";
 import cors from "cors";
 import express, { Application } from "express";
+import Redis from "ioredis";
 
 const app: Application = express();
+
+// Initialize Redis client
+const redis = new Redis({});
+
+redis.on("connect", () => {
+  console.log("Connected to Redis successfully");
+});
+
+redis.on("error", (err) => {
+  console.error("Redis connection error:", err);
+});
 
 // Define CORS options for specific origins
 const corsOptions: cors.CorsOptions =

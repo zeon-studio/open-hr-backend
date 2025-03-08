@@ -17,7 +17,16 @@ const globalErrorHandler_1 = require("./middlewares/globalErrorHandler");
 const routes_1 = __importDefault(require("./routes"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
+const ioredis_1 = __importDefault(require("ioredis"));
 const app = (0, express_1.default)();
+// Initialize Redis client
+const redis = new ioredis_1.default({});
+redis.on("connect", () => {
+    console.log("Connected to Redis successfully");
+});
+redis.on("error", (err) => {
+    console.error("Redis connection error:", err);
+});
 // Define CORS options for specific origins
 const corsOptions = process.env.NODE_ENV === "development"
     ? {

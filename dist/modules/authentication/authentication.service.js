@@ -12,11 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authenticationService = void 0;
+exports.authenticationService = exports.refreshTokenService = void 0;
 const variables_1 = __importDefault(require("../../config/variables"));
 const jwtTokenHelper_1 = require("../../lib/jwtTokenHelper");
 const mailSender_1 = require("../../lib/mailSender");
+const redisClient_1 = __importDefault(require("../../lib/redisClient"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const employee_model_1 = require("../employee/employee.model");
 const authentication_model_1 = require("./authentication.model");
@@ -31,17 +33,19 @@ const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void
     }
     const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({
         id: isUserExist.id,
-        role: isUserExist.role,
+        role: isUserExist.role || "user",
     }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
     const refreshToken = jwtTokenHelper_1.jwtHelpers.createRefreshToken({
         id: isUserExist.id,
-        role: isUserExist.role,
+        role: isUserExist.role || "user",
     }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
     // save refresh token to database
     yield authentication_model_1.Authentication.updateOne({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     return {
         accessToken,
         refreshToken,
+        // token will expire in 60 seconds
+        expiresAt: Date.now() + 60 * 1000,
         userId: isUserExist.id,
         name: isUserExist.name,
         email: isUserExist.work_email,
@@ -231,23 +235,66 @@ const createRefreshToken = (id, role) => {
 const verifyRefreshToken = (token) => {
     return jwtTokenHelper_1.jwtHelpers.verifyRefreshToken(token, variables_1.default.jwt_refresh_secret);
 };
-// refresh token service
+//
+const THROTTLE_CONFIG = {
+    maxAttempts: variables_1.default.env === "development" ? Infinity : 5,
+    windowSeconds: 60,
+    lockoutDurationSeconds: 300,
+    keyPrefix: "refresh:throttle:",
+};
+const getRedisKeys = (userId) => ({
+    attemptsKey: `${THROTTLE_CONFIG.keyPrefix}${userId}:attempts`,
+    lockKey: `${THROTTLE_CONFIG.keyPrefix}${userId}:lock`,
+});
 const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!refreshToken) {
+        throw new Error("Refresh token is required");
+    }
+    // Create a new refresh promise and store it
     const decodedToken = verifyRefreshToken(refreshToken);
-    const { id, role } = decodedToken;
-    const storedToken = yield authentication_model_1.Authentication.findOne({ user_id: id });
+    const { id: userId, role } = decodedToken;
+    if (!userId) {
+        throw new Error("Invalid refresh token");
+    }
+    const isExit = yield redisClient_1.default.get(refreshToken);
+    if (isExit) {
+        return JSON.parse(isExit);
+    }
+    const { attemptsKey, lockKey } = getRedisKeys(userId);
+    if (yield redisClient_1.default.get(lockKey)) {
+        const ttl = yield redisClient_1.default.ttl(lockKey);
+        throw new Error(`Too many requests. Try again in ${ttl} seconds.`);
+    }
+    const now = Date.now();
+    yield redisClient_1.default.zadd(attemptsKey, now, now);
+    yield redisClient_1.default.expire(attemptsKey, THROTTLE_CONFIG.windowSeconds * 2);
+    yield redisClient_1.default.zremrangebyscore(attemptsKey, 0, now - THROTTLE_CONFIG.windowSeconds * 1000);
+    const attemptCount = yield redisClient_1.default.zcard(attemptsKey);
+    if (attemptCount > THROTTLE_CONFIG.maxAttempts) {
+        yield redisClient_1.default.set(lockKey, "1", "EX", THROTTLE_CONFIG.lockoutDurationSeconds);
+        throw new Error("Too many attempts. Try again later.");
+    }
+    const storedToken = yield authentication_model_1.Authentication.findOne({ user_id: userId });
     if (!storedToken || storedToken.refresh_token !== refreshToken) {
         throw new Error("Invalid refresh token");
     }
-    const newAccessToken = jwtTokenHelper_1.jwtHelpers.createToken({ id, role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const newRefreshToken = createRefreshToken(id, role);
-    // Replace the old refresh token with the new one in the database
-    yield authentication_model_1.Authentication.updateOne({ user_id: id }, { $set: { refresh_token: newRefreshToken } });
+    const newAccessToken = jwtTokenHelper_1.jwtHelpers.createToken({
+        id: userId,
+        role: role || "user",
+    }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+    const newRefreshToken = jsonwebtoken_1.default.sign({ id: userId, role: role || "user" }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    yield authentication_model_1.Authentication.updateOne({ user_id: userId }, { refresh_token: newRefreshToken });
+    yield redisClient_1.default.psetex(refreshToken, 10 * 1000, JSON.stringify({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+    }));
+    yield redisClient_1.default.del(attemptsKey);
     return {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
     };
 });
+exports.refreshTokenService = refreshTokenService;
 // export services
 exports.authenticationService = {
     passwordLoginService,
@@ -261,6 +308,6 @@ exports.authenticationService = {
     resetPasswordOtpService,
     createRefreshToken,
     verifyRefreshToken,
-    refreshTokenService,
+    refreshTokenService: exports.refreshTokenService,
 };
 //# sourceMappingURL=authentication.service.js.map

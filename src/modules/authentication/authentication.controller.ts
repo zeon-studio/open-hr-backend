@@ -117,7 +117,6 @@ const refreshTokenController = catchAsync(
     const { refreshToken } = req.body;
     const tokens =
       await authenticationService.refreshTokenService(refreshToken);
-
     sendResponse(res, {
       success: true,
       statusCode: 200,
