@@ -1,8 +1,9 @@
 import variables from "@/config/variables";
 import { jwtHelpers } from "@/lib/jwtTokenHelper";
 import { mailSender } from "@/lib/mailSender";
+import redis from "@/lib/redisClient";
 import bcrypt from "bcrypt";
-import { Secret } from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
 import mongoose from "mongoose";
 import { Employee } from "../employee/employee.model";
 import { Authentication } from "./authentication.model";
@@ -26,7 +27,7 @@ const passwordLoginService = async (email: string, password: string) => {
   const accessToken = jwtHelpers.createToken(
     {
       id: isUserExist.id,
-      role: isUserExist.role,
+      role: isUserExist.role || "user",
     },
     variables.jwt_secret as Secret,
     variables.jwt_expire as string
@@ -35,7 +36,7 @@ const passwordLoginService = async (email: string, password: string) => {
   const refreshToken = jwtHelpers.createRefreshToken(
     {
       id: isUserExist.id,
-      role: isUserExist.role,
+      role: isUserExist.role || "user",
     },
     variables.jwt_refresh_secret as Secret,
     variables.jwt_refresh_expire as string
@@ -51,6 +52,9 @@ const passwordLoginService = async (email: string, password: string) => {
   return {
     accessToken,
     refreshToken,
+
+    // token will expire in 60 seconds
+    expiresAt: Date.now() + 60 * 1000,
     userId: isUserExist.id as string,
     name: isUserExist.name as string,
     email: isUserExist.work_email as string,
@@ -335,30 +339,94 @@ const verifyRefreshToken = (token: string) => {
   );
 };
 
-// refresh token service
-const refreshTokenService = async (refreshToken: string) => {
+//
+
+const THROTTLE_CONFIG = {
+  maxAttempts: variables.env === "development" ? Infinity : 5,
+  windowSeconds: 60,
+  lockoutDurationSeconds: 300,
+  keyPrefix: "refresh:throttle:",
+};
+
+const getRedisKeys = (userId: string) => ({
+  attemptsKey: `${THROTTLE_CONFIG.keyPrefix}${userId}:attempts`,
+  lockKey: `${THROTTLE_CONFIG.keyPrefix}${userId}:lock`,
+});
+
+export const refreshTokenService = async (refreshToken: string) => {
+  if (!refreshToken) {
+    throw new Error("Refresh token is required");
+  }
+
+  // Create a new refresh promise and store it
   const decodedToken = verifyRefreshToken(refreshToken);
-  const { id, role } = decodedToken;
+  const { id: userId, role } = decodedToken as { id: string; role: string };
+  if (!userId) {
+    throw new Error("Invalid refresh token");
+  }
+  const isExit = await redis.get(refreshToken);
 
-  const storedToken = await Authentication.findOne({ user_id: id });
+  if (isExit) {
+    return JSON.parse(isExit);
+  }
 
+  const { attemptsKey, lockKey } = getRedisKeys(userId);
+  if (await redis.get(lockKey)) {
+    const ttl = await redis.ttl(lockKey);
+    throw new Error(`Too many requests. Try again in ${ttl} seconds.`);
+  }
+
+  const now = Date.now();
+  await redis.zadd(attemptsKey, now, now);
+  await redis.expire(attemptsKey, THROTTLE_CONFIG.windowSeconds * 2);
+  await redis.zremrangebyscore(
+    attemptsKey,
+    0,
+    now - THROTTLE_CONFIG.windowSeconds * 1000
+  );
+
+  const attemptCount = await redis.zcard(attemptsKey);
+
+  if (attemptCount > THROTTLE_CONFIG.maxAttempts) {
+    await redis.set(lockKey, "1", "EX", THROTTLE_CONFIG.lockoutDurationSeconds);
+    throw new Error("Too many attempts. Try again later.");
+  }
+
+  const storedToken = await Authentication.findOne({ user_id: userId });
   if (!storedToken || storedToken.refresh_token !== refreshToken) {
     throw new Error("Invalid refresh token");
   }
 
   const newAccessToken = jwtHelpers.createToken(
-    { id, role },
+    {
+      id: userId,
+      role: role || "user",
+    },
     variables.jwt_secret as Secret,
     variables.jwt_expire as string
   );
 
-  const newRefreshToken = createRefreshToken(id, role);
-
-  // Replace the old refresh token with the new one in the database
-  await Authentication.updateOne(
-    { user_id: id },
-    { $set: { refresh_token: newRefreshToken } }
+  const newRefreshToken = jwt.sign(
+    { id: userId, role: role || "user" },
+    process.env.JWT_SECRET as string,
+    { expiresIn: "7d" }
   );
+
+  await Authentication.updateOne(
+    { user_id: userId },
+    { refresh_token: newRefreshToken }
+  );
+
+  await redis.psetex(
+    refreshToken,
+    10 * 1000,
+    JSON.stringify({
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    })
+  );
+
+  await redis.del(attemptsKey);
 
   return {
     accessToken: newAccessToken,
