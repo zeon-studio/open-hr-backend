@@ -2,7 +2,7 @@ import variables from "@/config/variables";
 import { jwtHelpers } from "@/lib/jwtTokenHelper";
 import { mailSender } from "@/lib/mailSender";
 import bcrypt from "bcrypt";
-import { Secret } from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
 import mongoose from "mongoose";
 import { Employee } from "../employee/employee.model";
 import { Authentication } from "./authentication.model";
@@ -32,12 +32,29 @@ const passwordLoginService = async (email: string, password: string) => {
     variables.jwt_expire as string
   );
 
+  const refreshToken = jwtHelpers.createToken(
+    {
+      id: isUserExist.id,
+      role: isUserExist.role,
+    },
+    variables.jwt_refresh_secret as Secret,
+    variables.jwt_refresh_expire as string
+  );
+
+  // save refresh token to database
+  await Authentication.updateOne(
+    { user_id: isUserExist.id },
+    { $set: { refresh_token: refreshToken } },
+    { upsert: true, new: true }
+  );
+
   return {
-    accessToken,
     userId: isUserExist.id as string,
     name: isUserExist.name as string,
     email: isUserExist.work_email as string,
     image: isUserExist?.image as string,
+    accessToken: accessToken,
+    refreshToken: refreshToken,
     role: isUserExist.role as string,
   };
 };
@@ -55,16 +72,32 @@ const oauthLoginService = async (email: string) => {
     name: loginUser.name,
     email: loginUser.work_email,
     image: loginUser.image,
-    role: loginUser.role || "user",
+    role: loginUser.role,
     accessToken: "",
+    refreshToken: "",
   };
-  const token = jwtHelpers.createToken(
+
+  const accessToken = jwtHelpers.createToken(
     { user_id: loginUser.id, role: loginUser.role },
     variables.jwt_secret as Secret,
     variables.jwt_expire as string
   );
 
-  userDetails.accessToken = token;
+  const refreshToken = jwtHelpers.createToken(
+    { user_id: loginUser.id, role: loginUser.role },
+    variables.jwt_refresh_secret as Secret,
+    variables.jwt_refresh_expire as string
+  );
+
+  // save refresh token to database
+  await Authentication.updateOne(
+    { user_id: loginUser.id },
+    { $set: { refresh_token: refreshToken } },
+    { upsert: true, new: true }
+  );
+
+  userDetails.accessToken = accessToken;
+  userDetails.refreshToken = refreshToken;
 
   return userDetails;
 };
@@ -88,8 +121,9 @@ const tokenLoginService = async (token: string) => {
     name: employee.name,
     email: employee.work_email,
     image: employee.image,
-    role: employee.role || "user",
+    role: employee.role,
     accessToken: "",
+    refreshToken: "",
   };
 
   const accessToken = jwtHelpers.createToken(
@@ -98,7 +132,22 @@ const tokenLoginService = async (token: string) => {
     variables.jwt_expire as string
   );
 
+  const refreshToken = jwtHelpers.createToken(
+    { user_id: employee.id, role: employee.role },
+    variables.jwt_refresh_secret as Secret,
+    variables.jwt_refresh_expire as string
+  );
+
+  // save refresh token to database
+  await Authentication.updateOne(
+    { user_id: employee.id },
+    { $set: { refresh_token: refreshToken } },
+    { upsert: true, new: true }
+  );
+
   userDetails.accessToken = accessToken;
+  userDetails.refreshToken = refreshToken;
+
   return userDetails;
 };
 
@@ -108,7 +157,6 @@ const verifyUserService = async (email: string, currentTime: string) => {
   if (!isUserExist) {
     throw Error("Something went wrong Try again");
   } else {
-    await Authentication.deleteOne({ user_id: isUserExist.id });
     await sendVerificationOtp(isUserExist.id!, email, currentTime);
     return isUserExist;
   }
@@ -126,12 +174,19 @@ const sendVerificationOtp = async (
     getCurrentTime.setMinutes(getCurrentTime.getMinutes() + 5)
   ).toISOString();
 
-  const userVerification = new Authentication({
-    user_id: id,
-    token: await bcrypt.hash(otp, variables.salt),
-    expires: expiringTime,
-  });
-  await userVerification.save();
+  const userVerification = {
+    pass_reset_token: {
+      token: await bcrypt.hash(otp, variables.salt),
+      expires: expiringTime,
+    },
+  };
+
+  await Authentication.updateOne(
+    { user_id: id },
+    { $set: userVerification },
+    { upsert: true, new: true }
+  );
+
   await mailSender.otpSender(email, otp);
 };
 
@@ -152,17 +207,20 @@ const verifyOtpService = async (
       throw Error("OTP not found");
     } else {
       const userId = verificationToken.user_id;
-      const { token: hashedOtp, expires } = verificationToken;
+      const { token: hashedOtp, expires } = verificationToken.pass_reset_token;
+
+      // Check if the OTP is still valid
       if (new Date(expires) > new Date(currentTime)) {
         const compareOtp = await bcrypt.compare(otp, hashedOtp);
         await Employee.updateOne({ id: userId }, { $set: { verified: true } });
+
+        // Check if the OTP is correct
         if (!compareOtp) {
           throw Error("Incorrect OTP!");
-        } else {
-          await Authentication.deleteOne({ user_id: userId });
         }
+
+        // Check if the OTP has expired
       } else {
-        await Authentication.deleteOne({ user_id: userId });
         throw Error("OTP Expired");
       }
     }
@@ -188,8 +246,6 @@ const resetPasswordService = async (email: string, password: string) => {
     if (!resetPassword) {
       throw new Error("Something went wrong");
     }
-
-    await Authentication.deleteOne({ user_id: resetPassword.id });
 
     await session.commitTransaction();
     await session.endSession();
@@ -258,11 +314,79 @@ const resendOtpService = async (email: string, currentTime: string) => {
   if (!email) {
     throw Error("Empty user information");
   } else {
-    await Authentication.deleteMany({ user_id });
     await sendVerificationOtp(user_id, email, currentTime);
   }
 };
 
+// in-memory cache implementation
+const refreshTokenCache = new Map<string, string>();
+function setRefreshTokenCache(key: string, ttl: number, value: string): void {
+  refreshTokenCache.set(key, value);
+  setTimeout(() => {
+    refreshTokenCache.delete(key);
+  }, ttl);
+}
+
+export const refreshTokenService = async (refreshToken: string) => {
+  if (!refreshToken) {
+    throw new Error("Refresh token is required");
+  }
+
+  const decodedToken = jwtHelpers.verifyToken(
+    refreshToken,
+    variables.jwt_refresh_secret as Secret
+  );
+  const { id: userId, role } = decodedToken;
+  if (!userId) {
+    throw new Error("Invalid refresh token");
+  }
+
+  // Check cached tokens from in-memory cache
+  const cached = refreshTokenCache.get(refreshToken);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  const storedToken = await Authentication.findOne({ user_id: userId });
+  if (!storedToken || storedToken.refresh_token !== refreshToken) {
+    throw new Error("Invalid refresh token");
+  }
+
+  const newAccessToken = jwtHelpers.createToken(
+    {
+      id: userId,
+      role: role,
+    },
+    variables.jwt_secret as Secret,
+    variables.jwt_expire as string
+  );
+
+  // @ts-ignore
+  const newRefreshToken = jwt.sign(
+    { id: userId, role: role },
+    variables.jwt_refresh_secret as Secret,
+    { expiresIn: variables.jwt_refresh_expire }
+  );
+
+  await Authentication.updateOne(
+    { user_id: userId },
+    { refresh_token: newRefreshToken },
+    { new: true, upsert: true }
+  );
+
+  const cacheData = JSON.stringify({
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  });
+  setRefreshTokenCache(refreshToken, 10 * 1000, cacheData);
+
+  return {
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  };
+};
+
+// export services
 export const authenticationService = {
   passwordLoginService,
   oauthLoginService,
@@ -273,4 +397,5 @@ export const authenticationService = {
   resetPasswordService,
   updatePasswordService,
   resetPasswordOtpService,
+  refreshTokenService,
 };
