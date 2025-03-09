@@ -13,7 +13,7 @@ export default {
   jwt_secret: process.env.JWT_SECRET,
   jwt_expire: process.env.JWT_TOKEN_EXPIRE,
   jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
-  jwt_refresh_expire: process.env.JWT_REFRESH_EXPIRE,
+  jwt_refresh_expire: process.env.JWT_REFRESH_TOKEN_EXPIRE!,
   dos_public_access_key: process.env.DOS_PUBLIC_ACCESS_KEY,
   dos_public_secret_key: process.env.DOS_PUBLIC_SECRET_KEY,
   dos_bucket_name: process.env.DOS_BUCKET_NAME,

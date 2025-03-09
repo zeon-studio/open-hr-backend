@@ -16,7 +16,6 @@ exports.authenticationService = exports.refreshTokenService = void 0;
 const variables_1 = __importDefault(require("../../config/variables"));
 const jwtTokenHelper_1 = require("../../lib/jwtTokenHelper");
 const mailSender_1 = require("../../lib/mailSender");
-const redisClient_1 = __importDefault(require("../../lib/redisClient"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -235,44 +234,27 @@ const createRefreshToken = (id, role) => {
 const verifyRefreshToken = (token) => {
     return jwtTokenHelper_1.jwtHelpers.verifyRefreshToken(token, variables_1.default.jwt_refresh_secret);
 };
-//
-const THROTTLE_CONFIG = {
-    maxAttempts: variables_1.default.env === "development" ? Infinity : 5,
-    windowSeconds: 60,
-    lockoutDurationSeconds: 300,
-    keyPrefix: "refresh:throttle:",
-};
-const getRedisKeys = (userId) => ({
-    attemptsKey: `${THROTTLE_CONFIG.keyPrefix}${userId}:attempts`,
-    lockKey: `${THROTTLE_CONFIG.keyPrefix}${userId}:lock`,
-});
+// in-memory cache implementation
+const inMemoryCache = new Map();
+function setCacheWithExpiration(key, ttl, value) {
+    inMemoryCache.set(key, value);
+    setTimeout(() => {
+        inMemoryCache.delete(key);
+    }, ttl);
+}
 const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
     if (!refreshToken) {
         throw new Error("Refresh token is required");
     }
-    // Create a new refresh promise and store it
     const decodedToken = verifyRefreshToken(refreshToken);
     const { id: userId, role } = decodedToken;
     if (!userId) {
         throw new Error("Invalid refresh token");
     }
-    const isExit = yield redisClient_1.default.get(refreshToken);
-    if (isExit) {
-        return JSON.parse(isExit);
-    }
-    const { attemptsKey, lockKey } = getRedisKeys(userId);
-    if (yield redisClient_1.default.get(lockKey)) {
-        const ttl = yield redisClient_1.default.ttl(lockKey);
-        throw new Error(`Too many requests. Try again in ${ttl} seconds.`);
-    }
-    const now = Date.now();
-    yield redisClient_1.default.zadd(attemptsKey, now, now);
-    yield redisClient_1.default.expire(attemptsKey, THROTTLE_CONFIG.windowSeconds * 2);
-    yield redisClient_1.default.zremrangebyscore(attemptsKey, 0, now - THROTTLE_CONFIG.windowSeconds * 1000);
-    const attemptCount = yield redisClient_1.default.zcard(attemptsKey);
-    if (attemptCount > THROTTLE_CONFIG.maxAttempts) {
-        yield redisClient_1.default.set(lockKey, "1", "EX", THROTTLE_CONFIG.lockoutDurationSeconds);
-        throw new Error("Too many attempts. Try again later.");
+    // Check cached tokens from in-memory cache
+    const cached = inMemoryCache.get(refreshToken);
+    if (cached) {
+        return JSON.parse(cached);
     }
     const storedToken = yield authentication_model_1.Authentication.findOne({ user_id: userId });
     if (!storedToken || storedToken.refresh_token !== refreshToken) {
@@ -282,13 +264,14 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
         id: userId,
         role: role || "user",
     }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const newRefreshToken = jsonwebtoken_1.default.sign({ id: userId, role: role || "user" }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    // @ts-ignore
+    const newRefreshToken = jsonwebtoken_1.default.sign({ id: userId, role: role || "user" }, variables_1.default.jwt_refresh_secret, { expiresIn: variables_1.default.jwt_refresh_expire });
     yield authentication_model_1.Authentication.updateOne({ user_id: userId }, { refresh_token: newRefreshToken });
-    yield redisClient_1.default.psetex(refreshToken, 10 * 1000, JSON.stringify({
+    const cacheData = JSON.stringify({
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
-    }));
-    yield redisClient_1.default.del(attemptsKey);
+    });
+    setCacheWithExpiration(refreshToken, 10 * 1000, cacheData);
     return {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,

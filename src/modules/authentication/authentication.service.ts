@@ -1,7 +1,6 @@
 import variables from "@/config/variables";
 import { jwtHelpers } from "@/lib/jwtTokenHelper";
 import { mailSender } from "@/lib/mailSender";
-import redis from "@/lib/redisClient";
 import bcrypt from "bcrypt";
 import jwt, { Secret } from "jsonwebtoken";
 import mongoose from "mongoose";
@@ -339,57 +338,30 @@ const verifyRefreshToken = (token: string) => {
   );
 };
 
-//
-
-const THROTTLE_CONFIG = {
-  maxAttempts: variables.env === "development" ? Infinity : 5,
-  windowSeconds: 60,
-  lockoutDurationSeconds: 300,
-  keyPrefix: "refresh:throttle:",
-};
-
-const getRedisKeys = (userId: string) => ({
-  attemptsKey: `${THROTTLE_CONFIG.keyPrefix}${userId}:attempts`,
-  lockKey: `${THROTTLE_CONFIG.keyPrefix}${userId}:lock`,
-});
+// in-memory cache implementation
+const inMemoryCache = new Map<string, string>();
+function setCacheWithExpiration(key: string, ttl: number, value: string): void {
+  inMemoryCache.set(key, value);
+  setTimeout(() => {
+    inMemoryCache.delete(key);
+  }, ttl);
+}
 
 export const refreshTokenService = async (refreshToken: string) => {
   if (!refreshToken) {
     throw new Error("Refresh token is required");
   }
 
-  // Create a new refresh promise and store it
   const decodedToken = verifyRefreshToken(refreshToken);
   const { id: userId, role } = decodedToken as { id: string; role: string };
   if (!userId) {
     throw new Error("Invalid refresh token");
   }
-  const isExit = await redis.get(refreshToken);
 
-  if (isExit) {
-    return JSON.parse(isExit);
-  }
-
-  const { attemptsKey, lockKey } = getRedisKeys(userId);
-  if (await redis.get(lockKey)) {
-    const ttl = await redis.ttl(lockKey);
-    throw new Error(`Too many requests. Try again in ${ttl} seconds.`);
-  }
-
-  const now = Date.now();
-  await redis.zadd(attemptsKey, now, now);
-  await redis.expire(attemptsKey, THROTTLE_CONFIG.windowSeconds * 2);
-  await redis.zremrangebyscore(
-    attemptsKey,
-    0,
-    now - THROTTLE_CONFIG.windowSeconds * 1000
-  );
-
-  const attemptCount = await redis.zcard(attemptsKey);
-
-  if (attemptCount > THROTTLE_CONFIG.maxAttempts) {
-    await redis.set(lockKey, "1", "EX", THROTTLE_CONFIG.lockoutDurationSeconds);
-    throw new Error("Too many attempts. Try again later.");
+  // Check cached tokens from in-memory cache
+  const cached = inMemoryCache.get(refreshToken);
+  if (cached) {
+    return JSON.parse(cached);
   }
 
   const storedToken = await Authentication.findOne({ user_id: userId });
@@ -406,10 +378,11 @@ export const refreshTokenService = async (refreshToken: string) => {
     variables.jwt_expire as string
   );
 
+  // @ts-ignore
   const newRefreshToken = jwt.sign(
     { id: userId, role: role || "user" },
-    process.env.JWT_SECRET as string,
-    { expiresIn: "7d" }
+    variables.jwt_refresh_secret as Secret,
+    { expiresIn: variables.jwt_refresh_expire }
   );
 
   await Authentication.updateOne(
@@ -417,16 +390,11 @@ export const refreshTokenService = async (refreshToken: string) => {
     { refresh_token: newRefreshToken }
   );
 
-  await redis.psetex(
-    refreshToken,
-    10 * 1000,
-    JSON.stringify({
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    })
-  );
-
-  await redis.del(attemptsKey);
+  const cacheData = JSON.stringify({
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  });
+  setCacheWithExpiration(refreshToken, 10 * 1000, cacheData);
 
   return {
     accessToken: newAccessToken,
