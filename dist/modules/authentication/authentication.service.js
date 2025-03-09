@@ -32,11 +32,11 @@ const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void
     }
     const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({
         id: isUserExist.id,
-        role: isUserExist.role || "user",
+        role: isUserExist.role,
     }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const refreshToken = jwtTokenHelper_1.jwtHelpers.createRefreshToken({
+    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({
         id: isUserExist.id,
-        role: isUserExist.role || "user",
+        role: isUserExist.role,
     }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
     // save refresh token to database
     yield authentication_model_1.Authentication.updateOne({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
@@ -66,7 +66,7 @@ const oauthLoginService = (email) => __awaiter(void 0, void 0, void 0, function*
         refreshToken: "",
     };
     const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: loginUser.id, role: loginUser.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const refreshToken = jwtTokenHelper_1.jwtHelpers.createRefreshToken({ user_id: loginUser.id, role: loginUser.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
+    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: loginUser.id, role: loginUser.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
     // save refresh token to database
     yield authentication_model_1.Authentication.updateOne({ user_id: loginUser.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     userDetails.accessToken = accessToken;
@@ -91,7 +91,7 @@ const tokenLoginService = (token) => __awaiter(void 0, void 0, void 0, function*
         refreshToken: "",
     };
     const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employee.id, role: employee.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const refreshToken = jwtTokenHelper_1.jwtHelpers.createRefreshToken({ user_id: employee.id, role: employee.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
+    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employee.id, role: employee.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
     // save refresh token to database
     yield authentication_model_1.Authentication.updateOne({ user_id: employee.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     userDetails.accessToken = accessToken;
@@ -224,33 +224,25 @@ const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 
         yield sendVerificationOtp(user_id, email, currentTime);
     }
 });
-// create refresh token
-const createRefreshToken = (id, role) => {
-    return jwtTokenHelper_1.jwtHelpers.createRefreshToken({ id, role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
-};
-// verify refresh token
-const verifyRefreshToken = (token) => {
-    return jwtTokenHelper_1.jwtHelpers.verifyRefreshToken(token, variables_1.default.jwt_refresh_secret);
-};
 // in-memory cache implementation
-const inMemoryCache = new Map();
-function setCacheWithExpiration(key, ttl, value) {
-    inMemoryCache.set(key, value);
+const refreshTokenCache = new Map();
+function setRefreshTokenCache(key, ttl, value) {
+    refreshTokenCache.set(key, value);
     setTimeout(() => {
-        inMemoryCache.delete(key);
+        refreshTokenCache.delete(key);
     }, ttl);
 }
 const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
     if (!refreshToken) {
         throw new Error("Refresh token is required");
     }
-    const decodedToken = verifyRefreshToken(refreshToken);
+    const decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(refreshToken, variables_1.default.jwt_refresh_secret);
     const { id: userId, role } = decodedToken;
     if (!userId) {
         throw new Error("Invalid refresh token");
     }
     // Check cached tokens from in-memory cache
-    const cached = inMemoryCache.get(refreshToken);
+    const cached = refreshTokenCache.get(refreshToken);
     if (cached) {
         return JSON.parse(cached);
     }
@@ -260,16 +252,16 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
     }
     const newAccessToken = jwtTokenHelper_1.jwtHelpers.createToken({
         id: userId,
-        role: role || "user",
+        role: role,
     }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
     // @ts-ignore
-    const newRefreshToken = jsonwebtoken_1.default.sign({ id: userId, role: role || "user" }, variables_1.default.jwt_refresh_secret, { expiresIn: variables_1.default.jwt_refresh_expire });
+    const newRefreshToken = jsonwebtoken_1.default.sign({ id: userId, role: role }, variables_1.default.jwt_refresh_secret, { expiresIn: variables_1.default.jwt_refresh_expire });
     yield authentication_model_1.Authentication.updateOne({ user_id: userId }, { refresh_token: newRefreshToken }, { new: true, upsert: true });
     const cacheData = JSON.stringify({
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
     });
-    setCacheWithExpiration(refreshToken, 10 * 1000, cacheData);
+    setRefreshTokenCache(refreshToken, 10 * 1000, cacheData);
     return {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
@@ -287,8 +279,6 @@ exports.authenticationService = {
     resetPasswordService,
     updatePasswordService,
     resetPasswordOtpService,
-    createRefreshToken,
-    verifyRefreshToken,
     refreshTokenService: exports.refreshTokenService,
 };
 //# sourceMappingURL=authentication.service.js.map

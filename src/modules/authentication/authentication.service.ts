@@ -26,16 +26,16 @@ const passwordLoginService = async (email: string, password: string) => {
   const accessToken = jwtHelpers.createToken(
     {
       id: isUserExist.id,
-      role: isUserExist.role || "user",
+      role: isUserExist.role,
     },
     variables.jwt_secret as Secret,
     variables.jwt_expire as string
   );
 
-  const refreshToken = jwtHelpers.createRefreshToken(
+  const refreshToken = jwtHelpers.createToken(
     {
       id: isUserExist.id,
-      role: isUserExist.role || "user",
+      role: isUserExist.role,
     },
     variables.jwt_refresh_secret as Secret,
     variables.jwt_refresh_expire as string
@@ -83,7 +83,7 @@ const oauthLoginService = async (email: string) => {
     variables.jwt_expire as string
   );
 
-  const refreshToken = jwtHelpers.createRefreshToken(
+  const refreshToken = jwtHelpers.createToken(
     { user_id: loginUser.id, role: loginUser.role },
     variables.jwt_refresh_secret as Secret,
     variables.jwt_refresh_expire as string
@@ -132,7 +132,7 @@ const tokenLoginService = async (token: string) => {
     variables.jwt_expire as string
   );
 
-  const refreshToken = jwtHelpers.createRefreshToken(
+  const refreshToken = jwtHelpers.createToken(
     { user_id: employee.id, role: employee.role },
     variables.jwt_refresh_secret as Secret,
     variables.jwt_refresh_expire as string
@@ -318,29 +318,12 @@ const resendOtpService = async (email: string, currentTime: string) => {
   }
 };
 
-// create refresh token
-const createRefreshToken = (id: string, role: string) => {
-  return jwtHelpers.createRefreshToken(
-    { id, role },
-    variables.jwt_refresh_secret as Secret,
-    variables.jwt_refresh_expire
-  );
-};
-
-// verify refresh token
-const verifyRefreshToken = (token: string) => {
-  return jwtHelpers.verifyRefreshToken(
-    token,
-    variables.jwt_refresh_secret as Secret
-  );
-};
-
 // in-memory cache implementation
-const inMemoryCache = new Map<string, string>();
-function setCacheWithExpiration(key: string, ttl: number, value: string): void {
-  inMemoryCache.set(key, value);
+const refreshTokenCache = new Map<string, string>();
+function setRefreshTokenCache(key: string, ttl: number, value: string): void {
+  refreshTokenCache.set(key, value);
   setTimeout(() => {
-    inMemoryCache.delete(key);
+    refreshTokenCache.delete(key);
   }, ttl);
 }
 
@@ -349,14 +332,17 @@ export const refreshTokenService = async (refreshToken: string) => {
     throw new Error("Refresh token is required");
   }
 
-  const decodedToken = verifyRefreshToken(refreshToken);
-  const { id: userId, role } = decodedToken as { id: string; role: string };
+  const decodedToken = jwtHelpers.verifyToken(
+    refreshToken,
+    variables.jwt_refresh_secret as Secret
+  );
+  const { id: userId, role } = decodedToken;
   if (!userId) {
     throw new Error("Invalid refresh token");
   }
 
   // Check cached tokens from in-memory cache
-  const cached = inMemoryCache.get(refreshToken);
+  const cached = refreshTokenCache.get(refreshToken);
   if (cached) {
     return JSON.parse(cached);
   }
@@ -369,7 +355,7 @@ export const refreshTokenService = async (refreshToken: string) => {
   const newAccessToken = jwtHelpers.createToken(
     {
       id: userId,
-      role: role || "user",
+      role: role,
     },
     variables.jwt_secret as Secret,
     variables.jwt_expire as string
@@ -377,7 +363,7 @@ export const refreshTokenService = async (refreshToken: string) => {
 
   // @ts-ignore
   const newRefreshToken = jwt.sign(
-    { id: userId, role: role || "user" },
+    { id: userId, role: role },
     variables.jwt_refresh_secret as Secret,
     { expiresIn: variables.jwt_refresh_expire }
   );
@@ -392,7 +378,7 @@ export const refreshTokenService = async (refreshToken: string) => {
     accessToken: newAccessToken,
     refreshToken: newRefreshToken,
   });
-  setCacheWithExpiration(refreshToken, 10 * 1000, cacheData);
+  setRefreshTokenCache(refreshToken, 10 * 1000, cacheData);
 
   return {
     accessToken: newAccessToken,
@@ -411,7 +397,5 @@ export const authenticationService = {
   resetPasswordService,
   updatePasswordService,
   resetPasswordOtpService,
-  createRefreshToken,
-  verifyRefreshToken,
   refreshTokenService,
 };
