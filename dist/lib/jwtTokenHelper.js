@@ -11,12 +11,19 @@ const createToken = (payload, secret, expires, timeStamp) => {
         expiresIn: expires ? expires : "9999d",
     });
 };
+// delete token
+const deleteToken = (token, secret) => {
+    return jsonwebtoken_1.default.sign({ id: token }, secret, {
+        expiresIn: "0s",
+    });
+};
 // verify token
 const verifyToken = (token, secret) => {
     return jsonwebtoken_1.default.verify(token, secret);
 };
 exports.jwtHelpers = {
     createToken,
+    deleteToken,
     verifyToken,
 };
 //# sourceMappingURL=jwtTokenHelper.js.map
