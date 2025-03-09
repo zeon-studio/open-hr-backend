@@ -114,13 +114,12 @@ const resendOtpController = catchAsync(async (req, res) => {
 // refresh token
 const refreshTokenController = catchAsync(
   async (req: Request, res: Response) => {
-    const { refreshToken, currentTime } = req.body;
-    const tokens =
-      await authenticationService.refreshTokenService(refreshToken);
+    const { refreshToken } = req.body;
+    const token = await authenticationService.refreshTokenService(refreshToken);
     sendResponse(res, {
       success: true,
       statusCode: 200,
-      result: tokens,
+      result: token,
       message: "Token refreshed successfully",
     });
   }

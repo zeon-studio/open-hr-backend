@@ -49,15 +49,12 @@ const passwordLoginService = async (email: string, password: string) => {
   );
 
   return {
-    accessToken,
-    refreshToken,
-
-    // token will expire in 60 seconds
-    expiresAt: Date.now() + 60 * 1000,
     userId: isUserExist.id as string,
     name: isUserExist.name as string,
     email: isUserExist.work_email as string,
     image: isUserExist?.image as string,
+    accessToken: accessToken,
+    refreshToken: refreshToken,
     role: isUserExist.role as string,
   };
 };
@@ -75,7 +72,7 @@ const oauthLoginService = async (email: string) => {
     name: loginUser.name,
     email: loginUser.work_email,
     image: loginUser.image,
-    role: loginUser.role || "user",
+    role: loginUser.role,
     accessToken: "",
     refreshToken: "",
   };
@@ -124,7 +121,7 @@ const tokenLoginService = async (token: string) => {
     name: employee.name,
     email: employee.work_email,
     image: employee.image,
-    role: employee.role || "user",
+    role: employee.role,
     accessToken: "",
     refreshToken: "",
   };
@@ -387,7 +384,8 @@ export const refreshTokenService = async (refreshToken: string) => {
 
   await Authentication.updateOne(
     { user_id: userId },
-    { refresh_token: newRefreshToken }
+    { refresh_token: newRefreshToken },
+    { new: true, upsert: true }
   );
 
   const cacheData = JSON.stringify({

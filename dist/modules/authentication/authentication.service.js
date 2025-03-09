@@ -41,14 +41,12 @@ const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void
     // save refresh token to database
     yield authentication_model_1.Authentication.updateOne({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     return {
-        accessToken,
-        refreshToken,
-        // token will expire in 60 seconds
-        expiresAt: Date.now() + 60 * 1000,
         userId: isUserExist.id,
         name: isUserExist.name,
         email: isUserExist.work_email,
         image: isUserExist === null || isUserExist === void 0 ? void 0 : isUserExist.image,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
         role: isUserExist.role,
     };
 });
@@ -63,7 +61,7 @@ const oauthLoginService = (email) => __awaiter(void 0, void 0, void 0, function*
         name: loginUser.name,
         email: loginUser.work_email,
         image: loginUser.image,
-        role: loginUser.role || "user",
+        role: loginUser.role,
         accessToken: "",
         refreshToken: "",
     };
@@ -88,7 +86,7 @@ const tokenLoginService = (token) => __awaiter(void 0, void 0, void 0, function*
         name: employee.name,
         email: employee.work_email,
         image: employee.image,
-        role: employee.role || "user",
+        role: employee.role,
         accessToken: "",
         refreshToken: "",
     };
@@ -266,7 +264,7 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
     }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
     // @ts-ignore
     const newRefreshToken = jsonwebtoken_1.default.sign({ id: userId, role: role || "user" }, variables_1.default.jwt_refresh_secret, { expiresIn: variables_1.default.jwt_refresh_expire });
-    yield authentication_model_1.Authentication.updateOne({ user_id: userId }, { refresh_token: newRefreshToken });
+    yield authentication_model_1.Authentication.updateOne({ user_id: userId }, { refresh_token: newRefreshToken }, { new: true, upsert: true });
     const cacheData = JSON.stringify({
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
