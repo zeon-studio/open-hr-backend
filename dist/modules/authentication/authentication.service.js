@@ -232,6 +232,7 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
         throw new Error("Refresh token is required");
     }
     const cached = refreshTokenCache.get(refreshToken);
+    console.log(cached);
     if (cached) {
         return cached;
     }

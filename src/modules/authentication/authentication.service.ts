@@ -328,6 +328,8 @@ export const refreshTokenService = async (refreshToken: string) => {
   }
 
   const cached = refreshTokenCache.get(refreshToken);
+  console.log(cached);
+
   if (cached) {
     return cached;
   }
