@@ -18,16 +18,16 @@ const jwtTokenHelper_1 = require("../lib/jwtTokenHelper");
 const sendResponse_1 = require("../lib/sendResponse");
 // check token
 const checkToken = (req, res, next) => {
-    const { authorization_token } = req.headers;
-    try {
-        const token = authorization_token.split(" ")[1];
-        if (token === variables_1.default.bearer_token) {
-            next();
-        }
-    }
-    catch (error) {
-        next("authorization failed");
-    }
+    next();
+    // const { authorization_token }: any = req.headers;
+    // try {
+    //   const token = authorization_token.split(" ")[1];
+    //   if (token === config.bearer_token) {
+    //     next();
+    //   }
+    // } catch (error) {
+    //   next("authorization failed");
+    // }
 };
 exports.checkToken = checkToken;
 // check invite token
