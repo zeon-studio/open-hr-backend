@@ -17,7 +17,6 @@ const variables_1 = __importDefault(require("../../config/variables"));
 const jwtTokenHelper_1 = require("../../lib/jwtTokenHelper");
 const mailSender_1 = require("../../lib/mailSender");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const node_cache_1 = __importDefault(require("node-cache"));
 const employee_model_1 = require("../employee/employee.model");
@@ -258,8 +257,10 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
             id: userId,
             role: role,
         }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-        // @ts-ignore
-        const newRefreshToken = jsonwebtoken_1.default.sign({ id: userId, role: role }, variables_1.default.jwt_refresh_secret, { expiresIn: variables_1.default.jwt_refresh_expire });
+        const newRefreshToken = jwtTokenHelper_1.jwtHelpers.createToken({
+            id: userId,
+            role: role,
+        }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
         // Update token in database using findOneAndUpdate to ensure atomicity
         const updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId, refresh_token: refreshToken }, { refresh_token: newRefreshToken }, { new: true });
         if (!updatedAuth) {

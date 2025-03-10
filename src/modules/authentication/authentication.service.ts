@@ -2,7 +2,7 @@ import variables from "@/config/variables";
 import { jwtHelpers } from "@/lib/jwtTokenHelper";
 import { mailSender } from "@/lib/mailSender";
 import bcrypt from "bcrypt";
-import jwt, { Secret } from "jsonwebtoken";
+import { Secret } from "jsonwebtoken";
 import mongoose from "mongoose";
 import NodeCache from "node-cache";
 import { Employee } from "../employee/employee.model";
@@ -368,11 +368,13 @@ export const refreshTokenService = async (refreshToken: string) => {
       variables.jwt_expire as string
     );
 
-    // @ts-ignore
-    const newRefreshToken = jwt.sign(
-      { id: userId, role: role },
+    const newRefreshToken = jwtHelpers.createToken(
+      {
+        id: userId,
+        role: role,
+      },
       variables.jwt_refresh_secret as Secret,
-      { expiresIn: variables.jwt_refresh_expire }
+      variables.jwt_refresh_expire as string
     );
 
     // Update token in database using findOneAndUpdate to ensure atomicity
