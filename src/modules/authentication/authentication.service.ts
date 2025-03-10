@@ -320,7 +320,7 @@ const resendOtpService = async (email: string, currentTime: string) => {
 };
 
 // Replace the Map cache with NodeCache instance
-const refreshTokenCache = new NodeCache({ stdTTL: 10 });
+const refreshTokenCache = new NodeCache({ stdTTL: 30 });
 
 export const refreshTokenService = async (refreshToken: string) => {
   if (!refreshToken) {

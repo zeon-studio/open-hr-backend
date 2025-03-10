@@ -226,7 +226,7 @@ const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 
     }
 });
 // Replace the Map cache with NodeCache instance
-const refreshTokenCache = new node_cache_1.default({ stdTTL: 10 });
+const refreshTokenCache = new node_cache_1.default({ stdTTL: 30 });
 const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
     if (!refreshToken) {
         throw new Error("Refresh token is required");
