@@ -225,7 +225,7 @@ const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 
         yield sendVerificationOtp(user_id, email, currentTime);
     }
 });
-const refreshTokenCache = new node_cache_1.default({ stdTTL: 10 });
+const refreshTokenCache = new node_cache_1.default({ stdTTL: 30 });
 // Track recently issued tokens for each user
 const userRecentTokensCache = new node_cache_1.default({ stdTTL: 60 });
 const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {

@@ -319,7 +319,7 @@ const resendOtpService = async (email: string, currentTime: string) => {
   }
 };
 
-const refreshTokenCache = new NodeCache({ stdTTL: 10 });
+const refreshTokenCache = new NodeCache({ stdTTL: 30 });
 // Track recently issued tokens for each user
 const userRecentTokensCache = new NodeCache({ stdTTL: 60 });
 
