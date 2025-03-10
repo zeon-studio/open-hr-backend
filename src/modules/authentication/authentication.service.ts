@@ -9,6 +9,9 @@ import { Employee } from "../employee/employee.model";
 import { Authentication } from "./authentication.model";
 import { AuthenticationType } from "./authentication.type";
 
+// Create a more robust cache with proper namespacing
+const refreshTokenCache = new NodeCache({ stdTTL: 10 });
+
 // password login
 const passwordLoginService = async (email: string, password: string) => {
   const isUserExist = await Employee.findOne({ work_email: email });
@@ -42,8 +45,7 @@ const passwordLoginService = async (email: string, password: string) => {
     variables.jwt_refresh_expire as string
   );
 
-  // save refresh token to database
-  await Authentication.updateOne(
+  await Authentication.findOneAndUpdate(
     { user_id: isUserExist.id },
     { $set: { refresh_token: refreshToken } },
     { upsert: true, new: true }
@@ -91,7 +93,7 @@ const oauthLoginService = async (email: string) => {
   );
 
   // save refresh token to database
-  await Authentication.updateOne(
+  await Authentication.findOneAndUpdate(
     { user_id: loginUser.id },
     { $set: { refresh_token: refreshToken } },
     { upsert: true, new: true }
@@ -140,7 +142,7 @@ const tokenLoginService = async (token: string) => {
   );
 
   // save refresh token to database
-  await Authentication.updateOne(
+  await Authentication.findOneAndUpdate(
     { user_id: employee.id },
     { $set: { refresh_token: refreshToken } },
     { upsert: true, new: true }
@@ -319,30 +321,23 @@ const resendOtpService = async (email: string, currentTime: string) => {
   }
 };
 
-const refreshTokenCache = new NodeCache({ stdTTL: 10 });
-// Cache for handling in-flight requests during token rotation
-const tokenTransitionCache = new NodeCache({ stdTTL: 5 }); // Very short TTL - just enough for concurrent requests
-
+// refresh token service
 export const refreshTokenService = async (refreshToken: string) => {
   if (!refreshToken) {
     throw new Error("Refresh token is required");
   }
 
-  // Check if this exact token has a cached response
-  const cached = refreshTokenCache.get(refreshToken);
+  // Use the full token as the cache key
+  const cacheKey = `token:${refreshToken}`;
+
+  // Check for cached response
+  const cached = refreshTokenCache.get(cacheKey);
   if (cached) {
     return cached;
   }
 
-  // Check if this token is in transition (being replaced but still valid)
-  const transitionData = tokenTransitionCache.get(refreshToken);
-  if (transitionData) {
-    console.log("Using transition token data for in-flight request");
-    return transitionData;
-  }
-
   try {
-    // Verify the token is structurally valid
+    // Verify token
     const decodedToken = jwtHelpers.verifyToken(
       refreshToken,
       variables.jwt_refresh_secret as Secret
@@ -350,18 +345,17 @@ export const refreshTokenService = async (refreshToken: string) => {
 
     const { id: userId, role } = decodedToken;
     if (!userId) {
-      throw new Error("Invalid refresh token - missing user ID");
+      throw new Error("Invalid refresh token");
     }
 
-    // Verify token exists in database
+    // Find user's token in database
     const storedToken = await Authentication.findOne({ user_id: userId });
     if (!storedToken) {
-      throw new Error("User not found in authentication records");
+      throw new Error("User not found");
     }
 
     if (storedToken.refresh_token !== refreshToken) {
-      console.log("Token mismatch for user:", userId);
-      throw new Error("Invalid refresh token - token mismatch");
+      throw new Error("Invalid refresh token");
     }
 
     // Generate new tokens
@@ -381,16 +375,7 @@ export const refreshTokenService = async (refreshToken: string) => {
       { expiresIn: variables.jwt_refresh_expire }
     );
 
-    const cacheData = {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    };
-
-    // Before updating the database, store the new tokens in the transition cache
-    // This ensures concurrent requests with the same token can still succeed
-    tokenTransitionCache.set(refreshToken, cacheData);
-
-    // Update the token in database
+    // Update token in database using findOneAndUpdate to ensure atomicity
     const updatedAuth = await Authentication.findOneAndUpdate(
       { user_id: userId, refresh_token: refreshToken },
       { refresh_token: newRefreshToken },
@@ -398,27 +383,36 @@ export const refreshTokenService = async (refreshToken: string) => {
     );
 
     if (!updatedAuth) {
-      // Handle race condition - check if token was updated by another request
-      const currentAuth = await Authentication.findOne({ user_id: userId });
+      // Handle race condition
+      console.log("Token update failed - possible race condition");
 
+      // Check if token was updated by another request
+      const currentAuth = await Authentication.findOne({ user_id: userId });
       if (!currentAuth) {
-        throw new Error("User authentication record not found");
+        throw new Error("Authentication record not found");
       }
 
+      // If token doesn't match either our old or new token, something else changed it
       if (
         currentAuth.refresh_token !== refreshToken &&
         currentAuth.refresh_token !== newRefreshToken
       ) {
-        // Token was changed by another process to something unexpected
-        console.log("Concurrent token update detected for user:", userId);
-        throw new Error("Token was updated by another request");
+        throw new Error("Token was modified by another request");
       }
     }
 
-    // Cache the response for the new token
-    refreshTokenCache.set(newRefreshToken, cacheData);
+    const responseData = {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    };
 
-    return cacheData;
+    // Cache the response using the *new* token as key
+    refreshTokenCache.set(`token:${newRefreshToken}`, responseData);
+
+    // Also cache using old token for a brief period
+    refreshTokenCache.set(cacheKey, responseData);
+
+    return responseData;
   } catch (error: any) {
     console.error("Refresh token error:", error.message);
     throw new Error("Invalid refresh token");

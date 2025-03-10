@@ -22,6 +22,8 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const node_cache_1 = __importDefault(require("node-cache"));
 const employee_model_1 = require("../employee/employee.model");
 const authentication_model_1 = require("./authentication.model");
+// Create a more robust cache with proper namespacing
+const refreshTokenCache = new node_cache_1.default({ stdTTL: 10 });
 // password login
 const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
     const isUserExist = yield employee_model_1.Employee.findOne({ work_email: email });
@@ -39,8 +41,7 @@ const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void
         id: isUserExist.id,
         role: isUserExist.role,
     }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
-    // save refresh token to database
-    yield authentication_model_1.Authentication.updateOne({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
+    yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     return {
         userId: isUserExist.id,
         name: isUserExist.name,
@@ -69,7 +70,7 @@ const oauthLoginService = (email) => __awaiter(void 0, void 0, void 0, function*
     const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: loginUser.id, role: loginUser.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
     const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: loginUser.id, role: loginUser.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
     // save refresh token to database
-    yield authentication_model_1.Authentication.updateOne({ user_id: loginUser.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
+    yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: loginUser.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     userDetails.accessToken = accessToken;
     userDetails.refreshToken = refreshToken;
     return userDetails;
@@ -94,7 +95,7 @@ const tokenLoginService = (token) => __awaiter(void 0, void 0, void 0, function*
     const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employee.id, role: employee.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
     const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employee.id, role: employee.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
     // save refresh token to database
-    yield authentication_model_1.Authentication.updateOne({ user_id: employee.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
+    yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: employee.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     userDetails.accessToken = accessToken;
     userDetails.refreshToken = refreshToken;
     return userDetails;
@@ -225,39 +226,32 @@ const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 
         yield sendVerificationOtp(user_id, email, currentTime);
     }
 });
-const refreshTokenCache = new node_cache_1.default({ stdTTL: 10 });
-// Cache for handling in-flight requests during token rotation
-const tokenTransitionCache = new node_cache_1.default({ stdTTL: 5 }); // Very short TTL - just enough for concurrent requests
+// refresh token service
 const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
     if (!refreshToken) {
         throw new Error("Refresh token is required");
     }
-    // Check if this exact token has a cached response
-    const cached = refreshTokenCache.get(refreshToken);
+    // Use the full token as the cache key
+    const cacheKey = `token:${refreshToken}`;
+    // Check for cached response
+    const cached = refreshTokenCache.get(cacheKey);
     if (cached) {
         return cached;
     }
-    // Check if this token is in transition (being replaced but still valid)
-    const transitionData = tokenTransitionCache.get(refreshToken);
-    if (transitionData) {
-        console.log("Using transition token data for in-flight request");
-        return transitionData;
-    }
     try {
-        // Verify the token is structurally valid
+        // Verify token
         const decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(refreshToken, variables_1.default.jwt_refresh_secret);
         const { id: userId, role } = decodedToken;
         if (!userId) {
-            throw new Error("Invalid refresh token - missing user ID");
+            throw new Error("Invalid refresh token");
         }
-        // Verify token exists in database
+        // Find user's token in database
         const storedToken = yield authentication_model_1.Authentication.findOne({ user_id: userId });
         if (!storedToken) {
-            throw new Error("User not found in authentication records");
+            throw new Error("User not found");
         }
         if (storedToken.refresh_token !== refreshToken) {
-            console.log("Token mismatch for user:", userId);
-            throw new Error("Invalid refresh token - token mismatch");
+            throw new Error("Invalid refresh token");
         }
         // Generate new tokens
         const newAccessToken = jwtTokenHelper_1.jwtHelpers.createToken({
@@ -266,31 +260,31 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
         }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
         // @ts-ignore
         const newRefreshToken = jsonwebtoken_1.default.sign({ id: userId, role: role }, variables_1.default.jwt_refresh_secret, { expiresIn: variables_1.default.jwt_refresh_expire });
-        const cacheData = {
+        // Update token in database using findOneAndUpdate to ensure atomicity
+        const updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId, refresh_token: refreshToken }, { refresh_token: newRefreshToken }, { new: true });
+        if (!updatedAuth) {
+            // Handle race condition
+            console.log("Token update failed - possible race condition");
+            // Check if token was updated by another request
+            const currentAuth = yield authentication_model_1.Authentication.findOne({ user_id: userId });
+            if (!currentAuth) {
+                throw new Error("Authentication record not found");
+            }
+            // If token doesn't match either our old or new token, something else changed it
+            if (currentAuth.refresh_token !== refreshToken &&
+                currentAuth.refresh_token !== newRefreshToken) {
+                throw new Error("Token was modified by another request");
+            }
+        }
+        const responseData = {
             accessToken: newAccessToken,
             refreshToken: newRefreshToken,
         };
-        // Before updating the database, store the new tokens in the transition cache
-        // This ensures concurrent requests with the same token can still succeed
-        tokenTransitionCache.set(refreshToken, cacheData);
-        // Update the token in database
-        const updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId, refresh_token: refreshToken }, { refresh_token: newRefreshToken }, { new: true });
-        if (!updatedAuth) {
-            // Handle race condition - check if token was updated by another request
-            const currentAuth = yield authentication_model_1.Authentication.findOne({ user_id: userId });
-            if (!currentAuth) {
-                throw new Error("User authentication record not found");
-            }
-            if (currentAuth.refresh_token !== refreshToken &&
-                currentAuth.refresh_token !== newRefreshToken) {
-                // Token was changed by another process to something unexpected
-                console.log("Concurrent token update detected for user:", userId);
-                throw new Error("Token was updated by another request");
-            }
-        }
-        // Cache the response for the new token
-        refreshTokenCache.set(newRefreshToken, cacheData);
-        return cacheData;
+        // Cache the response using the *new* token as key
+        refreshTokenCache.set(`token:${newRefreshToken}`, responseData);
+        // Also cache using old token for a brief period
+        refreshTokenCache.set(cacheKey, responseData);
+        return responseData;
     }
     catch (error) {
         console.error("Refresh token error:", error.message);
