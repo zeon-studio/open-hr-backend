@@ -225,9 +225,9 @@ const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 
         yield sendVerificationOtp(user_id, email, currentTime);
     }
 });
-const refreshTokenCache = new node_cache_1.default({ stdTTL: 30 });
-// Track recently issued tokens for each user
-const userRecentTokensCache = new node_cache_1.default({ stdTTL: 60 });
+const refreshTokenCache = new node_cache_1.default({ stdTTL: 10 });
+// Cache for handling in-flight requests during token rotation
+const tokenTransitionCache = new node_cache_1.default({ stdTTL: 5 }); // Very short TTL - just enough for concurrent requests
 const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
     if (!refreshToken) {
         throw new Error("Refresh token is required");
@@ -237,6 +237,12 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
     if (cached) {
         return cached;
     }
+    // Check if this token is in transition (being replaced but still valid)
+    const transitionData = tokenTransitionCache.get(refreshToken);
+    if (transitionData) {
+        console.log("Using transition token data for in-flight request");
+        return transitionData;
+    }
     try {
         // Verify the token is structurally valid
         const decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(refreshToken, variables_1.default.jwt_refresh_secret);
@@ -244,28 +250,13 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
         if (!userId) {
             throw new Error("Invalid refresh token - missing user ID");
         }
-        // Get user's recent tokens (array of valid tokens)
-        let recentTokens = userRecentTokensCache.get(userId) || [];
-        // If this token is in the recent tokens list, it's valid even if not the latest
-        const isRecentToken = Array.isArray(recentTokens) && recentTokens.includes(refreshToken);
         // Verify token exists in database
         const storedToken = yield authentication_model_1.Authentication.findOne({ user_id: userId });
         if (!storedToken) {
             throw new Error("User not found in authentication records");
         }
-        // Accept the token if either:
-        // 1. It matches the current database token, OR
-        // 2. It's in our list of recently issued tokens for this user
-        if (storedToken.refresh_token !== refreshToken && !isRecentToken) {
-            console.log("Token mismatch for user:", userId, {
-                latestToken: storedToken.refresh_token.substring(0, 20) + "...", // Log partial token for debugging
-            });
-            // Add the current database token to our recent tokens list
-            if (storedToken.refresh_token &&
-                !recentTokens.includes(storedToken.refresh_token)) {
-                recentTokens = [storedToken.refresh_token, ...recentTokens].slice(0, 5); // Keep last 5 tokens
-                userRecentTokensCache.set(userId, recentTokens);
-            }
+        if (storedToken.refresh_token !== refreshToken) {
+            console.log("Token mismatch for user:", userId);
             throw new Error("Invalid refresh token - token mismatch");
         }
         // Generate new tokens
@@ -275,28 +266,34 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
         }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
         // @ts-ignore
         const newRefreshToken = jsonwebtoken_1.default.sign({ id: userId, role: role }, variables_1.default.jwt_refresh_secret, { expiresIn: variables_1.default.jwt_refresh_expire });
-        // Update the token in database
-        // Note: We don't strictly check the previous token anymore to handle race conditions better
-        const updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId }, { refresh_token: newRefreshToken }, { new: true });
-        if (!updatedAuth) {
-            throw new Error("Failed to update token record");
-        }
-        // Update the recent tokens list for this user
-        recentTokens = [newRefreshToken, refreshToken, ...recentTokens].slice(0, 5); // Keep at most 5 recent tokens
-        userRecentTokensCache.set(userId, recentTokens);
         const cacheData = {
             accessToken: newAccessToken,
             refreshToken: newRefreshToken,
         };
-        // Cache responses for both the incoming token and the new token
-        refreshTokenCache.set(refreshToken, cacheData);
-        refreshTokenCache.set(newRefreshToken, cacheData); // Pre-cache for the new token too
+        // Before updating the database, store the new tokens in the transition cache
+        // This ensures concurrent requests with the same token can still succeed
+        tokenTransitionCache.set(refreshToken, cacheData);
+        // Update the token in database
+        const updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId, refresh_token: refreshToken }, { refresh_token: newRefreshToken }, { new: true });
+        if (!updatedAuth) {
+            // Handle race condition - check if token was updated by another request
+            const currentAuth = yield authentication_model_1.Authentication.findOne({ user_id: userId });
+            if (!currentAuth) {
+                throw new Error("User authentication record not found");
+            }
+            if (currentAuth.refresh_token !== refreshToken &&
+                currentAuth.refresh_token !== newRefreshToken) {
+                // Token was changed by another process to something unexpected
+                console.log("Concurrent token update detected for user:", userId);
+                throw new Error("Token was updated by another request");
+            }
+        }
+        // Cache the response for the new token
+        refreshTokenCache.set(newRefreshToken, cacheData);
         return cacheData;
     }
     catch (error) {
-        // Log the specific error for debugging but don't include sensitive data
         console.error("Refresh token error:", error.message);
-        // Rethrow with a consistent user-facing message
         throw new Error("Invalid refresh token");
     }
 });
