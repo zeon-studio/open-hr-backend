@@ -4,6 +4,7 @@ import { mailSender } from "@/lib/mailSender";
 import bcrypt from "bcrypt";
 import jwt, { Secret } from "jsonwebtoken";
 import mongoose from "mongoose";
+import NodeCache from "node-cache";
 import { Employee } from "../employee/employee.model";
 import { Authentication } from "./authentication.model";
 import { AuthenticationType } from "./authentication.type";
@@ -318,18 +319,17 @@ const resendOtpService = async (email: string, currentTime: string) => {
   }
 };
 
-// in-memory cache implementation
-const refreshTokenCache = new Map<string, string>();
-function setRefreshTokenCache(key: string, ttl: number, value: string): void {
-  refreshTokenCache.set(key, value);
-  setTimeout(() => {
-    refreshTokenCache.delete(key);
-  }, ttl);
-}
+// Replace the Map cache with NodeCache instance
+const refreshTokenCache = new NodeCache({ stdTTL: 10 });
 
 export const refreshTokenService = async (refreshToken: string) => {
   if (!refreshToken) {
     throw new Error("Refresh token is required");
+  }
+
+  const cached = refreshTokenCache.get(refreshToken);
+  if (cached) {
+    return cached;
   }
 
   const decodedToken = jwtHelpers.verifyToken(
@@ -339,12 +339,6 @@ export const refreshTokenService = async (refreshToken: string) => {
   const { id: userId, role } = decodedToken;
   if (!userId) {
     throw new Error("Invalid refresh token");
-  }
-
-  // Check cached tokens from in-memory cache
-  const cached = refreshTokenCache.get(refreshToken);
-  if (cached) {
-    return JSON.parse(cached);
   }
 
   const storedToken = await Authentication.findOne({ user_id: userId });
@@ -374,16 +368,13 @@ export const refreshTokenService = async (refreshToken: string) => {
     { new: true, upsert: true }
   );
 
-  const cacheData = JSON.stringify({
-    accessToken: newAccessToken,
-    refreshToken: newRefreshToken,
-  });
-  setRefreshTokenCache(refreshToken, 10 * 1000, cacheData);
-
-  return {
+  const cacheData = {
     accessToken: newAccessToken,
     refreshToken: newRefreshToken,
   };
+  refreshTokenCache.set(refreshToken, cacheData);
+
+  return cacheData;
 };
 
 // export services

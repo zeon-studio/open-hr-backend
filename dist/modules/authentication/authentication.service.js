@@ -19,6 +19,7 @@ const mailSender_1 = require("../../lib/mailSender");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const node_cache_1 = __importDefault(require("node-cache"));
 const employee_model_1 = require("../employee/employee.model");
 const authentication_model_1 = require("./authentication.model");
 // password login
@@ -224,27 +225,20 @@ const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 
         yield sendVerificationOtp(user_id, email, currentTime);
     }
 });
-// in-memory cache implementation
-const refreshTokenCache = new Map();
-function setRefreshTokenCache(key, ttl, value) {
-    refreshTokenCache.set(key, value);
-    setTimeout(() => {
-        refreshTokenCache.delete(key);
-    }, ttl);
-}
+// Replace the Map cache with NodeCache instance
+const refreshTokenCache = new node_cache_1.default({ stdTTL: 10 });
 const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
     if (!refreshToken) {
         throw new Error("Refresh token is required");
+    }
+    const cached = refreshTokenCache.get(refreshToken);
+    if (cached) {
+        return cached;
     }
     const decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(refreshToken, variables_1.default.jwt_refresh_secret);
     const { id: userId, role } = decodedToken;
     if (!userId) {
         throw new Error("Invalid refresh token");
-    }
-    // Check cached tokens from in-memory cache
-    const cached = refreshTokenCache.get(refreshToken);
-    if (cached) {
-        return JSON.parse(cached);
     }
     const storedToken = yield authentication_model_1.Authentication.findOne({ user_id: userId });
     if (!storedToken || storedToken.refresh_token !== refreshToken) {
@@ -257,15 +251,12 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
     // @ts-ignore
     const newRefreshToken = jsonwebtoken_1.default.sign({ id: userId, role: role }, variables_1.default.jwt_refresh_secret, { expiresIn: variables_1.default.jwt_refresh_expire });
     yield authentication_model_1.Authentication.updateOne({ user_id: userId }, { refresh_token: newRefreshToken }, { new: true, upsert: true });
-    const cacheData = JSON.stringify({
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-    });
-    setRefreshTokenCache(refreshToken, 10 * 1000, cacheData);
-    return {
+    const cacheData = {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
     };
+    refreshTokenCache.set(refreshToken, cacheData);
+    return cacheData;
 });
 exports.refreshTokenService = refreshTokenService;
 // export services
