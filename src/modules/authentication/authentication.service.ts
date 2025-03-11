@@ -384,6 +384,12 @@ export const refreshTokenService = async (refreshToken: string) => {
       throw new Error("User not found");
     }
 
+    // force logout if token is not valid
+    if (!storedToken || !storedToken.refresh_token) {
+      console.error(`No valid authentication record found for user: ${userId}`);
+      throw new Error("User has been logged out");
+    }
+
     // Generate new tokens
     const newAccessToken = jwtHelpers.createToken(
       {

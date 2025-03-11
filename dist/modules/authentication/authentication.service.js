@@ -280,6 +280,11 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
         if (!storedToken) {
             throw new Error("User not found");
         }
+        // force logout if token is not valid
+        if (!storedToken || !storedToken.refresh_token) {
+            console.error(`No valid authentication record found for user: ${userId}`);
+            throw new Error("User has been logged out");
+        }
         // Generate new tokens
         const newAccessToken = jwtTokenHelper_1.jwtHelpers.createToken({
             id: userId,
