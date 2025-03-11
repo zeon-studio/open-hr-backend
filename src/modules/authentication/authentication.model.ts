@@ -16,11 +16,9 @@ export const authenticationSchema = new mongoose.Schema<AuthenticationType>(
     pass_reset_token: {
       token: {
         type: String,
-        required: true,
       },
       expires: {
         type: String,
-        required: true,
       },
     },
   },

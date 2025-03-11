@@ -49,11 +49,9 @@ exports.authenticationSchema = new mongoose_1.default.Schema({
     pass_reset_token: {
         token: {
             type: String,
-            required: true,
         },
         expires: {
             type: String,
-            required: true,
         },
     },
 }, {

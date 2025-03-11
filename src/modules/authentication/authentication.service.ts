@@ -45,6 +45,7 @@ const passwordLoginService = async (email: string, password: string) => {
     variables.jwt_refresh_expire as string
   );
 
+  // Update with upsert to avoid race conditions
   await Authentication.findOneAndUpdate(
     { user_id: isUserExist.id },
     { $set: { refresh_token: refreshToken } },
@@ -210,10 +211,14 @@ const verifyOtpService = async (
       throw Error("OTP not found");
     } else {
       const userId = verificationToken.user_id;
-      const { token: hashedOtp, expires } = verificationToken.pass_reset_token;
+      const { token: hashedOtp, expires } =
+        verificationToken.pass_reset_token || {};
 
       // Check if the OTP is still valid
-      if (new Date(expires) > new Date(currentTime)) {
+      if (expires && new Date(expires) > new Date(currentTime)) {
+        if (!hashedOtp) {
+          throw new Error("OTP not found");
+        }
         const compareOtp = await bcrypt.compare(otp, hashedOtp);
         await Employee.updateOne({ id: userId }, { $set: { verified: true } });
 
@@ -327,15 +332,6 @@ export const refreshTokenService = async (refreshToken: string) => {
     throw new Error("Refresh token is required");
   }
 
-  // Use the full token as the cache key
-  const cacheKey = `token:${refreshToken}`;
-
-  // Check for cached response
-  const cached = refreshTokenCache.get(cacheKey);
-  if (cached) {
-    return cached;
-  }
-
   try {
     // Verify token
     const decodedToken = jwtHelpers.verifyToken(
@@ -346,6 +342,15 @@ export const refreshTokenService = async (refreshToken: string) => {
     const { id: userId, role } = decodedToken;
     if (!userId) {
       throw new Error("Invalid refresh token");
+    }
+
+    // Create a user-specific cache key (combining userId and token)
+    const cacheKey = `user:${userId}:token:${refreshToken}`;
+
+    // Check for cached response
+    const cached = refreshTokenCache.get(cacheKey);
+    if (cached) {
+      return cached;
     }
 
     // Find user's token in database
@@ -377,7 +382,7 @@ export const refreshTokenService = async (refreshToken: string) => {
       variables.jwt_refresh_expire as string
     );
 
-    // Update token in database using findOneAndUpdate to ensure atomicity
+    // Update token in database with optimistic locking
     const updatedAuth = await Authentication.findOneAndUpdate(
       { user_id: userId, refresh_token: refreshToken },
       { refresh_token: newRefreshToken },
@@ -385,16 +390,13 @@ export const refreshTokenService = async (refreshToken: string) => {
     );
 
     if (!updatedAuth) {
-      // Handle race condition
-      console.log("Token update failed - possible race condition");
-
       // Check if token was updated by another request
       const currentAuth = await Authentication.findOne({ user_id: userId });
       if (!currentAuth) {
         throw new Error("Authentication record not found");
       }
 
-      // If token doesn't match either our old or new token, something else changed it
+      // If token doesn't match either our old or new token, it was changed by another process
       if (
         currentAuth.refresh_token !== refreshToken &&
         currentAuth.refresh_token !== newRefreshToken
@@ -408,11 +410,12 @@ export const refreshTokenService = async (refreshToken: string) => {
       refreshToken: newRefreshToken,
     };
 
-    // Cache the response using the *new* token as key
-    refreshTokenCache.set(`token:${newRefreshToken}`, responseData);
+    // Cache the response using the user-specific new token key
+    const newCacheKey = `user:${userId}:token:${newRefreshToken}`;
+    refreshTokenCache.set(newCacheKey, responseData);
 
-    // Also cache using old token for a brief period
-    refreshTokenCache.set(cacheKey, responseData);
+    // Also cache using old token for a brief period to handle in-flight requests
+    refreshTokenCache.set(cacheKey, responseData, 5); // Shorter TTL for old token
 
     return responseData;
   } catch (error: any) {
