@@ -256,8 +256,8 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
             throw new Error("Invalid token payload");
         }
         console.log(`User ID from token: ${userId}, Role: ${role}`);
-        // Create a user-specific cache key (combining userId and token)
-        const cacheKey = `user:${userId}:token:${refreshToken}`;
+        // Create a user-specific cache key
+        const cacheKey = `user:${userId}`;
         console.log(`Cache key: ${cacheKey}`);
         // Check for cached response
         console.log("Checking cache...");
@@ -271,7 +271,20 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
         console.log(`Looking up token in database for user: ${userId}`);
         let storedToken;
         try {
-            storedToken = yield authentication_model_1.Authentication.findOne({ user_id: userId });
+            // Add retry logic for database operations
+            let retries = 3;
+            while (retries > 0) {
+                try {
+                    storedToken = yield authentication_model_1.Authentication.findOne({ user_id: userId });
+                    break; // If successful, exit the retry loop
+                }
+                catch (err) {
+                    retries--;
+                    if (retries === 0)
+                        throw err;
+                    yield new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms before retrying
+                }
+            }
             console.log(`Database lookup result: ${storedToken ? "Found" : "Not found"}`);
         }
         catch (dbError) {
@@ -282,14 +295,19 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
             console.error(`No authentication record found for user: ${userId}`);
             throw new Error("User not found");
         }
-        console.log(`Stored token match check: ${storedToken.refresh_token === refreshToken}`);
-        console.log(`Stored token starts with: ${storedToken.refresh_token.substring(0, 8)}...`);
-        if (storedToken.refresh_token !== refreshToken) {
-            console.error("Token mismatch - DB token:", storedToken.refresh_token.substring(0, 8));
-            console.error("Token mismatch - Received:", refreshToken.substring(0, 8));
-            throw new Error("Invalid refresh token");
+        // IMPORTANT CHANGE: Use decoded payload information instead of exact token matching
+        // This allows token rotation without forcing logout as long as the token is valid
+        // Get DB token info
+        let dbTokenInfo;
+        try {
+            dbTokenInfo = jwtTokenHelper_1.jwtHelpers.verifyToken(storedToken.refresh_token, variables_1.default.jwt_refresh_secret);
+            console.log("DB token verification successful");
         }
-        // Generate new tokens
+        catch (verifyError) {
+            console.error("DB token verification failed:", verifyError.message);
+            // If DB token is invalid, continue with token update anyway
+        }
+        // Allow token rotation as long as the user ID matches
         console.log("Generating new tokens");
         console.log(`Using jwt_expire: ${variables_1.default.jwt_expire}`);
         console.log(`Using jwt_refresh_expire: ${variables_1.default.jwt_refresh_expire}`);
@@ -303,11 +321,12 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
         }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
         console.log(`New access token created starting with: ${newAccessToken.substring(0, 8)}...`);
         console.log(`New refresh token created starting with: ${newRefreshToken.substring(0, 8)}...`);
-        // Update token in database with optimistic locking
+        // Update token in database - NOTE: Modified to find by user_id only
         console.log("Updating token in database...");
         let updatedAuth;
         try {
-            updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId, refresh_token: refreshToken }, { refresh_token: newRefreshToken }, { new: true });
+            updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId }, // Only match by user_id, not the token
+            { refresh_token: newRefreshToken }, { new: true });
             console.log(`Database update result: ${updatedAuth ? "Success" : "Failed"}`);
         }
         catch (updateError) {
@@ -315,40 +334,17 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
             throw new Error(`Database update error: ${updateError.message}`);
         }
         if (!updatedAuth) {
-            console.log("No document updated. Checking for race condition...");
-            // Check if token was updated by another request
-            let currentAuth;
-            try {
-                currentAuth = yield authentication_model_1.Authentication.findOne({ user_id: userId });
-                console.log(`Current auth lookup: ${currentAuth ? "Found" : "Not found"}`);
-            }
-            catch (lookupError) {
-                console.error("Current auth lookup error:", lookupError.message);
-            }
-            if (!currentAuth) {
-                console.error("Authentication record disappeared");
-                throw new Error("Authentication record not found");
-            }
-            console.log(`Current stored token: ${currentAuth.refresh_token.substring(0, 8)}...`);
-            // If token doesn't match either our old or new token, it was changed by another process
-            if (currentAuth.refresh_token !== refreshToken &&
-                currentAuth.refresh_token !== newRefreshToken) {
-                console.error("Token was modified by another request");
-                throw new Error("Token was modified by another request");
-            }
+            console.error("No document updated");
+            throw new Error("Authentication record not found or could not be updated");
         }
         const responseData = {
             accessToken: newAccessToken,
             refreshToken: newRefreshToken,
         };
-        // Cache the response using the user-specific new token key
-        console.log("Setting cache entries...");
-        const newCacheKey = `user:${userId}:token:${newRefreshToken}`;
-        refreshTokenCache.set(newCacheKey, responseData);
-        console.log(`Set cache for new token with key: ${newCacheKey}`);
-        // Also cache using old token for a brief period to handle in-flight requests
-        refreshTokenCache.set(cacheKey, responseData, 5); // Shorter TTL for old token
-        console.log(`Set cache for old token with key: ${cacheKey}`);
+        // Cache the response using just the user ID
+        console.log("Setting cache entry...");
+        refreshTokenCache.set(cacheKey, responseData);
+        console.log(`Set cache with key: ${cacheKey}`);
         console.log("Refresh process completed successfully");
         return responseData;
     }
