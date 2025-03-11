@@ -228,48 +228,36 @@ const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 
         yield sendVerificationOtp(user_id, email, currentTime);
     }
 });
-// Create a more robust cache with proper namespacing
+// refresh token cache
 const refreshTokenCache = new node_cache_1.default({ stdTTL: 10 });
 // refresh token service
 const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
     if (!refreshToken) {
-        console.error("No refresh token provided");
         throw new Error("Refresh token is required");
     }
-    console.log(`Processing refresh token starting with: ${refreshToken.substring(0, 8)}...`);
     try {
-        // Verify token with detailed error handling
-        console.log("Attempting to verify token...");
+        // Verify token
         let decodedToken;
         try {
             decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(refreshToken, variables_1.default.jwt_refresh_secret);
-            console.log("Token verification successful");
         }
         catch (verifyError) {
             console.error("Token verification failed:", verifyError.message);
-            console.error("Token verification error type:", verifyError.name);
             throw new Error(`Token verification error: ${verifyError.message}`);
         }
         const { id: userId, role } = decodedToken;
         if (!userId) {
-            console.error("No userId in decoded token");
             throw new Error("Invalid token payload");
         }
-        console.log(`User ID from token: ${userId}, Role: ${role}`);
         // Create a user-specific cache key
         const cacheKey = `user:${userId}`;
-        console.log(`Cache key: ${cacheKey}`);
         // Check for cached response
-        console.log("Checking cache...");
         const cached = refreshTokenCache.get(cacheKey);
         if (cached) {
-            console.log("Cache hit! Returning cached response");
             return cached;
         }
-        console.log("Cache miss. Continuing with database lookup");
         // Find user's token in database
-        console.log(`Looking up token in database for user: ${userId}`);
-        let storedToken;
+        let storedToken = null;
         try {
             // Add retry logic for database operations
             let retries = 3;
@@ -285,32 +273,14 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
                     yield new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms before retrying
                 }
             }
-            console.log(`Database lookup result: ${storedToken ? "Found" : "Not found"}`);
         }
         catch (dbError) {
-            console.error("Database lookup error:", dbError.message);
             throw new Error(`Database error: ${dbError.message}`);
         }
         if (!storedToken) {
-            console.error(`No authentication record found for user: ${userId}`);
             throw new Error("User not found");
         }
-        // IMPORTANT CHANGE: Use decoded payload information instead of exact token matching
-        // This allows token rotation without forcing logout as long as the token is valid
-        // Get DB token info
-        let dbTokenInfo;
-        try {
-            dbTokenInfo = jwtTokenHelper_1.jwtHelpers.verifyToken(storedToken.refresh_token, variables_1.default.jwt_refresh_secret);
-            console.log("DB token verification successful");
-        }
-        catch (verifyError) {
-            console.error("DB token verification failed:", verifyError.message);
-            // If DB token is invalid, continue with token update anyway
-        }
-        // Allow token rotation as long as the user ID matches
-        console.log("Generating new tokens");
-        console.log(`Using jwt_expire: ${variables_1.default.jwt_expire}`);
-        console.log(`Using jwt_refresh_expire: ${variables_1.default.jwt_refresh_expire}`);
+        // Generate new tokens
         const newAccessToken = jwtTokenHelper_1.jwtHelpers.createToken({
             id: userId,
             role: role,
@@ -319,22 +289,15 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
             id: userId,
             role: role,
         }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
-        console.log(`New access token created starting with: ${newAccessToken.substring(0, 8)}...`);
-        console.log(`New refresh token created starting with: ${newRefreshToken.substring(0, 8)}...`);
-        // Update token in database - NOTE: Modified to find by user_id only
-        console.log("Updating token in database...");
+        // Update token in database - only match by user_id
         let updatedAuth;
         try {
-            updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId }, // Only match by user_id, not the token
-            { refresh_token: newRefreshToken }, { new: true });
-            console.log(`Database update result: ${updatedAuth ? "Success" : "Failed"}`);
+            updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId }, { refresh_token: newRefreshToken }, { new: true });
         }
         catch (updateError) {
-            console.error("Database update error:", updateError.message);
             throw new Error(`Database update error: ${updateError.message}`);
         }
         if (!updatedAuth) {
-            console.error("No document updated");
             throw new Error("Authentication record not found or could not be updated");
         }
         const responseData = {
@@ -342,16 +305,11 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
             refreshToken: newRefreshToken,
         };
         // Cache the response using just the user ID
-        console.log("Setting cache entry...");
         refreshTokenCache.set(cacheKey, responseData);
-        console.log(`Set cache with key: ${cacheKey}`);
-        console.log("Refresh process completed successfully");
         return responseData;
     }
     catch (error) {
-        // Log the full error with stack trace
-        console.error("Refresh token complete error:", error);
-        console.error("Error stack:", error.stack);
+        console.error("Refresh token error:", error.message);
         throw new Error("Invalid refresh token");
     }
 });

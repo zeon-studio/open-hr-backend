@@ -2,7 +2,7 @@ import variables from "@/config/variables";
 import { jwtHelpers } from "@/lib/jwtTokenHelper";
 import { mailSender } from "@/lib/mailSender";
 import bcrypt from "bcrypt";
-import { Secret } from "jsonwebtoken";
+import { JwtPayload, Secret } from "jsonwebtoken";
 import mongoose from "mongoose";
 import NodeCache from "node-cache";
 import { Employee } from "../employee/employee.model";
@@ -325,60 +325,44 @@ const resendOtpService = async (email: string, currentTime: string) => {
   }
 };
 
-// Create a more robust cache with proper namespacing
+// refresh token cache
 const refreshTokenCache = new NodeCache({ stdTTL: 10 });
 
 // refresh token service
 export const refreshTokenService = async (refreshToken: string) => {
   if (!refreshToken) {
-    console.error("No refresh token provided");
     throw new Error("Refresh token is required");
   }
 
-  console.log(
-    `Processing refresh token starting with: ${refreshToken.substring(0, 8)}...`
-  );
-
   try {
-    // Verify token with detailed error handling
-    console.log("Attempting to verify token...");
-    let decodedToken;
+    // Verify token
+    let decodedToken: JwtPayload;
     try {
       decodedToken = jwtHelpers.verifyToken(
         refreshToken,
         variables.jwt_refresh_secret as Secret
       );
-      console.log("Token verification successful");
     } catch (verifyError: any) {
       console.error("Token verification failed:", verifyError.message);
-      console.error("Token verification error type:", verifyError.name);
       throw new Error(`Token verification error: ${verifyError.message}`);
     }
 
     const { id: userId, role } = decodedToken;
     if (!userId) {
-      console.error("No userId in decoded token");
       throw new Error("Invalid token payload");
     }
 
-    console.log(`User ID from token: ${userId}, Role: ${role}`);
-
     // Create a user-specific cache key
     const cacheKey = `user:${userId}`;
-    console.log(`Cache key: ${cacheKey}`);
 
     // Check for cached response
-    console.log("Checking cache...");
     const cached = refreshTokenCache.get(cacheKey);
     if (cached) {
-      console.log("Cache hit! Returning cached response");
       return cached;
     }
-    console.log("Cache miss. Continuing with database lookup");
 
     // Find user's token in database
-    console.log(`Looking up token in database for user: ${userId}`);
-    let storedToken;
+    let storedToken: AuthenticationType | null = null;
     try {
       // Add retry logic for database operations
       let retries = 3;
@@ -392,40 +376,15 @@ export const refreshTokenService = async (refreshToken: string) => {
           await new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms before retrying
         }
       }
-
-      console.log(
-        `Database lookup result: ${storedToken ? "Found" : "Not found"}`
-      );
     } catch (dbError: any) {
-      console.error("Database lookup error:", dbError.message);
       throw new Error(`Database error: ${dbError.message}`);
     }
 
     if (!storedToken) {
-      console.error(`No authentication record found for user: ${userId}`);
       throw new Error("User not found");
     }
 
-    // IMPORTANT CHANGE: Use decoded payload information instead of exact token matching
-    // This allows token rotation without forcing logout as long as the token is valid
-    // Get DB token info
-    let dbTokenInfo;
-    try {
-      dbTokenInfo = jwtHelpers.verifyToken(
-        storedToken.refresh_token,
-        variables.jwt_refresh_secret as Secret
-      );
-      console.log("DB token verification successful");
-    } catch (verifyError: any) {
-      console.error("DB token verification failed:", verifyError.message);
-      // If DB token is invalid, continue with token update anyway
-    }
-
-    // Allow token rotation as long as the user ID matches
-    console.log("Generating new tokens");
-    console.log(`Using jwt_expire: ${variables.jwt_expire}`);
-    console.log(`Using jwt_refresh_expire: ${variables.jwt_refresh_expire}`);
-
+    // Generate new tokens
     const newAccessToken = jwtHelpers.createToken(
       {
         id: userId,
@@ -444,32 +403,19 @@ export const refreshTokenService = async (refreshToken: string) => {
       variables.jwt_refresh_expire as string
     );
 
-    console.log(
-      `New access token created starting with: ${newAccessToken.substring(0, 8)}...`
-    );
-    console.log(
-      `New refresh token created starting with: ${newRefreshToken.substring(0, 8)}...`
-    );
-
-    // Update token in database - NOTE: Modified to find by user_id only
-    console.log("Updating token in database...");
-    let updatedAuth;
+    // Update token in database - only match by user_id
+    let updatedAuth: AuthenticationType | null;
     try {
       updatedAuth = await Authentication.findOneAndUpdate(
-        { user_id: userId }, // Only match by user_id, not the token
+        { user_id: userId },
         { refresh_token: newRefreshToken },
         { new: true }
       );
-      console.log(
-        `Database update result: ${updatedAuth ? "Success" : "Failed"}`
-      );
     } catch (updateError: any) {
-      console.error("Database update error:", updateError.message);
       throw new Error(`Database update error: ${updateError.message}`);
     }
 
     if (!updatedAuth) {
-      console.error("No document updated");
       throw new Error(
         "Authentication record not found or could not be updated"
       );
@@ -481,16 +427,11 @@ export const refreshTokenService = async (refreshToken: string) => {
     };
 
     // Cache the response using just the user ID
-    console.log("Setting cache entry...");
     refreshTokenCache.set(cacheKey, responseData);
-    console.log(`Set cache with key: ${cacheKey}`);
 
-    console.log("Refresh process completed successfully");
     return responseData;
   } catch (error: any) {
-    // Log the full error with stack trace
-    console.error("Refresh token complete error:", error);
-    console.error("Error stack:", error.stack);
+    console.error("Refresh token error:", error.message);
     throw new Error("Invalid refresh token");
   }
 };
