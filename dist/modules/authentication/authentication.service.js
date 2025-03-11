@@ -21,8 +21,6 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const node_cache_1 = __importDefault(require("node-cache"));
 const employee_model_1 = require("../employee/employee.model");
 const authentication_model_1 = require("./authentication.model");
-// Create a more robust cache with proper namespacing
-const refreshTokenCache = new node_cache_1.default({ stdTTL: 10 });
 // password login
 const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
     const isUserExist = yield employee_model_1.Employee.findOne({ work_email: email });
@@ -42,35 +40,36 @@ const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void
     }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
     // Update with upsert to avoid race conditions
     yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
-    return {
+    const userDetails = {
         userId: isUserExist.id,
         name: isUserExist.name,
         email: isUserExist.work_email,
         image: isUserExist === null || isUserExist === void 0 ? void 0 : isUserExist.image,
+        role: isUserExist.role,
         accessToken: accessToken,
         refreshToken: refreshToken,
-        role: isUserExist.role,
     };
+    return userDetails;
 });
 // oauth login
 const oauthLoginService = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const loginUser = yield employee_model_1.Employee.findOne({ work_email: email });
-    if (!loginUser) {
+    const isUserExist = yield employee_model_1.Employee.findOne({ work_email: email });
+    if (!isUserExist) {
         throw new Error("User not found");
     }
     const userDetails = {
-        userId: loginUser.id,
-        name: loginUser.name,
-        email: loginUser.work_email,
-        image: loginUser.image,
-        role: loginUser.role,
+        userId: isUserExist.id,
+        name: isUserExist.name,
+        email: isUserExist.work_email,
+        image: isUserExist.image,
+        role: isUserExist.role,
         accessToken: "",
         refreshToken: "",
     };
-    const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: loginUser.id, role: loginUser.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: loginUser.id, role: loginUser.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
+    const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: isUserExist.id, role: isUserExist.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: isUserExist.id, role: isUserExist.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
     // save refresh token to database
-    yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: loginUser.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
+    yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     userDetails.accessToken = accessToken;
     userDetails.refreshToken = refreshToken;
     return userDetails;
@@ -229,6 +228,8 @@ const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 
         yield sendVerificationOtp(user_id, email, currentTime);
     }
 });
+// Create a more robust cache with proper namespacing
+const refreshTokenCache = new node_cache_1.default({ stdTTL: 10 });
 // refresh token service
 const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
     if (!refreshToken) {

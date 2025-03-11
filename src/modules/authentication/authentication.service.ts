@@ -9,9 +9,6 @@ import { Employee } from "../employee/employee.model";
 import { Authentication } from "./authentication.model";
 import { AuthenticationType } from "./authentication.type";
 
-// Create a more robust cache with proper namespacing
-const refreshTokenCache = new NodeCache({ stdTTL: 10 });
-
 // password login
 const passwordLoginService = async (email: string, password: string) => {
   const isUserExist = await Employee.findOne({ work_email: email });
@@ -52,50 +49,52 @@ const passwordLoginService = async (email: string, password: string) => {
     { upsert: true, new: true }
   );
 
-  return {
+  const userDetails = {
     userId: isUserExist.id as string,
     name: isUserExist.name as string,
     email: isUserExist.work_email as string,
     image: isUserExist?.image as string,
+    role: isUserExist.role as string,
     accessToken: accessToken,
     refreshToken: refreshToken,
-    role: isUserExist.role as string,
   };
+
+  return userDetails;
 };
 
 // oauth login
 const oauthLoginService = async (email: string) => {
-  const loginUser = await Employee.findOne({ work_email: email });
+  const isUserExist = await Employee.findOne({ work_email: email });
 
-  if (!loginUser) {
+  if (!isUserExist) {
     throw new Error("User not found");
   }
 
   const userDetails = {
-    userId: loginUser.id,
-    name: loginUser.name,
-    email: loginUser.work_email,
-    image: loginUser.image,
-    role: loginUser.role,
+    userId: isUserExist.id,
+    name: isUserExist.name,
+    email: isUserExist.work_email,
+    image: isUserExist.image,
+    role: isUserExist.role,
     accessToken: "",
     refreshToken: "",
   };
 
   const accessToken = jwtHelpers.createToken(
-    { user_id: loginUser.id, role: loginUser.role },
+    { user_id: isUserExist.id, role: isUserExist.role },
     variables.jwt_secret as Secret,
     variables.jwt_expire as string
   );
 
   const refreshToken = jwtHelpers.createToken(
-    { user_id: loginUser.id, role: loginUser.role },
+    { user_id: isUserExist.id, role: isUserExist.role },
     variables.jwt_refresh_secret as Secret,
     variables.jwt_refresh_expire as string
   );
 
   // save refresh token to database
   await Authentication.findOneAndUpdate(
-    { user_id: loginUser.id },
+    { user_id: isUserExist.id },
     { $set: { refresh_token: refreshToken } },
     { upsert: true, new: true }
   );
@@ -325,6 +324,9 @@ const resendOtpService = async (email: string, currentTime: string) => {
     await sendVerificationOtp(user_id, email, currentTime);
   }
 };
+
+// Create a more robust cache with proper namespacing
+const refreshTokenCache = new NodeCache({ stdTTL: 10 });
 
 // refresh token service
 export const refreshTokenService = async (refreshToken: string) => {
