@@ -59,4 +59,10 @@ authenticationRouter.patch(
   authenticationController.updatePasswordController
 );
 
+// refresh token
+authenticationRouter.post(
+  "/refresh-token",
+  authenticationController.refreshTokenController
+);
+
 export default authenticationRouter;

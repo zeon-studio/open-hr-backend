@@ -2,8 +2,9 @@ import variables from "@/config/variables";
 import { jwtHelpers } from "@/lib/jwtTokenHelper";
 import { mailSender } from "@/lib/mailSender";
 import bcrypt from "bcrypt";
-import { Secret } from "jsonwebtoken";
+import { JwtPayload, Secret } from "jsonwebtoken";
 import mongoose from "mongoose";
+import NodeCache from "node-cache";
 import { Employee } from "../employee/employee.model";
 import { Authentication } from "./authentication.model";
 import { AuthenticationType } from "./authentication.type";
@@ -32,39 +33,74 @@ const passwordLoginService = async (email: string, password: string) => {
     variables.jwt_expire as string
   );
 
-  return {
-    accessToken,
+  const refreshToken = jwtHelpers.createToken(
+    {
+      id: isUserExist.id,
+      role: isUserExist.role,
+    },
+    variables.jwt_refresh_secret as Secret,
+    variables.jwt_refresh_expire as string
+  );
+
+  // Update with upsert to avoid race conditions
+  await Authentication.findOneAndUpdate(
+    { user_id: isUserExist.id },
+    { $set: { refresh_token: refreshToken } },
+    { upsert: true, new: true }
+  );
+
+  const userDetails = {
     userId: isUserExist.id as string,
     name: isUserExist.name as string,
     email: isUserExist.work_email as string,
     image: isUserExist?.image as string,
     role: isUserExist.role as string,
+    accessToken: accessToken,
+    refreshToken: refreshToken,
   };
+
+  return userDetails;
 };
 
 // oauth login
 const oauthLoginService = async (email: string) => {
-  const loginUser = await Employee.findOne({ work_email: email });
+  const isUserExist = await Employee.findOne({ work_email: email });
 
-  if (!loginUser) {
+  if (!isUserExist) {
     throw new Error("User not found");
   }
 
   const userDetails = {
-    userId: loginUser.id,
-    name: loginUser.name,
-    email: loginUser.work_email,
-    image: loginUser.image,
-    role: loginUser.role || "user",
+    userId: isUserExist.id,
+    name: isUserExist.name,
+    email: isUserExist.work_email,
+    image: isUserExist.image,
+    role: isUserExist.role,
     accessToken: "",
+    refreshToken: "",
   };
-  const token = jwtHelpers.createToken(
-    { user_id: loginUser.id, role: loginUser.role },
+
+  const accessToken = jwtHelpers.createToken(
+    { user_id: isUserExist.id, role: isUserExist.role },
     variables.jwt_secret as Secret,
     variables.jwt_expire as string
   );
 
-  userDetails.accessToken = token;
+  const refreshToken = jwtHelpers.createToken(
+    { user_id: isUserExist.id, role: isUserExist.role },
+    variables.jwt_refresh_secret as Secret,
+    variables.jwt_refresh_expire as string
+  );
+
+  // save refresh token to database
+  await Authentication.findOneAndUpdate(
+    { user_id: isUserExist.id },
+    { $set: { refresh_token: refreshToken } },
+    { upsert: true, new: true }
+  );
+
+  userDetails.accessToken = accessToken;
+  userDetails.refreshToken = refreshToken;
 
   return userDetails;
 };
@@ -88,8 +124,9 @@ const tokenLoginService = async (token: string) => {
     name: employee.name,
     email: employee.work_email,
     image: employee.image,
-    role: employee.role || "user",
+    role: employee.role,
     accessToken: "",
+    refreshToken: "",
   };
 
   const accessToken = jwtHelpers.createToken(
@@ -98,7 +135,22 @@ const tokenLoginService = async (token: string) => {
     variables.jwt_expire as string
   );
 
+  const refreshToken = jwtHelpers.createToken(
+    { user_id: employee.id, role: employee.role },
+    variables.jwt_refresh_secret as Secret,
+    variables.jwt_refresh_expire as string
+  );
+
+  // save refresh token to database
+  await Authentication.findOneAndUpdate(
+    { user_id: employee.id },
+    { $set: { refresh_token: refreshToken } },
+    { upsert: true, new: true }
+  );
+
   userDetails.accessToken = accessToken;
+  userDetails.refreshToken = refreshToken;
+
   return userDetails;
 };
 
@@ -108,7 +160,6 @@ const verifyUserService = async (email: string, currentTime: string) => {
   if (!isUserExist) {
     throw Error("Something went wrong Try again");
   } else {
-    await Authentication.deleteOne({ user_id: isUserExist.id });
     await sendVerificationOtp(isUserExist.id!, email, currentTime);
     return isUserExist;
   }
@@ -126,12 +177,19 @@ const sendVerificationOtp = async (
     getCurrentTime.setMinutes(getCurrentTime.getMinutes() + 5)
   ).toISOString();
 
-  const userVerification = new Authentication({
-    user_id: id,
-    token: await bcrypt.hash(otp, variables.salt),
-    expires: expiringTime,
-  });
-  await userVerification.save();
+  const userVerification = {
+    pass_reset_token: {
+      token: await bcrypt.hash(otp, variables.salt),
+      expires: expiringTime,
+    },
+  };
+
+  await Authentication.updateOne(
+    { user_id: id },
+    { $set: userVerification },
+    { upsert: true, new: true }
+  );
+
   await mailSender.otpSender(email, otp);
 };
 
@@ -152,17 +210,24 @@ const verifyOtpService = async (
       throw Error("OTP not found");
     } else {
       const userId = verificationToken.user_id;
-      const { token: hashedOtp, expires } = verificationToken;
-      if (new Date(expires) > new Date(currentTime)) {
+      const { token: hashedOtp, expires } =
+        verificationToken.pass_reset_token || {};
+
+      // Check if the OTP is still valid
+      if (expires && new Date(expires) > new Date(currentTime)) {
+        if (!hashedOtp) {
+          throw new Error("OTP not found");
+        }
         const compareOtp = await bcrypt.compare(otp, hashedOtp);
         await Employee.updateOne({ id: userId }, { $set: { verified: true } });
+
+        // Check if the OTP is correct
         if (!compareOtp) {
           throw Error("Incorrect OTP!");
-        } else {
-          await Authentication.deleteOne({ user_id: userId });
         }
+
+        // Check if the OTP has expired
       } else {
-        await Authentication.deleteOne({ user_id: userId });
         throw Error("OTP Expired");
       }
     }
@@ -188,8 +253,6 @@ const resetPasswordService = async (email: string, password: string) => {
     if (!resetPassword) {
       throw new Error("Something went wrong");
     }
-
-    await Authentication.deleteOne({ user_id: resetPassword.id });
 
     await session.commitTransaction();
     await session.endSession();
@@ -258,11 +321,128 @@ const resendOtpService = async (email: string, currentTime: string) => {
   if (!email) {
     throw Error("Empty user information");
   } else {
-    await Authentication.deleteMany({ user_id });
     await sendVerificationOtp(user_id, email, currentTime);
   }
 };
 
+// refresh token cache for 10 seconds
+const refreshTokenCache = new NodeCache({ stdTTL: 10 });
+
+// refresh token service
+export const refreshTokenService = async (refreshToken: string) => {
+  if (!refreshToken) {
+    throw new Error("Refresh token is required");
+  }
+
+  try {
+    // Verify token
+    let decodedToken: JwtPayload;
+    try {
+      decodedToken = jwtHelpers.verifyToken(
+        refreshToken,
+        variables.jwt_refresh_secret as Secret
+      );
+    } catch (verifyError: any) {
+      console.error("Token verification failed:", verifyError.message);
+      throw new Error(`Token verification error: ${verifyError.message}`);
+    }
+
+    const { id: userId, role } = decodedToken;
+    if (!userId) {
+      throw new Error("Invalid token payload");
+    }
+
+    // Create a user-specific cache key
+    const cacheKey = `user:${userId}`;
+
+    // Check for cached response
+    const cached = refreshTokenCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    // Find user's token in database
+    let storedToken: AuthenticationType | null = null;
+    try {
+      // Add retry logic for database operations
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          storedToken = await Authentication.findOne({ user_id: userId });
+          break; // If successful, exit the retry loop
+        } catch (err) {
+          retries--;
+          if (retries === 0) throw err;
+          await new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms before retrying
+        }
+      }
+    } catch (dbError: any) {
+      throw new Error(`Database error: ${dbError.message}`);
+    }
+
+    if (!storedToken) {
+      throw new Error("User not found");
+    }
+
+    // force logout if token is not valid
+    if (!storedToken || !storedToken.refresh_token) {
+      console.error(`No valid authentication record found for user: ${userId}`);
+      throw new Error("User has been logged out");
+    }
+
+    // Generate new tokens
+    const newAccessToken = jwtHelpers.createToken(
+      {
+        id: userId,
+        role: role,
+      },
+      variables.jwt_secret as Secret,
+      variables.jwt_expire as string
+    );
+
+    const newRefreshToken = jwtHelpers.createToken(
+      {
+        id: userId,
+        role: role,
+      },
+      variables.jwt_refresh_secret as Secret,
+      variables.jwt_refresh_expire as string
+    );
+
+    // Update token in database
+    let updatedAuth: AuthenticationType | null;
+    try {
+      updatedAuth = await Authentication.findOneAndUpdate(
+        { user_id: userId },
+        { refresh_token: newRefreshToken },
+        { new: true }
+      );
+    } catch (updateError: any) {
+      throw new Error(`Database update error: ${updateError.message}`);
+    }
+
+    if (!updatedAuth) {
+      throw new Error(
+        "Authentication record not found or could not be updated"
+      );
+    }
+
+    const responseData = {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    };
+
+    // Cache the response using just the user ID
+    refreshTokenCache.set(cacheKey, responseData);
+
+    return responseData;
+  } catch (error: any) {
+    console.error("Refresh token error:", error.message);
+    throw new Error("Invalid refresh token");
+  }
+};
+
+// export services
 export const authenticationService = {
   passwordLoginService,
   oauthLoginService,
@@ -273,4 +453,5 @@ export const authenticationService = {
   resetPasswordService,
   updatePasswordService,
   resetPasswordOtpService,
+  refreshTokenService,
 };

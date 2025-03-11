@@ -19,7 +19,7 @@ const http_status_1 = __importDefault(require("http-status"));
 const authentication_service_1 = require("./authentication.service");
 // password login
 const passwordLoginController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password, currentDate } = req.body;
+    const { email, password } = req.body;
     const user = yield authentication_service_1.authenticationService.passwordLoginService(email, password);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
@@ -98,6 +98,17 @@ const resendOtpController = (0, catchAsync_1.default)((req, res) => __awaiter(vo
         message: "otp resend successfully",
     });
 }));
+// refresh token
+const refreshTokenController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { refreshToken } = req.body;
+    const token = yield authentication_service_1.authenticationService.refreshTokenService(refreshToken);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: 200,
+        result: token,
+        message: "Token refreshed successfully",
+    });
+}));
 exports.authenticationController = {
     passwordLoginController,
     oauthLoginController,
@@ -107,5 +118,6 @@ exports.authenticationController = {
     resendOtpController,
     resetPasswordController,
     updatePasswordController,
+    refreshTokenController,
 };
 //# sourceMappingURL=authentication.controller.js.map
