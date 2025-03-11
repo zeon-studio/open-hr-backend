@@ -236,48 +236,28 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
         throw new Error("Refresh token is required");
     }
     try {
-        // Log the token (first few chars only for security)
-        console.log(`Refreshing token starting with: ${refreshToken.substring(0, 8)}...`);
-        // Explicitly log your secrets (first few chars only)
-        console.log(`JWT Refresh Secret begins with: ${variables_1.default.jwt_refresh_secret.toString().substring(0, 3)}...`);
-        // Try to verify with detailed error handling
-        let decodedToken;
-        try {
-            decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(refreshToken, variables_1.default.jwt_refresh_secret);
-            console.log("Token verified successfully");
-        }
-        catch (verifyError) {
-            console.error("Token verification failed:", verifyError.message);
-            console.error("Token verification error type:", verifyError.name);
-            throw new Error(`Token verification error: ${verifyError.message}`);
-        }
+        // Verify token
+        const decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(refreshToken, variables_1.default.jwt_refresh_secret);
         const { id: userId, role } = decodedToken;
         if (!userId) {
-            console.error("No userId in decoded token");
-            throw new Error("Invalid token payload");
+            throw new Error("Invalid refresh token");
         }
-        console.log(`Looking up token for user: ${userId}`);
-        // Find user's token in database with detailed error handling
-        let storedToken;
-        try {
-            storedToken = yield authentication_model_1.Authentication.findOne({ user_id: userId });
-            console.log(`Database lookup result: ${storedToken ? "Found" : "Not found"}`);
+        // Create a user-specific cache key (combining userId and token)
+        const cacheKey = `user:${userId}:token:${refreshToken}`;
+        // Check for cached response
+        const cached = refreshTokenCache.get(cacheKey);
+        if (cached) {
+            return cached;
         }
-        catch (dbError) {
-            console.error("Database error:", dbError.message);
-            throw new Error(`Database error: ${dbError.message}`);
-        }
+        // Find user's token in database
+        const storedToken = yield authentication_model_1.Authentication.findOne({ user_id: userId });
         if (!storedToken) {
-            throw new Error("Authentication record not found");
+            throw new Error("User not found");
         }
-        console.log(`Stored token match check: ${storedToken.refresh_token === refreshToken}`);
         if (storedToken.refresh_token !== refreshToken) {
-            console.error("Token mismatch - Stored:", storedToken.refresh_token.substring(0, 8));
-            console.error("Token mismatch - Received:", refreshToken.substring(0, 8));
-            throw new Error("Token mismatch in database");
+            throw new Error("Invalid refresh token");
         }
-        // Generate new tokens with explicit durations
-        console.log("Generating new tokens");
+        // Generate new tokens
         const newAccessToken = jwtTokenHelper_1.jwtHelpers.createToken({
             id: userId,
             role: role,
@@ -286,28 +266,34 @@ const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, 
             id: userId,
             role: role,
         }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
-        // Update database with both tokens for better tracing
-        try {
-            yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId }, {
-                refresh_token: newRefreshToken,
-            }, { new: true });
-            console.log("Database updated successfully");
+        // Update token in database with optimistic locking
+        const updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId, refresh_token: refreshToken }, { refresh_token: newRefreshToken }, { new: true });
+        if (!updatedAuth) {
+            // Check if token was updated by another request
+            const currentAuth = yield authentication_model_1.Authentication.findOne({ user_id: userId });
+            if (!currentAuth) {
+                throw new Error("Authentication record not found");
+            }
+            // If token doesn't match either our old or new token, it was changed by another process
+            if (currentAuth.refresh_token !== refreshToken &&
+                currentAuth.refresh_token !== newRefreshToken) {
+                throw new Error("Token was modified by another request");
+            }
         }
-        catch (updateError) {
-            console.error("Database update error:", updateError.message);
-            throw new Error(`Database update error: ${updateError.message}`);
-        }
-        console.log("Refresh completed successfully");
-        return {
+        const responseData = {
             accessToken: newAccessToken,
             refreshToken: newRefreshToken,
         };
+        // Cache the response using the user-specific new token key
+        const newCacheKey = `user:${userId}:token:${newRefreshToken}`;
+        refreshTokenCache.set(newCacheKey, responseData);
+        // Also cache using old token for a brief period to handle in-flight requests
+        refreshTokenCache.set(cacheKey, responseData, 5); // Shorter TTL for old token
+        return responseData;
     }
     catch (error) {
-        // Log the full error with stack trace
-        console.error("Refresh token complete error:", error);
-        console.error("Error stack:", error.stack);
-        throw new Error(`Refresh token error: ${error.message}`);
+        console.error("Refresh token error:", error.message);
+        throw new Error("Invalid refresh token");
     }
 });
 exports.refreshTokenService = refreshTokenService;
@@ -324,4 +310,4 @@ exports.authenticationService = {
     resetPasswordOtpService,
     refreshTokenService: exports.refreshTokenService,
 };
-//# sourceMappingURL=authentication.service.js.map
+//# sourceMappingURL=authentication.service.cache.js.map
