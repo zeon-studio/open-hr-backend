@@ -4,7 +4,6 @@
   "author": "zeon.studio",
   "license": "MIT",
   "description": "backend for open-hr",
-  "main": "server.ts",
   "scripts": {
     "start": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only ./src/server.ts",
     "build": "tsc && tsc-alias",
