@@ -314,8 +314,9 @@ const deleteLeaveRequestService = async (id: string) => {
 const getUpcomingLeaveRequestService = async (current_date: Date) => {
   const leaveRequest = await LeaveRequest.find({
     status: { $in: ["approved", "pending"] },
-    start_date: { $gte: current_date },
+    end_date: { $gte: current_date },
   }).sort({ start_date: 1 });
+
   return leaveRequest;
 };
 
