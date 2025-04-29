@@ -188,16 +188,31 @@ const createLeaveRequestService = async (data: LeaveRequestType) => {
 
       // send discord message
       if (config.discord_webhook_url) {
-        await axios.post(config.discord_webhook_url!, {
-          content: leaveRequestDiscordTemplate(
-            employeeData?.name!,
-            data.leave_type,
-            dayCount,
-            startDate,
-            endDate,
-            data.reason
-          ),
-        });
+        try {
+          await axios.post(config.discord_webhook_url!, {
+            content: leaveRequestDiscordTemplate(
+              employeeData?.name!,
+              data.leave_type,
+              dayCount,
+              startDate,
+              endDate,
+              data.reason
+            ),
+          });
+        } catch (discordError: any) {
+          if (discordError.response && discordError.response.status === 429) {
+            // Discord rate limit error
+            console.warn(
+              "Discord webhook rate limit exceeded. Skipping Discord notification."
+            );
+          } else {
+            // Log other errors but do not block leave request creation
+            console.warn(
+              "Failed to send Discord notification:",
+              discordError.message
+            );
+          }
+        }
       }
 
       await session.commitTransaction();

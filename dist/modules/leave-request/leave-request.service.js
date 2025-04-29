@@ -152,9 +152,21 @@ const createLeaveRequestService = (data) => __awaiter(void 0, void 0, void 0, fu
             yield mailSender_1.mailSender.leaveRequest(notifyEmailList, employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, data.leave_type, dayCount, startDate, endDate, data.reason);
             // send discord message
             if (variables_1.default.discord_webhook_url) {
-                yield axios_1.default.post(variables_1.default.discord_webhook_url, {
-                    content: (0, mailTemplate_1.leaveRequestDiscordTemplate)(employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, data.leave_type, dayCount, startDate, endDate, data.reason),
-                });
+                try {
+                    yield axios_1.default.post(variables_1.default.discord_webhook_url, {
+                        content: (0, mailTemplate_1.leaveRequestDiscordTemplate)(employeeData === null || employeeData === void 0 ? void 0 : employeeData.name, data.leave_type, dayCount, startDate, endDate, data.reason),
+                    });
+                }
+                catch (discordError) {
+                    if (discordError.response && discordError.response.status === 429) {
+                        // Discord rate limit error
+                        console.warn("Discord webhook rate limit exceeded. Skipping Discord notification.");
+                    }
+                    else {
+                        // Log other errors but do not block leave request creation
+                        console.warn("Failed to send Discord notification:", discordError.message);
+                    }
+                }
             }
             yield session.commitTransaction();
             return postData;
