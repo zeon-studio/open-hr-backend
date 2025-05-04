@@ -14,7 +14,7 @@ leaveRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_R
 // add new year data
 leaveRouter.patch("/update-year/:year", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_controller_1.leaveController.addNewYearLeaveController);
 // get single data
-leaveRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_controller_1.leaveController.getLeaveController);
+leaveRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.ALUMNI), leave_controller_1.leaveController.getLeaveController);
 // update data
 leaveRouter.patch("/:id/:year", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), leave_controller_1.leaveController.updateLeaveController);
 // delete data

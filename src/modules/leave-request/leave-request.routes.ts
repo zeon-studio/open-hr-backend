@@ -10,7 +10,7 @@ const leaveRequestRouter = express.Router();
 leaveRequestRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.ALUMNI),
   leaveRequestController.getAllLeaveRequestController
 );
 

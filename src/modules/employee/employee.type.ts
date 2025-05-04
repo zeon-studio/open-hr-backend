@@ -37,6 +37,7 @@ export enum ERole {
   USER = "user",
   MODERATOR = "moderator",
   ADMIN = "admin",
+  ALUMNI = "alumni",
 }
 
 export enum EEmployeeStatus {

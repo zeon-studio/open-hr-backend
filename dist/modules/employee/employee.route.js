@@ -16,11 +16,9 @@ employeeRouter.get("/basics", checkToken_1.checkToken, (0, auth_1.default)(roles
 // get admin and mods
 employeeRouter.get("/admin-and-mods", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_controller_1.employeeController.getAdminAndModsController);
 // get single employee by invite token
-employeeRouter.get("/invite-token/:inviteToken", checkToken_1.checkToken, 
-// auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
-employee_controller_1.employeeController.getSingleEmployeeByInviteTokenController);
+employeeRouter.get("/invite-token/:inviteToken", checkToken_1.checkToken, employee_controller_1.employeeController.getSingleEmployeeByInviteTokenController);
 // get single employee
-employeeRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.getSingleEmployeeController);
+employeeRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.ALUMNI), employee_controller_1.employeeController.getSingleEmployeeController);
 // insert employee
 employeeRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_controller_1.employeeController.createEmployeeController);
 // update employee data

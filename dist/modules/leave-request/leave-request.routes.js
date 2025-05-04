@@ -10,7 +10,7 @@ const express_1 = __importDefault(require("express"));
 const leave_request_controller_1 = require("./leave-request.controller");
 const leaveRequestRouter = express_1.default.Router();
 // get all data
-leaveRequestRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), leave_request_controller_1.leaveRequestController.getAllLeaveRequestController);
+leaveRequestRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.ALUMNI), leave_request_controller_1.leaveRequestController.getAllLeaveRequestController);
 // get upcoming leave request
 leaveRequestRouter.get("/upcoming/:current_date", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), leave_request_controller_1.leaveRequestController.getUpcomingLeaveRequestController);
 // get upcoming leave request

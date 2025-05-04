@@ -10,7 +10,7 @@ const express_1 = __importDefault(require("express"));
 const employee_offboarding_controller_1 = require("./employee-offboarding.controller");
 const employeeOffboardingRouter = express_1.default.Router();
 // get all data
-employeeOffboardingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_offboarding_controller_1.employeeOffboardingController.getAllEmployeeOffboardingController);
+employeeOffboardingRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.ALUMNI), employee_offboarding_controller_1.employeeOffboardingController.getAllEmployeeOffboardingController);
 // get pending onboarding task
 employeeOffboardingRouter.get("/pending-task", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.getPendingOffboardingTaskController);
 // create data

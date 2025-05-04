@@ -39,6 +39,7 @@ var ERole;
     ERole["USER"] = "user";
     ERole["MODERATOR"] = "moderator";
     ERole["ADMIN"] = "admin";
+    ERole["ALUMNI"] = "alumni";
 })(ERole || (exports.ERole = ERole = {}));
 var EEmployeeStatus;
 (function (EEmployeeStatus) {

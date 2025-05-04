@@ -5,5 +5,6 @@ exports.ENUM_ROLE = {
     ADMIN: "admin",
     MODERATOR: "moderator",
     USER: "user",
+    ALUMNI: "alumni",
 };
 //# sourceMappingURL=roles.js.map

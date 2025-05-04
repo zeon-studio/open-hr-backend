@@ -34,7 +34,6 @@ employeeRouter.get(
 employeeRouter.get(
   "/invite-token/:inviteToken",
   checkToken,
-  // auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.getSingleEmployeeByInviteTokenController
 );
 
@@ -42,7 +41,7 @@ employeeRouter.get(
 employeeRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.USER, ENUM_ROLE.MODERATOR),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.ALUMNI),
   employeeController.getSingleEmployeeController
 );
 

@@ -12,7 +12,7 @@ const employeeJobRouter = express_1.default.Router();
 // get all data
 employeeJobRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_job_controller_1.employeeJobController.getAllEmployeeJobController);
 // get single data
-employeeJobRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_job_controller_1.employeeJobController.getEmployeeJobController);
+employeeJobRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.ALUMNI), employee_job_controller_1.employeeJobController.getEmployeeJobController);
 // update data
 employeeJobRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), employee_job_controller_1.employeeJobController.updateEmployeeJobController);
 // delete data
