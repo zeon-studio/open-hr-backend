@@ -12,7 +12,7 @@ const employeeAchievementRouter = express_1.default.Router();
 // get all data
 employeeAchievementRouter.get("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), employee_achievement_controller_1.employeeAchievementController.getAllEmployeeAchievementController);
 // get single data
-employeeAchievementRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.ALUMNI), employee_achievement_controller_1.employeeAchievementController.getEmployeeAchievementController);
+employeeAchievementRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.FORMER), employee_achievement_controller_1.employeeAchievementController.getEmployeeAchievementController);
 // update data
 employeeAchievementRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_achievement_controller_1.employeeAchievementController.updateEmployeeAchievementController);
 // delete data

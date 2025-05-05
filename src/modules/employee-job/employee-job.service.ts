@@ -79,56 +79,65 @@ const updateEmployeeJobService = async (
   id: string,
   updateData: EmployeeJobType
 ) => {
-  // Convert dates to local dates
-  if (updateData.joining_date) {
-    updateData.joining_date = localDate(new Date(updateData.joining_date));
-  }
-  if (updateData.permanent_date) {
-    updateData.permanent_date = localDate(new Date(updateData.permanent_date));
-  }
-  if (updateData.resignation_date) {
-    updateData.resignation_date = localDate(
-      new Date(updateData.resignation_date)
-    );
-  }
-  if (updateData.promotions) {
-    updateData.promotions = updateData.promotions.map((promotion) => ({
-      ...promotion,
-      promotion_date: localDate(new Date(promotion.promotion_date)),
-    }));
-  }
-  if (updateData.prev_jobs) {
-    updateData.prev_jobs = updateData.prev_jobs.map((prevJob) => ({
-      ...prevJob,
-      start_date: localDate(new Date(prevJob.start_date)),
-      end_date: localDate(new Date(prevJob.end_date)),
-    }));
-  }
-
-  // update employee designation on employee data
-  const employee = await Employee.findOne({ id });
-  if (employee && updateData.promotions && updateData.promotions.length > 0) {
-    // Find the latest promotion by date
-    const latestPromotion = updateData.promotions.reduce((latest, current) => {
-      const latestDate = new Date(latest.promotion_date);
-      const currentDate = new Date(current.promotion_date);
-      return currentDate > latestDate ? current : latest;
-    });
-
-    employee.designation = latestPromotion.designation;
-    await employee.save();
-  }
-
-  // update employee job data
-  const result = await EmployeeJob.findOneAndUpdate(
-    { employee_id: id },
-    updateData,
-    {
-      new: true,
-      upsert: true,
+  try {
+    // Convert dates to local dates
+    if (updateData.joining_date) {
+      updateData.joining_date = localDate(new Date(updateData.joining_date));
     }
-  );
-  return result;
+    if (updateData.permanent_date) {
+      updateData.permanent_date = localDate(
+        new Date(updateData.permanent_date)
+      );
+    }
+    if (updateData.resignation_date) {
+      updateData.resignation_date = localDate(
+        new Date(updateData.resignation_date)
+      );
+    }
+    if (updateData.promotions) {
+      updateData.promotions = updateData.promotions.map((promotion) => ({
+        ...promotion,
+        promotion_date: localDate(new Date(promotion.promotion_date)),
+      }));
+    }
+    if (updateData.prev_jobs) {
+      updateData.prev_jobs = updateData.prev_jobs.map((prevJob) => ({
+        ...prevJob,
+        start_date: localDate(new Date(prevJob.start_date)),
+        end_date: localDate(new Date(prevJob.end_date)),
+      }));
+    }
+
+    // update employee designation on employee data
+    const employee = await Employee.findOne({ id });
+    if (employee && updateData.promotions && updateData.promotions.length > 0) {
+      // Find the latest promotion by date
+      const latestPromotion = updateData.promotions.reduce(
+        (latest, current) => {
+          const latestDate = new Date(latest.promotion_date);
+          const currentDate = new Date(current.promotion_date);
+          return currentDate > latestDate ? current : latest;
+        }
+      );
+
+      employee.designation = latestPromotion.designation;
+      await employee.save();
+    }
+
+    // update employee job data
+    const result = await EmployeeJob.findOneAndUpdate(
+      { employee_id: id },
+      { $set: updateData },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
+    return result;
+  } catch (error) {
+    console.error("Error in updateEmployeeJobService:", error);
+    throw error;
+  }
 };
 
 // delete

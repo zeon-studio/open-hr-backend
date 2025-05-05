@@ -16,7 +16,7 @@ payrollRouter.get("/basics", checkToken_1.checkToken, (0, auth_1.default)(roles_
 // create monthly data
 payrollRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN), payroll_controller_1.payrollController.createMonthlyPayrollController);
 // get single data
-payrollRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.ALUMNI), payroll_controller_1.payrollController.getPayrollController);
+payrollRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.FORMER), payroll_controller_1.payrollController.getPayrollController);
 // update data
 payrollRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), payroll_controller_1.payrollController.updatePayrollController);
 // delete data

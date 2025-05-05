@@ -71,40 +71,46 @@ const getEmployeeJobService = (id) => __awaiter(void 0, void 0, void 0, function
 });
 // update
 const updateEmployeeJobService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    // Convert dates to local dates
-    if (updateData.joining_date) {
-        updateData.joining_date = (0, dateConverter_1.localDate)(new Date(updateData.joining_date));
-    }
-    if (updateData.permanent_date) {
-        updateData.permanent_date = (0, dateConverter_1.localDate)(new Date(updateData.permanent_date));
-    }
-    if (updateData.resignation_date) {
-        updateData.resignation_date = (0, dateConverter_1.localDate)(new Date(updateData.resignation_date));
-    }
-    if (updateData.promotions) {
-        updateData.promotions = updateData.promotions.map((promotion) => (Object.assign(Object.assign({}, promotion), { promotion_date: (0, dateConverter_1.localDate)(new Date(promotion.promotion_date)) })));
-    }
-    if (updateData.prev_jobs) {
-        updateData.prev_jobs = updateData.prev_jobs.map((prevJob) => (Object.assign(Object.assign({}, prevJob), { start_date: (0, dateConverter_1.localDate)(new Date(prevJob.start_date)), end_date: (0, dateConverter_1.localDate)(new Date(prevJob.end_date)) })));
-    }
-    // update employee designation on employee data
-    const employee = yield employee_model_1.Employee.findOne({ id });
-    if (employee && updateData.promotions && updateData.promotions.length > 0) {
-        // Find the latest promotion by date
-        const latestPromotion = updateData.promotions.reduce((latest, current) => {
-            const latestDate = new Date(latest.promotion_date);
-            const currentDate = new Date(current.promotion_date);
-            return currentDate > latestDate ? current : latest;
+    try {
+        // Convert dates to local dates
+        if (updateData.joining_date) {
+            updateData.joining_date = (0, dateConverter_1.localDate)(new Date(updateData.joining_date));
+        }
+        if (updateData.permanent_date) {
+            updateData.permanent_date = (0, dateConverter_1.localDate)(new Date(updateData.permanent_date));
+        }
+        if (updateData.resignation_date) {
+            updateData.resignation_date = (0, dateConverter_1.localDate)(new Date(updateData.resignation_date));
+        }
+        if (updateData.promotions) {
+            updateData.promotions = updateData.promotions.map((promotion) => (Object.assign(Object.assign({}, promotion), { promotion_date: (0, dateConverter_1.localDate)(new Date(promotion.promotion_date)) })));
+        }
+        if (updateData.prev_jobs) {
+            updateData.prev_jobs = updateData.prev_jobs.map((prevJob) => (Object.assign(Object.assign({}, prevJob), { start_date: (0, dateConverter_1.localDate)(new Date(prevJob.start_date)), end_date: (0, dateConverter_1.localDate)(new Date(prevJob.end_date)) })));
+        }
+        // update employee designation on employee data
+        const employee = yield employee_model_1.Employee.findOne({ id });
+        if (employee && updateData.promotions && updateData.promotions.length > 0) {
+            // Find the latest promotion by date
+            const latestPromotion = updateData.promotions.reduce((latest, current) => {
+                const latestDate = new Date(latest.promotion_date);
+                const currentDate = new Date(current.promotion_date);
+                return currentDate > latestDate ? current : latest;
+            });
+            employee.designation = latestPromotion.designation;
+            yield employee.save();
+        }
+        // update employee job data
+        const result = yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: id }, { $set: updateData }, {
+            new: true,
+            upsert: true,
         });
-        employee.designation = latestPromotion.designation;
-        yield employee.save();
+        return result;
     }
-    // update employee job data
-    const result = yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: id }, updateData, {
-        new: true,
-        upsert: true,
-    });
-    return result;
+    catch (error) {
+        console.error("Error in updateEmployeeJobService:", error);
+        throw error;
+    }
 });
 // delete
 const deleteEmployeeJobService = (id) => __awaiter(void 0, void 0, void 0, function* () {

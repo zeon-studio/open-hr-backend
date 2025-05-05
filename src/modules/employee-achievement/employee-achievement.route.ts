@@ -18,7 +18,7 @@ employeeAchievementRouter.get(
 employeeAchievementRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.ALUMNI),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.FORMER),
   employeeAchievementController.getEmployeeAchievementController
 );
 

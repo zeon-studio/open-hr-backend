@@ -66,9 +66,25 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
         matchStage.$match.department = department;
     }
     let pipeline = [matchStage];
+    // sorting stage
+    pipeline.push({
+        $addFields: {
+            statusOrder: {
+                $switch: {
+                    branches: [
+                        { case: { $eq: ["$status", "active"] }, then: 0 },
+                        { case: { $eq: ["$status", "pending"] }, then: 1 },
+                        { case: { $eq: ["$status", "archived"] }, then: 2 },
+                    ],
+                    default: 3,
+                },
+            },
+        },
+    });
     // Sorting stage
     pipeline.push({
         $sort: {
+            statusOrder: 1,
             [sortBy]: sortOrder === "asc" ? 1 : -1,
             _id: 1,
         },
@@ -107,12 +123,6 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
             status: 1,
             note: 1,
             createdAt: 1,
-        },
-    });
-    // Reapply sorting after grouping
-    pipeline.push({
-        $sort: {
-            [sortBy]: sortOrder === "asc" ? 1 : -1,
         },
     });
     // result

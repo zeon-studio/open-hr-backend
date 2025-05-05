@@ -10,7 +10,7 @@ const employeeOffboardingRouter = express.Router();
 employeeOffboardingRouter.get(
   "/",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.ALUMNI),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.FORMER),
   employeeOffboardingController.getAllEmployeeOffboardingController
 );
 
