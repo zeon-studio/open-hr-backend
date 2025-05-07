@@ -18,8 +18,13 @@ const getAllCalendarService = () => __awaiter(void 0, void 0, void 0, function* 
     return calendars;
 });
 const getCalendarService = (year) => __awaiter(void 0, void 0, void 0, function* () {
-    const calendars = yield calendar_model_1.Calendar.findOne({ year: year });
-    return calendars;
+    const calendar = yield calendar_model_1.Calendar.findOne({ year: year });
+    if (!calendar)
+        return calendar;
+    // Sort holidays and events by start_date
+    calendar.holidays = calendar.holidays.sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
+    calendar.events = calendar.events.sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
+    return calendar;
 });
 // create calendar
 const createCalendarService = (calendarData) => __awaiter(void 0, void 0, void 0, function* () {

@@ -9,9 +9,21 @@ const getAllCalendarService = async () => {
 };
 
 const getCalendarService = async (year: number) => {
-  const calendars = await Calendar.findOne({ year: year });
+  const calendar = await Calendar.findOne({ year: year });
 
-  return calendars;
+  if (!calendar) return calendar;
+
+  // Sort holidays and events by start_date
+  calendar.holidays = calendar.holidays.sort(
+    (a, b) =>
+      new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+  );
+  calendar.events = calendar.events.sort(
+    (a, b) =>
+      new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+  );
+
+  return calendar;
 };
 
 // create calendar
