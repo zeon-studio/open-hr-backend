@@ -24,7 +24,7 @@ const otpSender = async (email: string, otp: string) => {
   let mailDetails = {
     from: config.sender_email,
     to: email,
-    subject: "ERP Solution Verification",
+    subject: "Verification Code For HR Management System",
     html: otpSenderTemplate(otp),
   };
   await mailTransporter.sendMail(mailDetails);

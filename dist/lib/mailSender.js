@@ -29,7 +29,7 @@ const otpSender = (email, otp) => __awaiter(void 0, void 0, void 0, function* ()
     let mailDetails = {
         from: variables_1.default.sender_email,
         to: email,
-        subject: "ERP Solution Verification",
+        subject: "Verification Code For HR Management System",
         html: (0, mailTemplate_1.otpSenderTemplate)(otp),
     };
     yield mailTransporter.sendMail(mailDetails);

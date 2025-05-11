@@ -66,8 +66,8 @@ const oauthLoginService = (email) => __awaiter(void 0, void 0, void 0, function*
         accessToken: "",
         refreshToken: "",
     };
-    const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: isUserExist.id, role: isUserExist.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: isUserExist.id, role: isUserExist.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
+    const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ id: isUserExist.id, role: isUserExist.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ id: isUserExist.id, role: isUserExist.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
     // save refresh token to database
     yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     userDetails.accessToken = accessToken;
@@ -91,8 +91,8 @@ const tokenLoginService = (token) => __awaiter(void 0, void 0, void 0, function*
         accessToken: "",
         refreshToken: "",
     };
-    const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employee.id, role: employee.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ user_id: employee.id, role: employee.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
+    const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ id: employee.id, role: employee.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
+    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ id: employee.id, role: employee.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
     // save refresh token to database
     yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: employee.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     userDetails.accessToken = accessToken;

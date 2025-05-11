@@ -81,13 +81,13 @@ const oauthLoginService = async (email: string) => {
   };
 
   const accessToken = jwtHelpers.createToken(
-    { user_id: isUserExist.id, role: isUserExist.role },
+    { id: isUserExist.id, role: isUserExist.role },
     variables.jwt_secret as Secret,
     variables.jwt_expire as string
   );
 
   const refreshToken = jwtHelpers.createToken(
-    { user_id: isUserExist.id, role: isUserExist.role },
+    { id: isUserExist.id, role: isUserExist.role },
     variables.jwt_refresh_secret as Secret,
     variables.jwt_refresh_expire as string
   );
@@ -130,13 +130,13 @@ const tokenLoginService = async (token: string) => {
   };
 
   const accessToken = jwtHelpers.createToken(
-    { user_id: employee.id, role: employee.role },
+    { id: employee.id, role: employee.role },
     variables.jwt_secret as Secret,
     variables.jwt_expire as string
   );
 
   const refreshToken = jwtHelpers.createToken(
-    { user_id: employee.id, role: employee.role },
+    { id: employee.id, role: employee.role },
     variables.jwt_refresh_secret as Secret,
     variables.jwt_refresh_expire as string
   );
