@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calendarService = void 0;
 const dateConverter_1 = require("../../lib/dateConverter");
+const setting_service_1 = require("../../modules/setting/setting.service");
 const calendar_model_1 = require("./calendar.model");
 // get all calendars
 const getAllCalendarService = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -24,7 +25,40 @@ const getCalendarService = (year) => __awaiter(void 0, void 0, void 0, function*
     // Sort holidays and events by start_date
     calendar.holidays = calendar.holidays.sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
     calendar.events = calendar.events.sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
-    return calendar;
+    const { weekends, conditionalWeekends } = yield setting_service_1.settingService.getWeekendsService();
+    // Generate all weekend dates for the year
+    const weekendObjects = [];
+    const start = new Date(year, 0, 1);
+    const end = new Date(year, 11, 31);
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dayName = d.toLocaleDateString("en-US", { weekday: "long" });
+        let isWeekend = false;
+        // Regular weekends
+        if (weekends.includes(dayName)) {
+            isWeekend = true;
+        }
+        // Conditional weekends
+        const cw = conditionalWeekends.find((cw) => cw.name === dayName);
+        if (cw) {
+            // Week number in month (1-based)
+            const firstDayOfMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+            const weekNumber = Math.ceil((d.getDate() + firstDayOfMonth.getDay()) / 7);
+            if (cw.pattern.includes(weekNumber)) {
+                isWeekend = true;
+            }
+        }
+        if (isWeekend) {
+            weekendObjects.push({
+                start_date: new Date(d),
+                end_date: new Date(d),
+                day_count: 1,
+                reason: "Weekend",
+            });
+        }
+    }
+    const calendarObj = calendar.toObject();
+    const result = Object.assign(Object.assign({}, calendarObj), { weekends: weekendObjects });
+    return result;
 });
 // create calendar
 const createCalendarService = (calendarData) => __awaiter(void 0, void 0, void 0, function* () {
