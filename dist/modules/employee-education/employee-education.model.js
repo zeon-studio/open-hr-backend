@@ -73,5 +73,7 @@ const employeeEducationSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
+// index for faster search
+employeeEducationSchema.index({ employee_id: 1 });
 exports.EmployeeEducation = (0, mongoose_1.model)("employee_education", employeeEducationSchema);
 //# sourceMappingURL=employee-education.model.js.map

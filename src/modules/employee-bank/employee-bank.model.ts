@@ -41,6 +41,9 @@ const employeeBankSchema = new mongoose.Schema<EmployeeBankType>(
   }
 );
 
+// index for faster search
+employeeBankSchema.index({ employee_id: 1 });
+
 export const EmployeeBank = model<EmployeeBankType>(
   "employee_bank",
   employeeBankSchema

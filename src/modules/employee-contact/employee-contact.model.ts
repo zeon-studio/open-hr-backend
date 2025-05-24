@@ -29,6 +29,9 @@ const employeeContactSchema = new mongoose.Schema<EmployeeContactType>(
   }
 );
 
+// index for faster search
+employeeContactSchema.index({ employee_id: 1 });
+
 export const EmployeeContact = model<EmployeeContactType>(
   "employee_contact",
   employeeContactSchema

@@ -54,4 +54,7 @@ const courseSchema = new mongoose.Schema<CourseType>(
   }
 );
 
+// index for faster search
+courseSchema.index({ platform: 1 });
+
 export const Course = model<CourseType>("course", courseSchema);

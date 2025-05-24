@@ -58,5 +58,7 @@ const employeeOffboardingSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
+// index for faster search
+employeeOffboardingSchema.index({ employee_id: 1 });
 exports.EmployeeOffboarding = (0, mongoose_1.model)("employee_offboarding", employeeOffboardingSchema);
 //# sourceMappingURL=employee-offboarding.model.js.map

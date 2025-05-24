@@ -29,6 +29,9 @@ const employeeDocumentSchema = new mongoose.Schema<EmployeeDocumentType>(
   }
 );
 
+// index for faster search
+employeeDocumentSchema.index({ employee_id: 1 });
+
 export const EmployeeDocument = model<EmployeeDocumentType>(
   "employee_document",
   employeeDocumentSchema

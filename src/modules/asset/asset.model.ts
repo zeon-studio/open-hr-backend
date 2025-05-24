@@ -64,4 +64,8 @@ const assetSchema = new mongoose.Schema<AssetType>(
   }
 );
 
+// index for faster search
+assetSchema.index({ asset_id: 1 });
+assetSchema.index({ user: 1 });
+
 export const Asset = model<AssetType>("asset", assetSchema);

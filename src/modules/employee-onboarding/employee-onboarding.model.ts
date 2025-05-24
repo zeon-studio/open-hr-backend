@@ -29,6 +29,9 @@ const employeeOnboardingSchema = new mongoose.Schema<EmployeeOnboardingType>(
   }
 );
 
+// index for faster search
+employeeOnboardingSchema.index({ employee_id: 1 });
+
 export const EmployeeOnboarding = model<EmployeeOnboardingType>(
   "employee_onboarding",
   employeeOnboardingSchema

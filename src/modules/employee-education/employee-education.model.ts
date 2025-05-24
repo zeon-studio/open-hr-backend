@@ -42,6 +42,9 @@ const employeeEducationSchema = new mongoose.Schema<EmployeeEducationType>(
   }
 );
 
+// index for faster search
+employeeEducationSchema.index({ employee_id: 1 });
+
 export const EmployeeEducation = model<EmployeeEducationType>(
   "employee_education",
   employeeEducationSchema

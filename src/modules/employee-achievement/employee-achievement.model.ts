@@ -32,6 +32,9 @@ const employeeAchievementSchema = new mongoose.Schema<EmployeeAchievementType>(
   }
 );
 
+// index for faster search
+employeeAchievementSchema.index({ employee_id: 1 });
+
 export const EmployeeAchievement = model<EmployeeAchievementType>(
   "employee_achievement",
   employeeAchievementSchema

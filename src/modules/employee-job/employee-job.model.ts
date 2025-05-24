@@ -78,6 +78,9 @@ const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
   }
 );
 
+// index for faster search
+employeeJobSchema.index({ employee_id: 1 });
+
 export const EmployeeJob = model<EmployeeJobType>(
   "employee_job",
   employeeJobSchema

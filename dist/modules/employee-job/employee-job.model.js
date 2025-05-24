@@ -109,5 +109,7 @@ const employeeJobSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
+// index for faster search
+employeeJobSchema.index({ employee_id: 1 });
 exports.EmployeeJob = (0, mongoose_1.model)("employee_job", employeeJobSchema);
 //# sourceMappingURL=employee-job.model.js.map

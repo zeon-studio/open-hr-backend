@@ -102,5 +102,7 @@ const payrollSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
+// index for faster search
+payrollSchema.index({ employee_id: 1 });
 exports.Payroll = (0, mongoose_1.model)("payroll", payrollSchema);
 //# sourceMappingURL=payroll.model.js.map

@@ -46,6 +46,10 @@ const leaveSchema = new mongoose.Schema<LeaveRequestType>(
   }
 );
 
+// index for faster search
+leaveSchema.index({ employee_id: 1 });
+leaveSchema.index({ end_date: 1 });
+
 export const LeaveRequest = model<LeaveRequestType>(
   "leave_request",
   leaveSchema

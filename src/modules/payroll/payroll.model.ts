@@ -71,4 +71,7 @@ const payrollSchema = new mongoose.Schema<PayrollType>(
   }
 );
 
+// index for faster search
+payrollSchema.index({ employee_id: 1 });
+
 export const Payroll = model<PayrollType>("payroll", payrollSchema);

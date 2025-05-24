@@ -95,5 +95,8 @@ const assetSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
+// index for faster search
+assetSchema.index({ asset_id: 1 });
+assetSchema.index({ user: 1 });
 exports.Asset = (0, mongoose_1.model)("asset", assetSchema);
 //# sourceMappingURL=asset.model.js.map

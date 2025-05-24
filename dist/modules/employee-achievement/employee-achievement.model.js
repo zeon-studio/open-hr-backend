@@ -60,5 +60,7 @@ const employeeAchievementSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
+// index for faster search
+employeeAchievementSchema.index({ employee_id: 1 });
 exports.EmployeeAchievement = (0, mongoose_1.model)("employee_achievement", employeeAchievementSchema);
 //# sourceMappingURL=employee-achievement.model.js.map

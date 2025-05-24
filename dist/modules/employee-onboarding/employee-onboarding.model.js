@@ -58,5 +58,7 @@ const employeeOnboardingSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
+// index for faster search
+employeeOnboardingSchema.index({ employee_id: 1 });
 exports.EmployeeOnboarding = (0, mongoose_1.model)("employee_onboarding", employeeOnboardingSchema);
 //# sourceMappingURL=employee-onboarding.model.js.map

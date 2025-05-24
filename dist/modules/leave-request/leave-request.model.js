@@ -73,5 +73,8 @@ const leaveSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
+// index for faster search
+leaveSchema.index({ employee_id: 1 });
+leaveSchema.index({ end_date: 1 });
 exports.LeaveRequest = (0, mongoose_1.model)("leave_request", leaveSchema);
 //# sourceMappingURL=leave-request.model.js.map

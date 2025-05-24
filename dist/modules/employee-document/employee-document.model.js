@@ -59,5 +59,7 @@ const employeeDocumentSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
+// index for faster search
+employeeDocumentSchema.index({ employee_id: 1 });
 exports.EmployeeDocument = (0, mongoose_1.model)("employee_document", employeeDocumentSchema);
 //# sourceMappingURL=employee-document.model.js.map
