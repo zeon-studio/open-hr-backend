@@ -164,6 +164,7 @@ const getAllEmployeeBasicsService = async () => {
       work_email: 1,
       department: 1,
       designation: 1,
+      role: 1,
     }
   ).exec();
   return result;
