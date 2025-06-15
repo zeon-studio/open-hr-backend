@@ -9,6 +9,7 @@ var EDepartment;
     EDepartment["ADMIN"] = "admin";
     EDepartment["PRODUCTION"] = "production";
     EDepartment["HR_FINANCE"] = "hr_finance";
+    EDepartment["PROJECT_MANAGEMENT"] = "project_management";
     EDepartment["OTHER"] = "other";
 })(EDepartment || (exports.EDepartment = EDepartment = {}));
 var EGender;

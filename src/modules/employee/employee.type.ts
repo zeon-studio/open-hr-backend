@@ -7,6 +7,7 @@ export enum EDepartment {
   ADMIN = "admin",
   PRODUCTION = "production",
   HR_FINANCE = "hr_finance",
+  PROJECT_MANAGEMENT = "project_management",
   OTHER = "other",
 }
 

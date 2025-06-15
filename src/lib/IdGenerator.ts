@@ -7,6 +7,7 @@ const departmentGenerator: { [key: string]: string } = {
   admin: "ADM",
   production: "PDC",
   hr_finance: "HRF",
+  project_management: "PRM",
   other: "OTH",
 };
 
