@@ -46,7 +46,4 @@ const calendarSchema = new mongoose.Schema<CalendarType>(
   }
 );
 
-// index for faster search
-calendarSchema.index({ year: 1 });
-
 export const Calendar = model<CalendarType>("calendar", calendarSchema);

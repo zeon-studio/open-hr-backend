@@ -76,7 +76,5 @@ const calendarSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
-// index for faster search
-calendarSchema.index({ year: 1 });
 exports.Calendar = (0, mongoose_1.model)("calendar", calendarSchema);
 //# sourceMappingURL=calendar.model.js.map
