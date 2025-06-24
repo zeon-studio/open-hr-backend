@@ -27,7 +27,7 @@ const corsOptions = process.env.NODE_ENV === "development"
         optionsSuccessStatus: 204,
     }
     : {
-        origin: [variables_1.default.cors_origin],
+        origin: variables_1.default.cors_origin.split(",").map((origin) => origin.trim()),
         methods: "GET,PUT,PATCH,POST,DELETE",
         preflightContinue: false,
         optionsSuccessStatus: 204,

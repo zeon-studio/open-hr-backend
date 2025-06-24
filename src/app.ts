@@ -16,7 +16,7 @@ const corsOptions: cors.CorsOptions =
         optionsSuccessStatus: 204,
       }
     : {
-        origin: [config.cors_origin],
+        origin: config.cors_origin.split(",").map((origin) => origin.trim()),
         methods: "GET,PUT,PATCH,POST,DELETE",
         preflightContinue: false,
         optionsSuccessStatus: 204,
