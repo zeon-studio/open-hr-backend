@@ -91,7 +91,5 @@ const toolSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
-// index for faster search
-toolSchema.index({ platform: 1 });
 exports.Tool = (0, mongoose_1.model)("tool", toolSchema);
 //# sourceMappingURL=tool.model.js.map

@@ -60,7 +60,4 @@ const toolSchema = new mongoose.Schema<ToolType>(
   }
 );
 
-// index for faster search
-toolSchema.index({ platform: 1 });
-
 export const Tool = model<ToolType>("tool", toolSchema);

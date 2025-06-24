@@ -104,6 +104,5 @@ const leaveSchema = new mongoose_1.default.Schema({
 });
 // index for faster search
 leaveSchema.index({ employee_id: 1 });
-leaveSchema.index({ years: 1 });
 exports.Leave = (0, mongoose_1.model)("leave", leaveSchema);
 //# sourceMappingURL=leave.model.js.map

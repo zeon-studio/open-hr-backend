@@ -85,7 +85,5 @@ const courseSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
-// index for faster search
-courseSchema.index({ platform: 1 });
 exports.Course = (0, mongoose_1.model)("course", courseSchema);
 //# sourceMappingURL=course.model.js.map

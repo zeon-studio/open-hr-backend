@@ -73,6 +73,5 @@ const leaveSchema = new mongoose.Schema<LeaveType>(
 
 // index for faster search
 leaveSchema.index({ employee_id: 1 });
-leaveSchema.index({ years: 1 });
 
 export const Leave = model<LeaveType>("leave", leaveSchema);
