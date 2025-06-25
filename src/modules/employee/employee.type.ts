@@ -63,6 +63,7 @@ export type EmployeeType = {
   phone: string;
   gender: EGender;
   blood_group: EBloodGroup;
+  blood_donor: boolean;
   marital_status: EMaritalStatus;
   present_address: string;
   permanent_address: string;

@@ -112,6 +112,7 @@ const getAllEmployeeService = (paginationOptions, filterOptions) => __awaiter(vo
             phone: 1,
             gender: 1,
             blood_group: 1,
+            blood_donor: 1,
             marital_status: 1,
             present_address: 1,
             permanent_address: 1,

@@ -62,6 +62,10 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
       type: String,
       enum: EBloodGroup,
     },
+    blood_donor: {
+      type: Boolean,
+      default: false,
+    },
     marital_status: {
       type: String,
       enum: EMaritalStatus,
