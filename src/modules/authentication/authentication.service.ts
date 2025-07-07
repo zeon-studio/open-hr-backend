@@ -2,9 +2,8 @@ import variables from "@/config/variables";
 import { jwtHelpers } from "@/lib/jwtTokenHelper";
 import { mailSender } from "@/lib/mailSender";
 import bcrypt from "bcrypt";
-import { JwtPayload, Secret } from "jsonwebtoken";
+import { Secret } from "jsonwebtoken";
 import mongoose from "mongoose";
-import NodeCache from "node-cache";
 import { Employee } from "../employee/employee.model";
 import { Authentication } from "./authentication.model";
 import { AuthenticationType } from "./authentication.type";
@@ -33,22 +32,6 @@ const passwordLoginService = async (email: string, password: string) => {
     variables.jwt_expire as string
   );
 
-  const refreshToken = jwtHelpers.createToken(
-    {
-      id: isUserExist.id,
-      role: isUserExist.role,
-    },
-    variables.jwt_refresh_secret as Secret,
-    variables.jwt_refresh_expire as string
-  );
-
-  // Update with upsert to avoid race conditions
-  await Authentication.findOneAndUpdate(
-    { user_id: isUserExist.id },
-    { $set: { refresh_token: refreshToken } },
-    { upsert: true, new: true }
-  );
-
   const userDetails = {
     userId: isUserExist.id as string,
     name: isUserExist.name as string,
@@ -56,7 +39,6 @@ const passwordLoginService = async (email: string, password: string) => {
     image: isUserExist?.image as string,
     role: isUserExist.role as string,
     accessToken: accessToken,
-    refreshToken: refreshToken,
   };
 
   return userDetails;
@@ -77,7 +59,6 @@ const oauthLoginService = async (email: string) => {
     image: isUserExist.image,
     role: isUserExist.role,
     accessToken: "",
-    refreshToken: "",
   };
 
   const accessToken = jwtHelpers.createToken(
@@ -86,21 +67,7 @@ const oauthLoginService = async (email: string) => {
     variables.jwt_expire as string
   );
 
-  const refreshToken = jwtHelpers.createToken(
-    { id: isUserExist.id, role: isUserExist.role },
-    variables.jwt_refresh_secret as Secret,
-    variables.jwt_refresh_expire as string
-  );
-
-  // save refresh token to database
-  await Authentication.findOneAndUpdate(
-    { user_id: isUserExist.id },
-    { $set: { refresh_token: refreshToken } },
-    { upsert: true, new: true }
-  );
-
   userDetails.accessToken = accessToken;
-  userDetails.refreshToken = refreshToken;
 
   return userDetails;
 };
@@ -126,7 +93,6 @@ const tokenLoginService = async (token: string) => {
     image: employee.image,
     role: employee.role,
     accessToken: "",
-    refreshToken: "",
   };
 
   const accessToken = jwtHelpers.createToken(
@@ -135,21 +101,7 @@ const tokenLoginService = async (token: string) => {
     variables.jwt_expire as string
   );
 
-  const refreshToken = jwtHelpers.createToken(
-    { id: employee.id, role: employee.role },
-    variables.jwt_refresh_secret as Secret,
-    variables.jwt_refresh_expire as string
-  );
-
-  // save refresh token to database
-  await Authentication.findOneAndUpdate(
-    { user_id: employee.id },
-    { $set: { refresh_token: refreshToken } },
-    { upsert: true, new: true }
-  );
-
   userDetails.accessToken = accessToken;
-  userDetails.refreshToken = refreshToken;
 
   return userDetails;
 };
@@ -325,123 +277,6 @@ const resendOtpService = async (email: string, currentTime: string) => {
   }
 };
 
-// refresh token cache for 10 seconds
-const refreshTokenCache = new NodeCache({ stdTTL: 10 });
-
-// refresh token service
-export const refreshTokenService = async (refreshToken: string) => {
-  if (!refreshToken) {
-    throw new Error("Refresh token is required");
-  }
-
-  try {
-    // Verify token
-    let decodedToken: JwtPayload;
-    try {
-      decodedToken = jwtHelpers.verifyToken(
-        refreshToken,
-        variables.jwt_refresh_secret as Secret
-      );
-    } catch (verifyError: any) {
-      console.error("Token verification failed:", verifyError.message);
-      throw new Error(`Token verification error: ${verifyError.message}`);
-    }
-
-    const { id: userId, role } = decodedToken;
-    if (!userId) {
-      throw new Error("Invalid token payload");
-    }
-
-    // Create a user-specific cache key
-    const cacheKey = `user:${userId}`;
-
-    // Check for cached response
-    const cached = refreshTokenCache.get(cacheKey);
-    if (cached) {
-      return cached;
-    }
-
-    // Find user's token in database
-    let storedToken: AuthenticationType | null = null;
-    try {
-      // Add retry logic for database operations
-      let retries = 3;
-      while (retries > 0) {
-        try {
-          storedToken = await Authentication.findOne({ user_id: userId });
-          break; // If successful, exit the retry loop
-        } catch (err) {
-          retries--;
-          if (retries === 0) throw err;
-          await new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms before retrying
-        }
-      }
-    } catch (dbError: any) {
-      throw new Error(`Database error: ${dbError.message}`);
-    }
-
-    if (!storedToken) {
-      throw new Error("User not found");
-    }
-
-    // force logout if token is not valid
-    if (!storedToken || !storedToken.refresh_token) {
-      console.error(`No valid authentication record found for user: ${userId}`);
-      throw new Error("User has been logged out");
-    }
-
-    // Generate new tokens
-    const newAccessToken = jwtHelpers.createToken(
-      {
-        id: userId,
-        role: role,
-      },
-      variables.jwt_secret as Secret,
-      variables.jwt_expire as string
-    );
-
-    const newRefreshToken = jwtHelpers.createToken(
-      {
-        id: userId,
-        role: role,
-      },
-      variables.jwt_refresh_secret as Secret,
-      variables.jwt_refresh_expire as string
-    );
-
-    // Update token in database
-    let updatedAuth: AuthenticationType | null;
-    try {
-      updatedAuth = await Authentication.findOneAndUpdate(
-        { user_id: userId },
-        { refresh_token: newRefreshToken },
-        { new: true }
-      );
-    } catch (updateError: any) {
-      throw new Error(`Database update error: ${updateError.message}`);
-    }
-
-    if (!updatedAuth) {
-      throw new Error(
-        "Authentication record not found or could not be updated"
-      );
-    }
-
-    const responseData = {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    };
-
-    // Cache the response using just the user ID
-    refreshTokenCache.set(cacheKey, responseData);
-
-    return responseData;
-  } catch (error: any) {
-    console.error("Refresh token error:", error.message);
-    throw new Error("Invalid refresh token");
-  }
-};
-
 // export services
 export const authenticationService = {
   passwordLoginService,
@@ -453,5 +288,4 @@ export const authenticationService = {
   resetPasswordService,
   updatePasswordService,
   resetPasswordOtpService,
-  refreshTokenService,
 };

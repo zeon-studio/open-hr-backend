@@ -12,13 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authenticationService = exports.refreshTokenService = void 0;
+exports.authenticationService = void 0;
 const variables_1 = __importDefault(require("../../config/variables"));
 const jwtTokenHelper_1 = require("../../lib/jwtTokenHelper");
 const mailSender_1 = require("../../lib/mailSender");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const node_cache_1 = __importDefault(require("node-cache"));
 const employee_model_1 = require("../employee/employee.model");
 const authentication_model_1 = require("./authentication.model");
 // password login
@@ -34,12 +33,6 @@ const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void
         id: isUserExist.id,
         role: isUserExist.role,
     }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({
-        id: isUserExist.id,
-        role: isUserExist.role,
-    }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
-    // Update with upsert to avoid race conditions
-    yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     const userDetails = {
         userId: isUserExist.id,
         name: isUserExist.name,
@@ -47,7 +40,6 @@ const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void
         image: isUserExist === null || isUserExist === void 0 ? void 0 : isUserExist.image,
         role: isUserExist.role,
         accessToken: accessToken,
-        refreshToken: refreshToken,
     };
     return userDetails;
 });
@@ -64,14 +56,9 @@ const oauthLoginService = (email) => __awaiter(void 0, void 0, void 0, function*
         image: isUserExist.image,
         role: isUserExist.role,
         accessToken: "",
-        refreshToken: "",
     };
     const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ id: isUserExist.id, role: isUserExist.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ id: isUserExist.id, role: isUserExist.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
-    // save refresh token to database
-    yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: isUserExist.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     userDetails.accessToken = accessToken;
-    userDetails.refreshToken = refreshToken;
     return userDetails;
 });
 // token login
@@ -89,14 +76,9 @@ const tokenLoginService = (token) => __awaiter(void 0, void 0, void 0, function*
         image: employee.image,
         role: employee.role,
         accessToken: "",
-        refreshToken: "",
     };
     const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ id: employee.id, role: employee.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    const refreshToken = jwtTokenHelper_1.jwtHelpers.createToken({ id: employee.id, role: employee.role }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
-    // save refresh token to database
-    yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: employee.id }, { $set: { refresh_token: refreshToken } }, { upsert: true, new: true });
     userDetails.accessToken = accessToken;
-    userDetails.refreshToken = refreshToken;
     return userDetails;
 });
 // user verification for password recovery
@@ -228,97 +210,6 @@ const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 
         yield sendVerificationOtp(user_id, email, currentTime);
     }
 });
-// refresh token cache for 10 seconds
-const refreshTokenCache = new node_cache_1.default({ stdTTL: 10 });
-// refresh token service
-const refreshTokenService = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!refreshToken) {
-        throw new Error("Refresh token is required");
-    }
-    try {
-        // Verify token
-        let decodedToken;
-        try {
-            decodedToken = jwtTokenHelper_1.jwtHelpers.verifyToken(refreshToken, variables_1.default.jwt_refresh_secret);
-        }
-        catch (verifyError) {
-            console.error("Token verification failed:", verifyError.message);
-            throw new Error(`Token verification error: ${verifyError.message}`);
-        }
-        const { id: userId, role } = decodedToken;
-        if (!userId) {
-            throw new Error("Invalid token payload");
-        }
-        // Create a user-specific cache key
-        const cacheKey = `user:${userId}`;
-        // Check for cached response
-        const cached = refreshTokenCache.get(cacheKey);
-        if (cached) {
-            return cached;
-        }
-        // Find user's token in database
-        let storedToken = null;
-        try {
-            // Add retry logic for database operations
-            let retries = 3;
-            while (retries > 0) {
-                try {
-                    storedToken = yield authentication_model_1.Authentication.findOne({ user_id: userId });
-                    break; // If successful, exit the retry loop
-                }
-                catch (err) {
-                    retries--;
-                    if (retries === 0)
-                        throw err;
-                    yield new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms before retrying
-                }
-            }
-        }
-        catch (dbError) {
-            throw new Error(`Database error: ${dbError.message}`);
-        }
-        if (!storedToken) {
-            throw new Error("User not found");
-        }
-        // force logout if token is not valid
-        if (!storedToken || !storedToken.refresh_token) {
-            console.error(`No valid authentication record found for user: ${userId}`);
-            throw new Error("User has been logged out");
-        }
-        // Generate new tokens
-        const newAccessToken = jwtTokenHelper_1.jwtHelpers.createToken({
-            id: userId,
-            role: role,
-        }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-        const newRefreshToken = jwtTokenHelper_1.jwtHelpers.createToken({
-            id: userId,
-            role: role,
-        }, variables_1.default.jwt_refresh_secret, variables_1.default.jwt_refresh_expire);
-        // Update token in database
-        let updatedAuth;
-        try {
-            updatedAuth = yield authentication_model_1.Authentication.findOneAndUpdate({ user_id: userId }, { refresh_token: newRefreshToken }, { new: true });
-        }
-        catch (updateError) {
-            throw new Error(`Database update error: ${updateError.message}`);
-        }
-        if (!updatedAuth) {
-            throw new Error("Authentication record not found or could not be updated");
-        }
-        const responseData = {
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-        };
-        // Cache the response using just the user ID
-        refreshTokenCache.set(cacheKey, responseData);
-        return responseData;
-    }
-    catch (error) {
-        console.error("Refresh token error:", error.message);
-        throw new Error("Invalid refresh token");
-    }
-});
-exports.refreshTokenService = refreshTokenService;
 // export services
 exports.authenticationService = {
     passwordLoginService,
@@ -330,6 +221,5 @@ exports.authenticationService = {
     resetPasswordService,
     updatePasswordService,
     resetPasswordOtpService,
-    refreshTokenService: exports.refreshTokenService,
 };
 //# sourceMappingURL=authentication.service.js.map

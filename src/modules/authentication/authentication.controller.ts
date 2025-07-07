@@ -111,20 +111,6 @@ const resendOtpController = catchAsync(async (req, res) => {
   });
 });
 
-// refresh token
-const refreshTokenController = catchAsync(
-  async (req: Request, res: Response) => {
-    const { refreshToken } = req.body;
-    const token = await authenticationService.refreshTokenService(refreshToken);
-    sendResponse(res, {
-      success: true,
-      statusCode: 200,
-      result: token,
-      message: "Token refreshed successfully",
-    });
-  }
-);
-
 export const authenticationController = {
   passwordLoginController,
   oauthLoginController,
@@ -134,5 +120,4 @@ export const authenticationController = {
   resendOtpController,
   resetPasswordController,
   updatePasswordController,
-  refreshTokenController,
 };
