@@ -42,7 +42,7 @@ employeeOffboardingRouter.patch(
 employeeOffboardingRouter.get(
   "/:id",
   checkToken,
-  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
+  auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.FORMER),
   employeeOffboardingController.getEmployeeOffboardingController
 );
 

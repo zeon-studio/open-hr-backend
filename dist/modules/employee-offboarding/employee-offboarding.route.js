@@ -18,7 +18,7 @@ employeeOffboardingRouter.post("/", checkToken_1.checkToken, (0, auth_1.default)
 // update task status
 employeeOffboardingRouter.patch("/task/:id/:taskName", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.updateOffboardingTaskStatusController);
 // get single data
-employeeOffboardingRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.getEmployeeOffboardingController);
+employeeOffboardingRouter.get("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER, roles_1.ENUM_ROLE.FORMER), employee_offboarding_controller_1.employeeOffboardingController.getEmployeeOffboardingController);
 // update data
 employeeOffboardingRouter.patch("/:id", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR), employee_offboarding_controller_1.employeeOffboardingController.updateEmployeeOffboardingController);
 // delete data
