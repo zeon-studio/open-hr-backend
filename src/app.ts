@@ -4,7 +4,13 @@ import router from "@/routes";
 import cors from "cors";
 import express, { Application } from "express";
 
-console.log("App module loaded");
+// Global flag to prevent multiple app loads
+let isAppLoaded = false;
+
+if (!isAppLoaded) {
+  console.log("App module loaded");
+  isAppLoaded = true;
+}
 
 const app: Application = express();
 

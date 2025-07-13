@@ -3,11 +3,16 @@ import config from "@/config/variables";
 import { Server } from "http";
 import mongoose from "mongoose";
 
-console.log("Server module loaded");
-
+// Global flag to prevent multiple initializations
+let isInitialized = false;
 let server: Server;
 let isConnected = false;
 let isServerStarted = false;
+
+// Only log once
+if (!isInitialized) {
+  console.log("Server module loaded");
+}
 
 if (config.env !== "development") {
   // detect unhandled exceptions
@@ -37,24 +42,28 @@ const mongoOptions = {
 };
 
 // Set up MongoDB event listeners once
-mongoose.connection.on("connected", () => {
-  console.log("Mongoose connected to MongoDB");
-  isConnected = true;
-});
+if (!isInitialized) {
+  mongoose.connection.on("connected", () => {
+    console.log("Mongoose connected to MongoDB");
+    isConnected = true;
+  });
 
-mongoose.connection.on("error", (err) => {
-  console.log("Mongoose connection error:", err);
-});
+  mongoose.connection.on("error", (err) => {
+    console.log("Mongoose connection error:", err);
+  });
 
-mongoose.connection.on("disconnected", () => {
-  console.log("Mongoose disconnected from MongoDB");
-  isConnected = false;
-});
+  mongoose.connection.on("disconnected", () => {
+    console.log("Mongoose disconnected from MongoDB");
+    isConnected = false;
+  });
+}
 
 const dbConnect = async () => {
   // Prevent multiple connection attempts
-  if (isConnected || mongoose.connection.readyState === 1) {
-    console.log("MongoDB already connected, skipping connection attempt");
+  if (isConnected || mongoose.connection.readyState === 1 || isInitialized) {
+    if (!isInitialized) {
+      console.log("MongoDB already connected, skipping connection attempt");
+    }
 
     // Start server if not already started
     if (!isServerStarted && !server) {
@@ -65,6 +74,8 @@ const dbConnect = async () => {
     }
     return;
   }
+
+  isInitialized = true; // Mark as initialized
 
   let retries = 5;
 
@@ -115,22 +126,25 @@ const dbConnect = async () => {
 };
 
 // Graceful shutdown
-process.on("SIGINT", async () => {
-  console.log("SIGINT received. Shutting down gracefully...");
-  if (server) {
-    server.close(() => {
-      console.log("HTTP server closed.");
-    });
-  }
-  await mongoose.connection.close();
-  console.log("MongoDB connection closed.");
-  isConnected = false;
-  isServerStarted = false;
-  process.exit(0);
-});
+if (!isInitialized) {
+  process.on("SIGINT", async () => {
+    console.log("SIGINT received. Shutting down gracefully...");
+    if (server) {
+      server.close(() => {
+        console.log("HTTP server closed.");
+      });
+    }
+    await mongoose.connection.close();
+    console.log("MongoDB connection closed.");
+    isConnected = false;
+    isServerStarted = false;
+    isInitialized = false;
+    process.exit(0);
+  });
+}
 
 // Initialize connection only once
-if (!isConnected && mongoose.connection.readyState === 0) {
+if (!isInitialized && !isConnected && mongoose.connection.readyState === 0) {
   dbConnect();
 }
 
