@@ -16,6 +16,7 @@ const app_1 = __importDefault(require("./app"));
 const variables_1 = __importDefault(require("./config/variables"));
 const mongoose_1 = __importDefault(require("mongoose"));
 let server;
+let isConnected = false;
 if (variables_1.default.env !== "development") {
     // detect unhandled exceptions
     process.on("uncaughtException", (err) => {
@@ -41,15 +42,23 @@ const mongoOptions = {
     retryReads: true,
 };
 const dbConnect = () => __awaiter(void 0, void 0, void 0, function* () {
+    // Prevent multiple connection attempts
+    if (isConnected) {
+        return;
+    }
     let retries = 5;
     while (retries > 0) {
         try {
             console.log(`Attempting to connect to MongoDB... (${6 - retries}/5)`);
             yield mongoose_1.default.connect(variables_1.default.database_uri, mongoOptions);
             console.log("Successfully connected to MongoDB");
-            server = app_1.default.listen(variables_1.default.port, () => {
-                console.log(`Server running on port ${variables_1.default.port}`);
-            });
+            isConnected = true;
+            // Only start server once connection is established
+            if (!server) {
+                server = app_1.default.listen(variables_1.default.port, () => {
+                    console.log(`Server running on port ${variables_1.default.port}`);
+                });
+            }
             break; // Exit the retry loop on successful connection
         }
         catch (error) {
@@ -63,15 +72,18 @@ const dbConnect = () => __awaiter(void 0, void 0, void 0, function* () {
             yield new Promise((resolve) => setTimeout(resolve, 2000));
         }
     }
-    // MongoDB event listeners
+    // MongoDB event listeners - only set once
+    mongoose_1.default.connection.removeAllListeners(); // Remove any existing listeners
     mongoose_1.default.connection.on("connected", () => {
         console.log("Mongoose connected to MongoDB");
+        isConnected = true;
     });
     mongoose_1.default.connection.on("error", (err) => {
         console.log("Mongoose connection error:", err);
     });
     mongoose_1.default.connection.on("disconnected", () => {
         console.log("Mongoose disconnected from MongoDB");
+        isConnected = false;
     });
     if (variables_1.default.env !== "development") {
         // stop server when unhandled promise rejections occur
@@ -99,8 +111,10 @@ process.on("SIGINT", () => __awaiter(void 0, void 0, void 0, function* () {
     }
     yield mongoose_1.default.connection.close();
     console.log("MongoDB connection closed.");
+    isConnected = false;
     process.exit(0);
 }));
+// Initialize connection only once
 dbConnect();
 exports.default = app_1.default;
 //# sourceMappingURL=server.js.map

@@ -4,6 +4,7 @@ import { Server } from "http";
 import mongoose from "mongoose";
 
 let server: Server;
+let isConnected = false;
 
 if (config.env !== "development") {
   // detect unhandled exceptions
@@ -33,6 +34,11 @@ const mongoOptions = {
 };
 
 const dbConnect = async () => {
+  // Prevent multiple connection attempts
+  if (isConnected) {
+    return;
+  }
+
   let retries = 5;
 
   while (retries > 0) {
@@ -42,10 +48,14 @@ const dbConnect = async () => {
       await mongoose.connect(config.database_uri as string, mongoOptions);
 
       console.log("Successfully connected to MongoDB");
+      isConnected = true;
 
-      server = app.listen(config.port, () => {
-        console.log(`Server running on port ${config.port}`);
-      });
+      // Only start server once connection is established
+      if (!server) {
+        server = app.listen(config.port, () => {
+          console.log(`Server running on port ${config.port}`);
+        });
+      }
 
       break; // Exit the retry loop on successful connection
     } catch (error) {
@@ -62,9 +72,12 @@ const dbConnect = async () => {
     }
   }
 
-  // MongoDB event listeners
+  // MongoDB event listeners - only set once
+  mongoose.connection.removeAllListeners(); // Remove any existing listeners
+
   mongoose.connection.on("connected", () => {
     console.log("Mongoose connected to MongoDB");
+    isConnected = true;
   });
 
   mongoose.connection.on("error", (err) => {
@@ -73,6 +86,7 @@ const dbConnect = async () => {
 
   mongoose.connection.on("disconnected", () => {
     console.log("Mongoose disconnected from MongoDB");
+    isConnected = false;
   });
 
   if (config.env !== "development") {
@@ -101,9 +115,11 @@ process.on("SIGINT", async () => {
   }
   await mongoose.connection.close();
   console.log("MongoDB connection closed.");
+  isConnected = false;
   process.exit(0);
 });
 
+// Initialize connection only once
 dbConnect();
 
 export default app;
