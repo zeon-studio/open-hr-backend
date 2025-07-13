@@ -15,25 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
 const variables_1 = __importDefault(require("./config/variables"));
 const mongoose_1 = __importDefault(require("mongoose"));
-// Global flag to prevent multiple initializations
-let isInitialized = false;
-let server;
-let isConnected = false;
-let isServerStarted = false;
-// Only log once
-if (!isInitialized) {
+// Only log if not already initialized
+if (!global.__mongoConnected && !global.__serverStarted) {
     console.log("Server module loaded");
 }
+let server;
 if (variables_1.default.env !== "development") {
-    // detect unhandled exceptions
     process.on("uncaughtException", (err) => {
         console.log(err);
     });
-    // create signal when server is closed
     process.on("SIGTERM", () => {
+        var _a;
         console.log("SIGTERM is received");
-        if (server) {
-            server.close();
+        if (server || global.__appServer) {
+            (_a = (server || global.__appServer)) === null || _a === void 0 ? void 0 : _a.close();
         }
     });
 }
@@ -48,48 +43,48 @@ const mongoOptions = {
     retryWrites: true,
     retryReads: true,
 };
-// Set up MongoDB event listeners once
-if (!isInitialized) {
+// Set up MongoDB event listeners only once
+if (!global.__mongoConnected) {
     mongoose_1.default.connection.on("connected", () => {
         console.log("Mongoose connected to MongoDB");
-        isConnected = true;
+        global.__mongoConnected = true;
     });
     mongoose_1.default.connection.on("error", (err) => {
         console.log("Mongoose connection error:", err);
     });
     mongoose_1.default.connection.on("disconnected", () => {
         console.log("Mongoose disconnected from MongoDB");
-        isConnected = false;
+        global.__mongoConnected = false;
     });
 }
 const dbConnect = () => __awaiter(void 0, void 0, void 0, function* () {
-    // Prevent multiple connection attempts
-    if (isConnected || mongoose_1.default.connection.readyState === 1 || isInitialized) {
-        if (!isInitialized) {
-            console.log("MongoDB already connected, skipping connection attempt");
-        }
+    // Check if already connected using mongoose state and global flag
+    if (global.__mongoConnected ||
+        mongoose_1.default.connection.readyState === 1 ||
+        mongoose_1.default.connection.readyState === 2) {
         // Start server if not already started
-        if (!isServerStarted && !server) {
+        if (!global.__serverStarted && !global.__appServer) {
             server = app_1.default.listen(variables_1.default.port, () => {
                 console.log(`Server running on port ${variables_1.default.port}`);
-                isServerStarted = true;
+                global.__serverStarted = true;
+                global.__appServer = server;
             });
         }
         return;
     }
-    isInitialized = true; // Mark as initialized
     let retries = 5;
     while (retries > 0) {
         try {
             console.log(`Attempting to connect to MongoDB... (${6 - retries}/5)`);
             yield mongoose_1.default.connect(variables_1.default.database_uri, mongoOptions);
             console.log("Successfully connected to MongoDB");
-            isConnected = true;
-            // Only start server once connection is established and if not already started
-            if (!isServerStarted && !server) {
+            global.__mongoConnected = true;
+            // Start server if not already started
+            if (!global.__serverStarted && !global.__appServer) {
                 server = app_1.default.listen(variables_1.default.port, () => {
                     console.log(`Server running on port ${variables_1.default.port}`);
-                    isServerStarted = true;
+                    global.__serverStarted = true;
+                    global.__appServer = server;
                 });
             }
             break;
@@ -106,9 +101,10 @@ const dbConnect = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     if (variables_1.default.env !== "development") {
         process.on("unhandledRejection", (err) => {
+            var _a;
             console.log("unhandled rejection occur closing the server...");
-            if (server) {
-                server.close(() => {
+            if (server || global.__appServer) {
+                (_a = (server || global.__appServer)) === null || _a === void 0 ? void 0 : _a.close(() => {
                     console.log(err);
                     process.exit(1);
                 });
@@ -120,25 +116,23 @@ const dbConnect = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 // Graceful shutdown
-if (!isInitialized) {
-    process.on("SIGINT", () => __awaiter(void 0, void 0, void 0, function* () {
-        console.log("SIGINT received. Shutting down gracefully...");
-        if (server) {
-            server.close(() => {
-                console.log("HTTP server closed.");
-            });
-        }
-        yield mongoose_1.default.connection.close();
-        console.log("MongoDB connection closed.");
-        isConnected = false;
-        isServerStarted = false;
-        isInitialized = false;
-        process.exit(0);
-    }));
-}
-// Only start server if this file is run directly (not imported as a module)
-if (require.main === module) {
-    // Initialize connection only once
+process.on("SIGINT", () => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    console.log("SIGINT received. Shutting down gracefully...");
+    if (server || global.__appServer) {
+        (_a = (server || global.__appServer)) === null || _a === void 0 ? void 0 : _a.close(() => {
+            console.log("HTTP server closed.");
+        });
+    }
+    yield mongoose_1.default.connection.close();
+    console.log("MongoDB connection closed.");
+    global.__mongoConnected = false;
+    global.__serverStarted = false;
+    global.__appServer = undefined;
+    process.exit(0);
+}));
+// Initialize connection only if not already connected
+if (!global.__mongoConnected && mongoose_1.default.connection.readyState === 0) {
     dbConnect();
 }
 exports.default = app_1.default;

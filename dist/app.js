@@ -17,11 +17,9 @@ const globalErrorHandler_1 = require("./middlewares/globalErrorHandler");
 const routes_1 = __importDefault(require("./routes"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
-// Global flag to prevent multiple app loads
-let isAppLoaded = false;
-if (!isAppLoaded) {
+if (!global.__appLoaded) {
     console.log("App module loaded");
-    isAppLoaded = true;
+    global.__appLoaded = true;
 }
 const app = (0, express_1.default)();
 // Define CORS options for specific origins

@@ -4,12 +4,14 @@ import router from "@/routes";
 import cors from "cors";
 import express, { Application } from "express";
 
-// Global flag to prevent multiple app loads
-let isAppLoaded = false;
+// Use process global to persist across module reloads
+declare global {
+  var __appLoaded: boolean | undefined;
+}
 
-if (!isAppLoaded) {
+if (!global.__appLoaded) {
   console.log("App module loaded");
-  isAppLoaded = true;
+  global.__appLoaded = true;
 }
 
 const app: Application = express();
