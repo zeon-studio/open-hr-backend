@@ -10,40 +10,43 @@ declare global {
 }
 
 if (!global.__appLoaded) {
-  console.log("App module loaded");
+  console.log("📦 Loading Express application...");
   global.__appLoaded = true;
 }
 
 const app: Application = express();
 
-// Define CORS options for specific origins
-const corsOptions: cors.CorsOptions =
-  process.env.NODE_ENV === "development"
-    ? {
-        origin: "*",
-        methods: "GET,PUT,PATCH,POST,DELETE",
-        preflightContinue: false,
-        optionsSuccessStatus: 204,
-      }
-    : {
-        origin: config.cors_origin.split(",").map((origin) => origin.trim()),
-        methods: "GET,PUT,PATCH,POST,DELETE",
-        preflightContinue: false,
-        optionsSuccessStatus: 204,
-      };
+// CORS configuration
+const isDevelopment = process.env.NODE_ENV === "development";
+const corsOptions: cors.CorsOptions = {
+  origin: isDevelopment
+    ? "*"
+    : config.cors_origin.split(",").map((origin) => origin.trim()),
+  methods: ["GET", "PUT", "PATCH", "POST", "DELETE"],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+  credentials: true, // Allow cookies if needed
+};
 
+// Middleware setup
 app.use(cors(corsOptions));
+app.use(express.json({ limit: "10mb" })); // Add size limit
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.get("/", async (req, res) => {
-  res.send("Welcome to the backend of Open HR");
+// Health check endpoint
+app.get("/", (req, res) => {
+  res.json({
+    message: "Welcome to the backend of Open HR",
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    environment: config.env,
+  });
 });
 
+// API routes
 app.use("/api/v1", router);
 
+// Global error handler (must be last)
 app.use(globalErrorhandler);
 
-// Export the app for Vercel
 export default app;

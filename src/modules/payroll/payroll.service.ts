@@ -87,6 +87,14 @@ const getPayrollService = async (id: string) => {
 
 // create monthly data
 const createMonthlyPayrollService = async (payData: CreateMonthlySalary) => {
+  if (!payData?.employees?.length) {
+    throw new Error("Employee data is required");
+  }
+
+  if (!payData.salary_date) {
+    throw new Error("Salary date is required");
+  }
+
   const salaryDate = localDate(new Date(payData.salary_date));
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -98,10 +106,14 @@ const createMonthlyPayrollService = async (payData: CreateMonthlySalary) => {
     }).session(session);
 
     if (existingPayroll) {
-      throw new Error("Payroll data for this salary date already exists.");
+      throw new Error("Payroll data for this salary date already exists");
     }
 
     const bulkOperations = payData.employees.map((data) => {
+      if (!data.employee_id || !data.gross_salary) {
+        throw new Error("Employee ID and gross salary are required");
+      }
+
       const update: any = {
         $push: {
           salary: {
@@ -111,11 +123,11 @@ const createMonthlyPayrollService = async (payData: CreateMonthlySalary) => {
         },
       };
 
-      if (data.bonus_amount) {
+      if (data.bonus_amount && data.bonus_type) {
         update.$push.bonus = {
           amount: data.bonus_amount,
           type: data.bonus_type,
-          reason: data.bonus_reason,
+          reason: data.bonus_reason || "",
           date: salaryDate,
         };
       }
@@ -125,7 +137,6 @@ const createMonthlyPayrollService = async (payData: CreateMonthlySalary) => {
           filter: { employee_id: data.employee_id },
           update,
           upsert: true,
-          new: true,
         },
       };
     });
@@ -133,12 +144,12 @@ const createMonthlyPayrollService = async (payData: CreateMonthlySalary) => {
     const result = await Payroll.bulkWrite(bulkOperations, { session });
 
     // Send email to each employee
-    for (const data of payData.employees) {
+    const emailPromises = payData.employees.map(async (data) => {
       const employee = await Employee.findOne({ id: data.employee_id }).session(
         session
       );
-      if (employee) {
-        await mailSender.salarySheet(
+      if (employee?.work_email) {
+        return mailSender.salarySheet(
           employee.work_email,
           employee.name,
           payData.salary_date,
@@ -147,13 +158,14 @@ const createMonthlyPayrollService = async (payData: CreateMonthlySalary) => {
           data.bonus_amount
         );
       }
-    }
+    });
 
+    await Promise.all(emailPromises);
     await session.commitTransaction();
     return result;
   } catch (error) {
     await session.abortTransaction();
-    throw new Error();
+    throw error;
   } finally {
     session.endSession();
   }
@@ -161,6 +173,10 @@ const createMonthlyPayrollService = async (payData: CreateMonthlySalary) => {
 
 // update
 const updatePayrollService = async (id: string, updateData: PayrollType) => {
+  if (!id) {
+    throw new Error("Employee ID is required");
+  }
+
   // Convert dates to local dates
   if (updateData.salary) {
     updateData.salary = updateData.salary.map((salary) => ({
@@ -184,17 +200,28 @@ const updatePayrollService = async (id: string, updateData: PayrollType) => {
   const result = await Payroll.findOneAndUpdate(
     { employee_id: id },
     updateData,
-    {
-      new: true,
-      upsert: true,
-    }
+    { new: true, upsert: true }
   );
+
+  if (!result) {
+    throw new Error("Failed to update payroll");
+  }
+
   return result;
 };
 
 // delete
 const deletePayrollService = async (id: string) => {
-  await Payroll.findOneAndDelete({ employee_id: id });
+  if (!id) {
+    throw new Error("Employee ID is required");
+  }
+
+  const result = await Payroll.findOneAndDelete({ employee_id: id });
+  if (!result) {
+    throw new Error("Payroll record not found");
+  }
+
+  return result;
 };
 
 export const payrollService = {

@@ -17,22 +17,27 @@ const variables_1 = __importDefault(require("./config/variables"));
 const mongoose_1 = __importDefault(require("mongoose"));
 // Only log if not already initialized
 if (!global.__mongoConnected && !global.__serverStarted) {
-    console.log("Server module loaded");
+    console.log("🚀 Initializing ERP Solution Backend...");
 }
 let server;
+// Production error handling
 if (variables_1.default.env !== "development") {
     process.on("uncaughtException", (err) => {
-        console.log(err);
+        console.error("💥 Uncaught Exception:", err);
+        process.exit(1);
     });
     process.on("SIGTERM", () => {
         var _a;
-        console.log("SIGTERM is received");
+        console.log("🛑 SIGTERM received. Shutting down gracefully...");
         if (server || global.__appServer) {
-            (_a = (server || global.__appServer)) === null || _a === void 0 ? void 0 : _a.close();
+            (_a = (server || global.__appServer)) === null || _a === void 0 ? void 0 : _a.close(() => {
+                console.log("✅ HTTP server closed");
+                process.exit(0);
+            });
         }
     });
 }
-// MongoDB connection options
+// MongoDB configuration
 const mongoOptions = {
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
@@ -43,69 +48,76 @@ const mongoOptions = {
     retryWrites: true,
     retryReads: true,
 };
-// Set up MongoDB event listeners only once
+// MongoDB event listeners (set only once)
 if (!global.__mongoConnected) {
     mongoose_1.default.connection.on("connected", () => {
-        console.log("Mongoose connected to MongoDB");
+        console.log("✅ MongoDB connected successfully");
         global.__mongoConnected = true;
     });
     mongoose_1.default.connection.on("error", (err) => {
-        console.log("Mongoose connection error:", err);
+        console.error("❌ MongoDB connection error:", err);
     });
     mongoose_1.default.connection.on("disconnected", () => {
-        console.log("Mongoose disconnected from MongoDB");
+        console.log("⚠️  MongoDB disconnected");
         global.__mongoConnected = false;
     });
+    mongoose_1.default.connection.on("reconnected", () => {
+        console.log("🔄 MongoDB reconnected");
+        global.__mongoConnected = true;
+    });
 }
+const startServer = () => {
+    if (!global.__serverStarted && !global.__appServer) {
+        server = app_1.default.listen(variables_1.default.port, () => {
+            console.log(`🎉 Server running on http://localhost:${variables_1.default.port}`);
+            console.log(`📊 Environment: ${variables_1.default.env}`);
+            console.log(`🕒 Started at: ${new Date().toISOString()}`);
+            global.__serverStarted = true;
+            global.__appServer = server;
+        });
+        // Handle server errors
+        server.on("error", (err) => {
+            console.error("❌ Server error:", err);
+        });
+    }
+};
 const dbConnect = () => __awaiter(void 0, void 0, void 0, function* () {
-    // Check if already connected using mongoose state and global flag
-    if (global.__mongoConnected ||
+    // Check connection state
+    const isConnected = global.__mongoConnected ||
         mongoose_1.default.connection.readyState === 1 ||
-        mongoose_1.default.connection.readyState === 2) {
-        // Start server if not already started
-        if (!global.__serverStarted && !global.__appServer) {
-            server = app_1.default.listen(variables_1.default.port, () => {
-                console.log(`Server running on port ${variables_1.default.port}`);
-                global.__serverStarted = true;
-                global.__appServer = server;
-            });
-        }
+        mongoose_1.default.connection.readyState === 2;
+    if (isConnected) {
+        startServer();
         return;
     }
     let retries = 5;
     while (retries > 0) {
         try {
-            console.log(`Attempting to connect to MongoDB... (${6 - retries}/5)`);
+            console.log(`🔄 Connecting to MongoDB... (attempt ${6 - retries}/5)`);
             yield mongoose_1.default.connect(variables_1.default.database_uri, mongoOptions);
-            console.log("Successfully connected to MongoDB");
+            console.log("✅ MongoDB connection established");
             global.__mongoConnected = true;
-            // Start server if not already started
-            if (!global.__serverStarted && !global.__appServer) {
-                server = app_1.default.listen(variables_1.default.port, () => {
-                    console.log(`Server running on port ${variables_1.default.port}`);
-                    global.__serverStarted = true;
-                    global.__appServer = server;
-                });
-            }
+            startServer();
             break;
         }
         catch (error) {
-            console.log(`MongoDB connection attempt ${6 - retries} failed:`, error);
+            console.error(`❌ MongoDB connection failed (attempt ${6 - retries}/5):`, error);
             retries--;
             if (retries === 0) {
-                console.log("All MongoDB connection attempts failed. Exiting...");
+                console.error("💥 All MongoDB connection attempts failed. Shutting down...");
                 process.exit(1);
             }
+            // Wait before retry
             yield new Promise((resolve) => setTimeout(resolve, 2000));
         }
     }
+    // Production error handling
     if (variables_1.default.env !== "development") {
         process.on("unhandledRejection", (err) => {
             var _a;
-            console.log("unhandled rejection occur closing the server...");
+            console.error("💥 Unhandled Promise Rejection:", err);
             if (server || global.__appServer) {
                 (_a = (server || global.__appServer)) === null || _a === void 0 ? void 0 : _a.close(() => {
-                    console.log(err);
                     process.exit(1);
                 });
             }
@@ -115,23 +127,39 @@ const dbConnect = () => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
 });
-// Graceful shutdown
-process.on("SIGINT", () => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    console.log("SIGINT received. Shutting down gracefully...");
-    if (server || global.__appServer) {
-        (_a = (server || global.__appServer)) === null || _a === void 0 ? void 0 : _a.close(() => {
-            console.log("HTTP server closed.");
-        });
+// Graceful shutdown handler
+const gracefulShutdown = (signal) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(`🛑 ${signal} received. Shutting down gracefully...`);
+    try {
+        // Close HTTP server
+        if (server || global.__appServer) {
+            yield new Promise((resolve) => {
+                var _a;
+                (_a = (server || global.__appServer)) === null || _a === void 0 ? void 0 : _a.close(() => {
+                    console.log("✅ HTTP server closed");
+                    resolve();
+                });
+            });
+        }
+        // Close MongoDB connection
+        yield mongoose_1.default.connection.close();
+        console.log("✅ MongoDB connection closed");
+        // Reset global flags
+        global.__mongoConnected = false;
+        global.__serverStarted = false;
+        global.__appServer = undefined;
+        console.log("✅ Graceful shutdown completed");
+        process.exit(0);
     }
-    yield mongoose_1.default.connection.close();
-    console.log("MongoDB connection closed.");
-    global.__mongoConnected = false;
-    global.__serverStarted = false;
-    global.__appServer = undefined;
-    process.exit(0);
-}));
-// Initialize connection only if not already connected
+    catch (error) {
+        console.error("❌ Error during shutdown:", error);
+        process.exit(1);
+    }
+});
+// Register shutdown handlers
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+// Initialize database connection
 if (!global.__mongoConnected && mongoose_1.default.connection.readyState === 0) {
     dbConnect();
 }

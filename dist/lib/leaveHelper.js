@@ -27,76 +27,87 @@ const getWeekOfMonth = (date) => {
 };
 // leave day counter
 const dayCounterWithoutHoliday = (startDate, endDate) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!startDate || !endDate) {
+        throw new Error("Start date and end date are required");
+    }
+    if (startDate > endDate) {
+        throw new Error("Start date cannot be after end date");
+    }
     const year = startDate.getFullYear();
-    const holidayRecords = yield calendar_model_1.Calendar.find({ year });
-    // Flatten the holidays from each record
-    const holidays = holidayRecords.flatMap((record) => record.holidays);
-    // Ensure start and end are at the start and end of their respective days
-    const start = (0, date_fns_1.startOfDay)(startDate);
-    const end = (0, date_fns_1.endOfDay)(endDate);
-    const daysInterval = (0, date_fns_1.eachDayOfInterval)({ start, end });
-    // Fetch weekends and conditional weekends from settings
-    const { weekends, conditionalWeekends } = yield setting_service_1.settingService.getWeekendsService();
-    // Modify the holiday filtering logic to handle edge cases
-    const holidayDays = holidays.filter((holiday) => {
-        const holidayStart = (0, date_fns_1.startOfDay)((0, date_fns_1.parseISO)(new Date(holiday.start_date).toISOString()));
-        const holidayEnd = (0, date_fns_1.endOfDay)((0, date_fns_1.parseISO)(new Date(holiday.end_date).toISOString()));
-        // Comprehensive overlap check
-        return (
-        // Holiday starts within the range
-        (holidayStart >= start && holidayStart <= end) ||
-            // Holiday ends within the range
-            (holidayEnd >= start && holidayEnd <= end) ||
-            // Holiday completely encompasses the range
-            (holidayStart <= start && holidayEnd >= end));
-    });
-    // Calculate total holidays with precise overlap
-    const totalHolidays = holidayDays.reduce((count, holiday) => {
-        const holidayStart = (0, date_fns_1.startOfDay)((0, date_fns_1.parseISO)(new Date(holiday.start_date).toISOString()));
-        const holidayEnd = (0, date_fns_1.endOfDay)((0, date_fns_1.parseISO)(new Date(holiday.end_date).toISOString()));
-        // Determine the precise overlap
-        const overlapStart = holidayStart > start ? holidayStart : start;
-        const overlapEnd = holidayEnd < end ? holidayEnd : end;
-        // Calculate the number of overlapping days
-        const overlappingDays = (0, date_fns_1.differenceInDays)(overlapEnd, overlapStart) + 1;
-        return count + overlappingDays;
-    }, 0);
-    // Find all weekends in the interval
-    const weekendInterval = daysInterval.filter((day) => {
-        const dayName = day.toLocaleDateString("en-US", { weekday: "long" });
-        // Check regular weekend days
-        if (weekends.includes(dayName)) {
-            return true;
-        }
-        // Check conditional weekend days
-        const conditionalWeekend = conditionalWeekends.find((cw) => cw.name === dayName);
-        if (conditionalWeekend) {
-            const weekNumber = getWeekOfMonth(day);
-            return conditionalWeekend.pattern.includes(weekNumber);
-        }
-        return false;
-    });
-    // Find weekends that are not within holidays
-    const nonHolidayWeekends = weekendInterval.filter((weekend) => !holidayDays.some((holiday) => {
-        const holidayStart = (0, date_fns_1.startOfDay)((0, date_fns_1.parseISO)(new Date(holiday.start_date).toISOString()));
-        const holidayEnd = (0, date_fns_1.endOfDay)((0, date_fns_1.parseISO)(new Date(holiday.end_date).toISOString()));
-        return (0, date_fns_1.isWithinInterval)(weekend, {
-            start: holidayStart,
-            end: holidayEnd,
+    try {
+        const holidayRecords = yield calendar_model_1.Calendar.find({ year });
+        const holidays = holidayRecords.flatMap((record) => record.holidays);
+        const start = (0, date_fns_1.startOfDay)(startDate);
+        const end = (0, date_fns_1.endOfDay)(endDate);
+        const daysInterval = (0, date_fns_1.eachDayOfInterval)({ start, end });
+        const { weekends, conditionalWeekends } = yield setting_service_1.settingService.getWeekendsService();
+        // Modify the holiday filtering logic to handle edge cases
+        const holidayDays = holidays.filter((holiday) => {
+            const holidayStart = (0, date_fns_1.startOfDay)((0, date_fns_1.parseISO)(new Date(holiday.start_date).toISOString()));
+            const holidayEnd = (0, date_fns_1.endOfDay)((0, date_fns_1.parseISO)(new Date(holiday.end_date).toISOString()));
+            // Comprehensive overlap check
+            return (
+            // Holiday starts within the range
+            (holidayStart >= start && holidayStart <= end) ||
+                // Holiday ends within the range
+                (holidayEnd >= start && holidayEnd <= end) ||
+                // Holiday completely encompasses the range
+                (holidayStart <= start && holidayEnd >= end));
         });
-    }));
-    const totalDays = (0, date_fns_1.differenceInDays)(end, start) + 1;
-    let finalDays = totalDays;
-    // Reduce days for holidays
-    finalDays -= totalHolidays;
-    // Reduce days for non-holiday weekends
-    finalDays -= nonHolidayWeekends.length;
-    return finalDays;
+        // Calculate total holidays with precise overlap
+        const totalHolidays = holidayDays.reduce((count, holiday) => {
+            const holidayStart = (0, date_fns_1.startOfDay)((0, date_fns_1.parseISO)(new Date(holiday.start_date).toISOString()));
+            const holidayEnd = (0, date_fns_1.endOfDay)((0, date_fns_1.parseISO)(new Date(holiday.end_date).toISOString()));
+            // Determine the precise overlap
+            const overlapStart = holidayStart > start ? holidayStart : start;
+            const overlapEnd = holidayEnd < end ? holidayEnd : end;
+            // Calculate the number of overlapping days
+            const overlappingDays = (0, date_fns_1.differenceInDays)(overlapEnd, overlapStart) + 1;
+            return count + overlappingDays;
+        }, 0);
+        // Find all weekends in the interval
+        const weekendInterval = daysInterval.filter((day) => {
+            const dayName = day.toLocaleDateString("en-US", { weekday: "long" });
+            // Check regular weekend days
+            if (weekends.includes(dayName)) {
+                return true;
+            }
+            // Check conditional weekend days
+            const conditionalWeekend = conditionalWeekends.find((cw) => cw.name === dayName);
+            if (conditionalWeekend) {
+                const weekNumber = getWeekOfMonth(day);
+                return conditionalWeekend.pattern.includes(weekNumber);
+            }
+            return false;
+        });
+        // Find weekends that are not within holidays
+        const nonHolidayWeekends = weekendInterval.filter((weekend) => !holidayDays.some((holiday) => {
+            const holidayStart = (0, date_fns_1.startOfDay)((0, date_fns_1.parseISO)(new Date(holiday.start_date).toISOString()));
+            const holidayEnd = (0, date_fns_1.endOfDay)((0, date_fns_1.parseISO)(new Date(holiday.end_date).toISOString()));
+            return (0, date_fns_1.isWithinInterval)(weekend, {
+                start: holidayStart,
+                end: holidayEnd,
+            });
+        }));
+        const totalDays = (0, date_fns_1.differenceInDays)(end, start) + 1;
+        let finalDays = totalDays - totalHolidays - nonHolidayWeekends.length;
+        return Math.max(0, finalDays); // Ensure non-negative result
+    }
+    catch (error) {
+        console.error("Error calculating leave days:", error);
+        throw new Error("Failed to calculate leave days");
+    }
 });
 exports.dayCounterWithoutHoliday = dayCounterWithoutHoliday;
 // leave data validator
 const leaveValidator = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!data) {
+        throw new ApiError_1.default("Leave request data is required", 400);
+    }
     const { leave_type, employee_id, start_date, end_date } = data;
+    if (!leave_type || !employee_id || !start_date || !end_date) {
+        throw new ApiError_1.default("All required fields must be provided", 400);
+    }
     const year = start_date.getFullYear();
     const leaveTypes = ["casual", "earned", "sick", "without_pay"];
     if (!leaveTypes.includes(leave_type)) {
@@ -128,6 +139,12 @@ const leaveValidator = (data) => __awaiter(void 0, void 0, void 0, function* () 
 exports.leaveValidator = leaveValidator;
 // calculate leave based on join date
 function calculateRemainingLeave(joinDate, leaveAllottedPerYear) {
+    if (!joinDate || typeof leaveAllottedPerYear !== "number") {
+        throw new Error("Join date and leave allotted per year are required");
+    }
+    if (leaveAllottedPerYear < 0) {
+        throw new Error("Leave allotted per year must be non-negative");
+    }
     // Convert joinDate to a Date object
     const joinDateObj = new Date(joinDate);
     const currentYear = joinDateObj.getFullYear();

@@ -77,6 +77,13 @@ const getPayrollService = (id) => __awaiter(void 0, void 0, void 0, function* ()
 });
 // create monthly data
 const createMonthlyPayrollService = (payData) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    if (!((_a = payData === null || payData === void 0 ? void 0 : payData.employees) === null || _a === void 0 ? void 0 : _a.length)) {
+        throw new Error("Employee data is required");
+    }
+    if (!payData.salary_date) {
+        throw new Error("Salary date is required");
+    }
     const salaryDate = (0, dateConverter_1.localDate)(new Date(payData.salary_date));
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
@@ -86,9 +93,12 @@ const createMonthlyPayrollService = (payData) => __awaiter(void 0, void 0, void 
             "salary.date": salaryDate,
         }).session(session);
         if (existingPayroll) {
-            throw new Error("Payroll data for this salary date already exists.");
+            throw new Error("Payroll data for this salary date already exists");
         }
         const bulkOperations = payData.employees.map((data) => {
+            if (!data.employee_id || !data.gross_salary) {
+                throw new Error("Employee ID and gross salary are required");
+            }
             const update = {
                 $push: {
                     salary: {
@@ -97,11 +107,11 @@ const createMonthlyPayrollService = (payData) => __awaiter(void 0, void 0, void 
                     },
                 },
             };
-            if (data.bonus_amount) {
+            if (data.bonus_amount && data.bonus_type) {
                 update.$push.bonus = {
                     amount: data.bonus_amount,
                     type: data.bonus_type,
-                    reason: data.bonus_reason,
+                    reason: data.bonus_reason || "",
                     date: salaryDate,
                 };
             }
@@ -110,24 +120,24 @@ const createMonthlyPayrollService = (payData) => __awaiter(void 0, void 0, void 
                     filter: { employee_id: data.employee_id },
                     update,
                     upsert: true,
-                    new: true,
                 },
             };
         });
         const result = yield payroll_model_1.Payroll.bulkWrite(bulkOperations, { session });
         // Send email to each employee
-        for (const data of payData.employees) {
+        const emailPromises = payData.employees.map((data) => __awaiter(void 0, void 0, void 0, function* () {
             const employee = yield employee_model_1.Employee.findOne({ id: data.employee_id }).session(session);
-            if (employee) {
-                yield mailSender_1.mailSender.salarySheet(employee.work_email, employee.name, payData.salary_date, data.gross_salary, data.bonus_type, data.bonus_amount);
+            if (employee === null || employee === void 0 ? void 0 : employee.work_email) {
+                return mailSender_1.mailSender.salarySheet(employee.work_email, employee.name, payData.salary_date, data.gross_salary, data.bonus_type, data.bonus_amount);
             }
-        }
+        }));
+        yield Promise.all(emailPromises);
         yield session.commitTransaction();
         return result;
     }
     catch (error) {
         yield session.abortTransaction();
-        throw new Error();
+        throw error;
     }
     finally {
         session.endSession();
@@ -135,6 +145,9 @@ const createMonthlyPayrollService = (payData) => __awaiter(void 0, void 0, void 
 });
 // update
 const updatePayrollService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!id) {
+        throw new Error("Employee ID is required");
+    }
     // Convert dates to local dates
     if (updateData.salary) {
         updateData.salary = updateData.salary.map((salary) => (Object.assign(Object.assign({}, salary), { date: (0, dateConverter_1.localDate)(new Date(salary.date)) })));
@@ -145,15 +158,22 @@ const updatePayrollService = (id, updateData) => __awaiter(void 0, void 0, void 
     if (updateData.increments) {
         updateData.increments = updateData.increments.map((increment) => (Object.assign(Object.assign({}, increment), { date: (0, dateConverter_1.localDate)(new Date(increment.date)) })));
     }
-    const result = yield payroll_model_1.Payroll.findOneAndUpdate({ employee_id: id }, updateData, {
-        new: true,
-        upsert: true,
-    });
+    const result = yield payroll_model_1.Payroll.findOneAndUpdate({ employee_id: id }, updateData, { new: true, upsert: true });
+    if (!result) {
+        throw new Error("Failed to update payroll");
+    }
     return result;
 });
 // delete
 const deletePayrollService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield payroll_model_1.Payroll.findOneAndDelete({ employee_id: id });
+    if (!id) {
+        throw new Error("Employee ID is required");
+    }
+    const result = yield payroll_model_1.Payroll.findOneAndDelete({ employee_id: id });
+    if (!result) {
+        throw new Error("Payroll record not found");
+    }
+    return result;
 });
 exports.payrollService = {
     getAllPayrollService,

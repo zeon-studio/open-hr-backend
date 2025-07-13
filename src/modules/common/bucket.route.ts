@@ -106,6 +106,27 @@ const checkFileExists = async (key: string) => {
   }
 };
 
+// Helper function for retry deletion
+const retryDelete = async (
+  key: string,
+  maxRetries: number = 3
+): Promise<boolean> => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      await deleteFile(key);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const stillExists = await checkFileExists(key);
+      if (!stillExists) {
+        return true;
+      }
+    } catch (error) {
+      console.error(`Delete attempt ${i + 1} failed:`, error);
+    }
+  }
+  return false;
+};
+
 // delete router
 bucketRouter.delete(
   "/delete/:key",
@@ -124,8 +145,8 @@ bucketRouter.delete(
 
     try {
       // Check if file exists before deleting
-      const headResult = await checkFileExists(key);
-      if (!headResult) {
+      const fileExists = await checkFileExists(key);
+      if (!fileExists) {
         return sendResponse(res, {
           statusCode: 404,
           success: false,
@@ -133,40 +154,17 @@ bucketRouter.delete(
         });
       }
 
-      const deleteResult = await deleteFile(key);
-      if (!deleteResult) {
+      // Delete the file
+      await deleteFile(key);
+
+      // Verify deletion with retry logic
+      const deleted = await retryDelete(key);
+      if (!deleted) {
         return sendResponse(res, {
           statusCode: 500,
           success: false,
-          message: "Failed to delete file",
+          message: "Failed to delete file after multiple attempts",
         });
-      }
-
-      // Verify deletion after deletion
-      const existsAfterDelete = await checkFileExists(key);
-      if (existsAfterDelete) {
-        // Retry logic
-        let retryCount = 0;
-        const maxRetries = 3;
-        let deleted = false;
-
-        while (retryCount < maxRetries && !deleted) {
-          await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
-          await deleteFile(key);
-          const stillExists = await checkFileExists(key);
-          if (!stillExists) {
-            deleted = true;
-          }
-          retryCount++;
-        }
-
-        if (!deleted) {
-          return sendResponse(res, {
-            statusCode: 500,
-            success: false,
-            message: "Failed to delete file after multiple attempts",
-          });
-        }
       }
 
       return sendResponse(res, {
@@ -175,6 +173,7 @@ bucketRouter.delete(
         message: "File deleted successfully",
       });
     } catch (error) {
+      console.error("Delete file error:", error);
       next(error);
     }
   }

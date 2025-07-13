@@ -98,6 +98,10 @@ const getLeaveService = async (id: string) => {
 
 // add new year data
 const addNewYearLeaveService = async (year: number) => {
+  if (!year || year < 1900 || year > 2100) {
+    throw new Error("Valid year is required");
+  }
+
   // Check if the year data already exists
   const existingYearData = await Leave.findOne({ "years.year": year });
   if (existingYearData) {
@@ -107,30 +111,32 @@ const addNewYearLeaveService = async (year: number) => {
   const leaveAllottedDays = await settingService.getLeaveAllottedDays();
   const employees = await EmployeeJob.find({});
 
+  if (employees.length === 0) {
+    throw new Error("No employees found");
+  }
+
+  const bulkOperations: any[] = [];
+
   for (const employee of employees) {
     const createEmployeeLeaveData = {
       year: year,
       casual: {
-        allotted: leaveAllottedDays.casual,
+        allotted: leaveAllottedDays.casual || 0,
         consumed: 0,
       },
       sick: {
-        allotted: leaveAllottedDays.sick,
+        allotted: leaveAllottedDays.sick || 0,
         consumed: 0,
       },
       earned: {
-        allotted: leaveAllottedDays.earned,
+        allotted: leaveAllottedDays.earned || 0,
         consumed: 0,
       },
       without_pay: {
-        allotted: leaveAllottedDays.without_pay,
+        allotted: leaveAllottedDays.without_pay || 0,
         consumed: 0,
       },
     };
-    const previousYearData = await Leave.findOne({
-      employee_id: employee.employee_id,
-      "years.year": year - 1,
-    });
 
     const permanentDate = new Date(employee.permanent_date);
     const currentDate = new Date(`01-01-${year}`);
@@ -139,22 +145,32 @@ const addNewYearLeaveService = async (year: number) => {
       createEmployeeLeaveData.earned.allotted = 0;
     }
 
+    const previousYearData = await Leave.findOne({
+      employee_id: employee.employee_id,
+      "years.year": year - 1,
+    });
+
     if (previousYearData) {
       const previousYear = previousYearData.years.find(
         (y: any) => y.year === year - 1
       );
       if (previousYear) {
-        createEmployeeLeaveData.earned.allotted +=
+        const carryOverEarned =
           previousYear.earned.allotted - previousYear.earned.consumed;
+        createEmployeeLeaveData.earned.allotted += Math.max(0, carryOverEarned);
       }
     }
 
-    await Leave.updateMany(
-      { employee_id: employee.employee_id, "years.year": { $ne: year } },
-      { $push: { years: createEmployeeLeaveData } }
-    );
+    bulkOperations.push({
+      updateOne: {
+        filter: { employee_id: employee.employee_id },
+        update: { $push: { years: createEmployeeLeaveData } },
+        upsert: true,
+      },
+    });
   }
 
+  await Leave.bulkWrite(bulkOperations);
   return { message: "Year data added successfully" };
 };
 
@@ -164,19 +180,35 @@ const updateLeaveService = async (
   year: number,
   updateData: LeaveYear
 ) => {
+  if (!id || !year || !updateData) {
+    throw new Error("Employee ID, year, and update data are required");
+  }
+
   const result = await Leave.findOneAndUpdate(
     { employee_id: id, "years.year": year },
     { $set: { "years.$": updateData } },
-    {
-      new: true,
-    }
+    { new: true }
   );
+
+  if (!result) {
+    throw new Error("Leave record not found");
+  }
+
   return result;
 };
 
 // delete
 const deleteLeaveService = async (id: string) => {
-  await Leave.findOneAndDelete({ employee_id: id });
+  if (!id) {
+    throw new Error("Employee ID is required");
+  }
+
+  const result = await Leave.findOneAndDelete({ employee_id: id });
+  if (!result) {
+    throw new Error("Leave record not found");
+  }
+
+  return result;
 };
 
 export const leaveService = {

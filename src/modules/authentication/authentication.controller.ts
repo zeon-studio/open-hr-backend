@@ -50,15 +50,17 @@ const tokenLoginController = catchAsync(async (req: Request, res: Response) => {
 
 // verify user
 const verifyUserController = catchAsync(async (req, res) => {
+  const { email, currentTime } = req.body;
   const user = await authenticationService.verifyUserService(
-    req.body.email,
-    req.body.currentTime
+    email,
+    currentTime
   );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "otp send successfully",
-    result: user,
+    success: true,
+    message: "OTP sent successfully",
+    result: { email: user.work_email },
   });
 });
 
@@ -66,9 +68,11 @@ const verifyUserController = catchAsync(async (req, res) => {
 const verifyTokenController = catchAsync(async (req, res) => {
   const { email, otp, currentTime } = req.body;
   await authenticationService.verifyOtpService(email, otp, currentTime);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "user token verified successfully",
+    success: true,
+    message: "OTP verified successfully",
   });
 });
 
@@ -80,7 +84,7 @@ const resetPasswordController = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "password reset successfully",
+    message: "Password reset successfully",
   });
 });
 
@@ -96,18 +100,19 @@ const updatePasswordController = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "password update successfully",
+    message: "Password updated successfully",
   });
 });
 
-//  resend otp
+// resend otp
 const resendOtpController = catchAsync(async (req, res) => {
   const { currentTime, email } = req.body;
   await authenticationService.resendOtpService(email, currentTime);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "otp resend successfully",
+    message: "OTP resent successfully",
   });
 });
 

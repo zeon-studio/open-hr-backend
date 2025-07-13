@@ -11,6 +11,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.settingService = void 0;
 const setting_model_1 = require("./setting.model");
+// Helper function to get settings with error handling
+const getSettingsOrThrow = () => __awaiter(void 0, void 0, void 0, function* () {
+    const settings = yield setting_model_1.Setting.findOne().exec();
+    if (!settings) {
+        throw new Error("Settings not found");
+    }
+    return settings;
+});
 // get single data
 const getSettingService = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield setting_model_1.Setting.findOne();
@@ -18,17 +26,21 @@ const getSettingService = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 // update
 const updateSettingService = (updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield setting_model_1.Setting.findOneAndUpdate({}, { $set: updateData }, {
-        new: true,
-    });
+    if (!updateData || Object.keys(updateData).length === 0) {
+        throw new Error("Update data is required");
+    }
+    const result = yield setting_model_1.Setting.findOneAndUpdate({}, { $set: updateData }, { new: true });
+    if (!result) {
+        throw new Error("Settings not found");
+    }
     return result;
 });
 // update module
 const updateModuleStatusService = (name, enable) => __awaiter(void 0, void 0, void 0, function* () {
-    const setting = yield setting_model_1.Setting.findOne().exec();
-    if (!setting) {
-        throw new Error("Settings not found");
+    if (!name || typeof enable !== "boolean") {
+        throw new Error("Module name and enable status are required");
     }
+    const setting = yield getSettingsOrThrow();
     const module = setting.modules.find((mod) => mod.name === name);
     if (!module) {
         setting.modules.push({ name, enable });
@@ -41,10 +53,7 @@ const updateModuleStatusService = (name, enable) => __awaiter(void 0, void 0, vo
 });
 // get weekends and conditional weekends
 const getWeekendsService = () => __awaiter(void 0, void 0, void 0, function* () {
-    const setting = yield setting_model_1.Setting.findOne().exec();
-    if (!setting) {
-        throw new Error("Settings not found");
-    }
+    const setting = yield getSettingsOrThrow();
     return {
         weekends: setting.weekends,
         conditionalWeekends: setting.conditional_weekends,
@@ -52,10 +61,7 @@ const getWeekendsService = () => __awaiter(void 0, void 0, void 0, function* () 
 });
 // get leave allotted days
 const getLeaveAllottedDays = () => __awaiter(void 0, void 0, void 0, function* () {
-    const setting = yield setting_model_1.Setting.findOne().exec();
-    if (!setting) {
-        throw new Error("Settings not found");
-    }
+    const setting = yield getSettingsOrThrow();
     const leaveAllottedDays = {};
     setting.leaves.forEach((leave) => {
         leaveAllottedDays[leave.name] = leave.days;
@@ -64,18 +70,12 @@ const getLeaveAllottedDays = () => __awaiter(void 0, void 0, void 0, function* (
 });
 // get onboarding tasks
 const getOnboardingTasksService = () => __awaiter(void 0, void 0, void 0, function* () {
-    const setting = yield setting_model_1.Setting.findOne().exec();
-    if (!setting) {
-        throw new Error("Settings not found");
-    }
+    const setting = yield getSettingsOrThrow();
     return setting.onboarding_tasks;
 });
 // get offboarding tasks
 const getOffboardingTasksService = () => __awaiter(void 0, void 0, void 0, function* () {
-    const setting = yield setting_model_1.Setting.findOne().exec();
-    if (!setting) {
-        throw new Error("Settings not found");
-    }
+    const setting = yield getSettingsOrThrow();
     return setting.offboarding_tasks;
 });
 exports.settingService = {

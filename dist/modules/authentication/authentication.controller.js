@@ -52,11 +52,13 @@ const tokenLoginController = (0, catchAsync_1.default)((req, res) => __awaiter(v
 }));
 // verify user
 const verifyUserController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield authentication_service_1.authenticationService.verifyUserService(req.body.email, req.body.currentTime);
+    const { email, currentTime } = req.body;
+    const user = yield authentication_service_1.authenticationService.verifyUserService(email, currentTime);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
-        message: "otp send successfully",
-        result: user,
+        success: true,
+        message: "OTP sent successfully",
+        result: { email: user.work_email },
     });
 }));
 // verify token
@@ -65,7 +67,8 @@ const verifyTokenController = (0, catchAsync_1.default)((req, res) => __awaiter(
     yield authentication_service_1.authenticationService.verifyOtpService(email, otp, currentTime);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
-        message: "user token verified successfully",
+        success: true,
+        message: "OTP verified successfully",
     });
 }));
 // reset password
@@ -75,7 +78,7 @@ const resetPasswordController = (0, catchAsync_1.default)((req, res) => __awaite
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "password reset successfully",
+        message: "Password reset successfully",
     });
 }));
 // update password
@@ -85,17 +88,17 @@ const updatePasswordController = (0, catchAsync_1.default)((req, res) => __await
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "password update successfully",
+        message: "Password updated successfully",
     });
 }));
-//  resend otp
+// resend otp
 const resendOtpController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { currentTime, email } = req.body;
     yield authentication_service_1.authenticationService.resendOtpService(email, currentTime);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "otp resend successfully",
+        message: "OTP resent successfully",
     });
 }));
 exports.authenticationController = {

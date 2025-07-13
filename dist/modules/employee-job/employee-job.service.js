@@ -71,6 +71,9 @@ const getEmployeeJobService = (id) => __awaiter(void 0, void 0, void 0, function
 });
 // update
 const updateEmployeeJobService = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!id) {
+        throw new Error("Employee ID is required");
+    }
     try {
         // Convert dates to local dates
         if (updateData.joining_date) {
@@ -88,33 +91,37 @@ const updateEmployeeJobService = (id, updateData) => __awaiter(void 0, void 0, v
         if (updateData.prev_jobs) {
             updateData.prev_jobs = updateData.prev_jobs.map((prevJob) => (Object.assign(Object.assign({}, prevJob), { start_date: (0, dateConverter_1.localDate)(new Date(prevJob.start_date)), end_date: (0, dateConverter_1.localDate)(new Date(prevJob.end_date)) })));
         }
-        // update employee designation on employee data
-        const employee = yield employee_model_1.Employee.findOne({ id });
-        if (employee && updateData.promotions && updateData.promotions.length > 0) {
-            // Find the latest promotion by date
+        // Update employee designation if promotions exist
+        if (updateData.promotions && updateData.promotions.length > 0) {
             const latestPromotion = updateData.promotions.reduce((latest, current) => {
                 const latestDate = new Date(latest.promotion_date);
                 const currentDate = new Date(current.promotion_date);
                 return currentDate > latestDate ? current : latest;
             });
-            employee.designation = latestPromotion.designation;
-            yield employee.save();
+            yield employee_model_1.Employee.findOneAndUpdate({ id }, { designation: latestPromotion.designation }, { new: true });
         }
-        // update employee job data
-        const result = yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: id }, { $set: updateData }, {
-            new: true,
-            upsert: true,
-        });
+        // Update employee job data
+        const result = yield employee_job_model_1.EmployeeJob.findOneAndUpdate({ employee_id: id }, { $set: updateData }, { new: true, upsert: true });
+        if (!result) {
+            throw new Error("Failed to update employee job data");
+        }
         return result;
     }
     catch (error) {
         console.error("Error in updateEmployeeJobService:", error);
-        throw new Error();
+        throw error;
     }
 });
 // delete
 const deleteEmployeeJobService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield employee_job_model_1.EmployeeJob.findOneAndDelete({ employee_id: id });
+    if (!id) {
+        throw new Error("Employee ID is required");
+    }
+    const result = yield employee_job_model_1.EmployeeJob.findOneAndDelete({ employee_id: id });
+    if (!result) {
+        throw new Error("Employee job record not found");
+    }
+    return result;
 });
 exports.employeeJobService = {
     getAllEmployeeJobService,

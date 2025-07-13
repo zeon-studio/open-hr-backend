@@ -79,6 +79,10 @@ const updateEmployeeJobService = async (
   id: string,
   updateData: EmployeeJobType
 ) => {
+  if (!id) {
+    throw new Error("Employee ID is required");
+  }
+
   try {
     // Convert dates to local dates
     if (updateData.joining_date) {
@@ -108,10 +112,8 @@ const updateEmployeeJobService = async (
       }));
     }
 
-    // update employee designation on employee data
-    const employee = await Employee.findOne({ id });
-    if (employee && updateData.promotions && updateData.promotions.length > 0) {
-      // Find the latest promotion by date
+    // Update employee designation if promotions exist
+    if (updateData.promotions && updateData.promotions.length > 0) {
       const latestPromotion = updateData.promotions.reduce(
         (latest, current) => {
           const latestDate = new Date(latest.promotion_date);
@@ -120,29 +122,43 @@ const updateEmployeeJobService = async (
         }
       );
 
-      employee.designation = latestPromotion.designation;
-      await employee.save();
+      await Employee.findOneAndUpdate(
+        { id },
+        { designation: latestPromotion.designation },
+        { new: true }
+      );
     }
 
-    // update employee job data
+    // Update employee job data
     const result = await EmployeeJob.findOneAndUpdate(
       { employee_id: id },
       { $set: updateData },
-      {
-        new: true,
-        upsert: true,
-      }
+      { new: true, upsert: true }
     );
+
+    if (!result) {
+      throw new Error("Failed to update employee job data");
+    }
+
     return result;
   } catch (error) {
     console.error("Error in updateEmployeeJobService:", error);
-    throw new Error();
+    throw error;
   }
 };
 
 // delete
 const deleteEmployeeJobService = async (id: string) => {
-  await EmployeeJob.findOneAndDelete({ employee_id: id });
+  if (!id) {
+    throw new Error("Employee ID is required");
+  }
+
+  const result = await EmployeeJob.findOneAndDelete({ employee_id: id });
+  if (!result) {
+    throw new Error("Employee job record not found");
+  }
+
+  return result;
 };
 
 export const employeeJobService = {

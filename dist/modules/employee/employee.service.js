@@ -264,55 +264,69 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
 });
 // update
 const updateEmployeeService = (updatedData, id) => __awaiter(void 0, void 0, void 0, function* () {
-    // const employee = await Employee.findOne({ id });
-    // if (
-    //   employee?.image !== updatedData.image &&
-    //   employee?.image &&
-    //   !employee.image.startsWith("http")
-    // ) {
-    //   await deleteFile(employee?.image);
-    // }
-    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, {
-        $set: updatedData,
-    }, {
-        new: true,
-    });
+    if (!id) {
+        throw new Error("Employee ID is required");
+    }
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id }, { $set: updatedData }, { new: true });
+    if (!result) {
+        throw new Error("Employee not found");
+    }
     return result;
 });
 // update employee work email
 const updateEmployeeEmailService = (work_email, id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { work_email }, {
-        new: true,
-    });
+    if (!work_email || !id) {
+        throw new Error("Work email and employee ID are required");
+    }
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id }, { work_email }, { new: true });
+    if (!result) {
+        throw new Error("Employee not found");
+    }
     return result;
 });
 // update employee password
 const updateEmployeePasswordService = (password, id) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!password || !id) {
+        throw new Error("Password and employee ID are required");
+    }
     const hashedPassword = yield bcrypt_1.default.hash(password, variables_1.default.salt);
-    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { password: hashedPassword }, {
-        new: true,
-    });
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id }, { password: hashedPassword }, { new: true });
+    if (!result) {
+        throw new Error("Employee not found");
+    }
     return result;
 });
 // update employee communication_id
 const updateEmployeeCommunicationIdService = (communication_id, id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { communication_id }, {
-        new: true,
-    });
+    if (!communication_id || !id) {
+        throw new Error("Communication ID and employee ID are required");
+    }
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id }, { communication_id }, { new: true });
+    if (!result) {
+        throw new Error("Employee not found");
+    }
     return result;
 });
 // update employee personality
 const updateEmployeePersonalityService = (personality, id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { personality }, {
-        new: true,
-    });
+    if (!personality || !id) {
+        throw new Error("Personality and employee ID are required");
+    }
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id }, { personality }, { new: true });
+    if (!result) {
+        throw new Error("Employee not found");
+    }
     return result;
 });
 // update employee role
 const updateEmployeeRoleService = (id, role) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield employee_model_1.Employee.findOneAndUpdate({ id: id }, { role }, {
-        new: true,
-    });
+    if (!id || !role) {
+        throw new Error("Employee ID and role are required");
+    }
+    const result = yield employee_model_1.Employee.findOneAndUpdate({ id }, { role }, { new: true });
+    if (!result) {
+        throw new Error("Employee not found");
+    }
     return result;
 });
 // delete employee

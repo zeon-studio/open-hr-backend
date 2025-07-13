@@ -329,50 +329,59 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
 
 // update
 const updateEmployeeService = async (updatedData: EmployeeType, id: string) => {
-  // const employee = await Employee.findOne({ id });
-  // if (
-  //   employee?.image !== updatedData.image &&
-  //   employee?.image &&
-  //   !employee.image.startsWith("http")
-  // ) {
-  //   await deleteFile(employee?.image);
-  // }
+  if (!id) {
+    throw new Error("Employee ID is required");
+  }
 
   const result = await Employee.findOneAndUpdate(
-    { id: id },
-    {
-      $set: updatedData,
-    },
-    {
-      new: true,
-    }
+    { id },
+    { $set: updatedData },
+    { new: true }
   );
+
+  if (!result) {
+    throw new Error("Employee not found");
+  }
+
   return result;
 };
 
 // update employee work email
 const updateEmployeeEmailService = async (work_email: string, id: string) => {
+  if (!work_email || !id) {
+    throw new Error("Work email and employee ID are required");
+  }
+
   const result = await Employee.findOneAndUpdate(
-    { id: id },
+    { id },
     { work_email },
-    {
-      new: true,
-    }
+    { new: true }
   );
+
+  if (!result) {
+    throw new Error("Employee not found");
+  }
+
   return result;
 };
 
 // update employee password
 const updateEmployeePasswordService = async (password: string, id: string) => {
-  const hashedPassword = await bcrypt.hash(password, variables.salt);
+  if (!password || !id) {
+    throw new Error("Password and employee ID are required");
+  }
 
+  const hashedPassword = await bcrypt.hash(password, variables.salt);
   const result = await Employee.findOneAndUpdate(
-    { id: id },
+    { id },
     { password: hashedPassword },
-    {
-      new: true,
-    }
+    { new: true }
   );
+
+  if (!result) {
+    throw new Error("Employee not found");
+  }
+
   return result;
 };
 
@@ -381,13 +390,20 @@ const updateEmployeeCommunicationIdService = async (
   communication_id: string,
   id: string
 ) => {
+  if (!communication_id || !id) {
+    throw new Error("Communication ID and employee ID are required");
+  }
+
   const result = await Employee.findOneAndUpdate(
-    { id: id },
+    { id },
     { communication_id },
-    {
-      new: true,
-    }
+    { new: true }
   );
+
+  if (!result) {
+    throw new Error("Employee not found");
+  }
+
   return result;
 };
 
@@ -396,25 +412,39 @@ const updateEmployeePersonalityService = async (
   personality: string,
   id: string
 ) => {
+  if (!personality || !id) {
+    throw new Error("Personality and employee ID are required");
+  }
+
   const result = await Employee.findOneAndUpdate(
-    { id: id },
+    { id },
     { personality },
-    {
-      new: true,
-    }
+    { new: true }
   );
+
+  if (!result) {
+    throw new Error("Employee not found");
+  }
+
   return result;
 };
 
 // update employee role
 const updateEmployeeRoleService = async (id: string, role: string) => {
+  if (!id || !role) {
+    throw new Error("Employee ID and role are required");
+  }
+
   const result = await Employee.findOneAndUpdate(
-    { id: id },
+    { id },
     { role },
-    {
-      new: true,
-    }
+    { new: true }
   );
+
+  if (!result) {
+    throw new Error("Employee not found");
+  }
+
   return result;
 };
 

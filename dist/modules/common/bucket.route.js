@@ -103,6 +103,23 @@ const checkFileExists = (key) => __awaiter(void 0, void 0, void 0, function* () 
         throw new Error(`Failed to check file existence: ${err.message}`);
     }
 });
+// Helper function for retry deletion
+const retryDelete = (key_1, ...args_1) => __awaiter(void 0, [key_1, ...args_1], void 0, function* (key, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            yield (0, exports.deleteFile)(key);
+            yield new Promise((resolve) => setTimeout(resolve, 1000));
+            const stillExists = yield checkFileExists(key);
+            if (!stillExists) {
+                return true;
+            }
+        }
+        catch (error) {
+            console.error(`Delete attempt ${i + 1} failed:`, error);
+        }
+    }
+    return false;
+});
 // delete router
 bucketRouter.delete("/delete/:key", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const key = decodeURIComponent(req.params.key);
@@ -115,45 +132,24 @@ bucketRouter.delete("/delete/:key", checkToken_1.checkToken, (0, auth_1.default)
     }
     try {
         // Check if file exists before deleting
-        const headResult = yield checkFileExists(key);
-        if (!headResult) {
+        const fileExists = yield checkFileExists(key);
+        if (!fileExists) {
             return (0, sendResponse_1.sendResponse)(res, {
                 statusCode: 404,
                 success: false,
                 message: "File not found",
             });
         }
-        const deleteResult = yield (0, exports.deleteFile)(key);
-        if (!deleteResult) {
+        // Delete the file
+        yield (0, exports.deleteFile)(key);
+        // Verify deletion with retry logic
+        const deleted = yield retryDelete(key);
+        if (!deleted) {
             return (0, sendResponse_1.sendResponse)(res, {
                 statusCode: 500,
                 success: false,
-                message: "Failed to delete file",
+                message: "Failed to delete file after multiple attempts",
             });
-        }
-        // Verify deletion after deletion
-        const existsAfterDelete = yield checkFileExists(key);
-        if (existsAfterDelete) {
-            // Retry logic
-            let retryCount = 0;
-            const maxRetries = 3;
-            let deleted = false;
-            while (retryCount < maxRetries && !deleted) {
-                yield new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
-                yield (0, exports.deleteFile)(key);
-                const stillExists = yield checkFileExists(key);
-                if (!stillExists) {
-                    deleted = true;
-                }
-                retryCount++;
-            }
-            if (!deleted) {
-                return (0, sendResponse_1.sendResponse)(res, {
-                    statusCode: 500,
-                    success: false,
-                    message: "Failed to delete file after multiple attempts",
-                });
-            }
         }
         return (0, sendResponse_1.sendResponse)(res, {
             statusCode: 200,
@@ -162,6 +158,7 @@ bucketRouter.delete("/delete/:key", checkToken_1.checkToken, (0, auth_1.default)
         });
     }
     catch (error) {
+        console.error("Delete file error:", error);
         next(error);
     }
 }));
