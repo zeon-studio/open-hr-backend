@@ -109,7 +109,7 @@ const updateEmployeeJobService = (id, updateData) => __awaiter(void 0, void 0, v
     }
     catch (error) {
         console.error("Error in updateEmployeeJobService:", error);
-        throw error;
+        throw new Error();
     }
 });
 // delete

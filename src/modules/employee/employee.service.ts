@@ -323,7 +323,7 @@ const createEmployeeService = async (employeeData: EmployeeCreateType) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    throw error;
+    throw new Error();
   }
 };
 

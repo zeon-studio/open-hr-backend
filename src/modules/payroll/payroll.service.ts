@@ -153,7 +153,7 @@ const createMonthlyPayrollService = async (payData: CreateMonthlySalary) => {
     return result;
   } catch (error) {
     await session.abortTransaction();
-    throw error;
+    throw new Error();
   } finally {
     session.endSession();
   }

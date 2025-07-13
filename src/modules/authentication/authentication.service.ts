@@ -10,17 +10,28 @@ import { AuthenticationType } from "./authentication.type";
 
 // password login
 const passwordLoginService = async (email: string, password: string) => {
+  if (!email || !password) {
+    throw new Error("Email and password are required");
+  }
+
   const isUserExist = await Employee.findOne({ work_email: email });
 
-  if (!isUserExist) throw Error("User not found");
+  if (!isUserExist) throw new Error("User not found");
+
+  // Check if user has a password set
+  if (!isUserExist.password) {
+    throw new Error(
+      "Password not set for this user. Please use OAuth login or reset your password."
+    );
+  }
 
   const isMatch = await bcrypt.compare(
     password,
     isUserExist.password as string
   );
 
-  if (!isMatch && isUserExist.password) {
-    throw Error("Incorrect password");
+  if (!isMatch) {
+    throw new Error("Incorrect password");
   }
 
   const accessToken = jwtHelpers.createToken(
@@ -46,20 +57,15 @@ const passwordLoginService = async (email: string, password: string) => {
 
 // oauth login
 const oauthLoginService = async (email: string) => {
+  if (!email) {
+    throw new Error("Email is required");
+  }
+
   const isUserExist = await Employee.findOne({ work_email: email });
 
   if (!isUserExist) {
     throw new Error("User not found");
   }
-
-  const userDetails = {
-    userId: isUserExist.id,
-    name: isUserExist.name,
-    email: isUserExist.work_email,
-    image: isUserExist.image,
-    role: isUserExist.role,
-    accessToken: "",
-  };
 
   const accessToken = jwtHelpers.createToken(
     { id: isUserExist.id, role: isUserExist.role },
@@ -67,7 +73,14 @@ const oauthLoginService = async (email: string) => {
     variables.jwt_expire as string
   );
 
-  userDetails.accessToken = accessToken;
+  const userDetails = {
+    userId: isUserExist.id,
+    name: isUserExist.name,
+    email: isUserExist.work_email,
+    image: isUserExist.image,
+    role: isUserExist.role,
+    accessToken: accessToken,
+  };
 
   return userDetails;
 };
@@ -110,7 +123,7 @@ const tokenLoginService = async (token: string) => {
 const verifyUserService = async (email: string, currentTime: string) => {
   const isUserExist = await Employee.findOne({ work_email: email });
   if (!isUserExist) {
-    throw Error("Something went wrong Try again");
+    throw new Error("Something went wrong Try again");
   } else {
     await sendVerificationOtp(isUserExist.id!, email, currentTime);
     return isUserExist;
@@ -151,38 +164,39 @@ const verifyOtpService = async (
   otp: string,
   currentTime: string
 ) => {
-  if (!otp && !email) {
-    throw Error("Empty details are not allowed");
-  } else {
-    const user = await Employee.findOne({ work_email: email });
-    const verificationToken = await Authentication.findOne({
-      user_id: user?.id,
-    });
-    if (!verificationToken) {
-      throw Error("OTP not found");
-    } else {
-      const userId = verificationToken.user_id;
-      const { token: hashedOtp, expires } =
-        verificationToken.pass_reset_token || {};
+  if (!otp || !email) {
+    throw new Error("Email and OTP are required");
+  }
 
-      // Check if the OTP is still valid
-      if (expires && new Date(expires) > new Date(currentTime)) {
-        if (!hashedOtp) {
-          throw new Error("OTP not found");
-        }
-        const compareOtp = await bcrypt.compare(otp, hashedOtp);
-        await Employee.updateOne({ id: userId }, { $set: { verified: true } });
+  const user = await Employee.findOne({ work_email: email });
+  if (!user) {
+    throw new Error("User not found");
+  }
 
-        // Check if the OTP is correct
-        if (!compareOtp) {
-          throw Error("Incorrect OTP!");
-        }
+  const verificationToken = await Authentication.findOne({
+    user_id: user.id,
+  });
 
-        // Check if the OTP has expired
-      } else {
-        throw Error("OTP Expired");
-      }
-    }
+  if (!verificationToken) {
+    throw new Error("OTP not found");
+  }
+
+  const { token: hashedOtp, expires } =
+    verificationToken.pass_reset_token || {};
+
+  if (!hashedOtp) {
+    throw new Error("OTP not found");
+  }
+
+  // Check if the OTP has expired
+  if (!expires || new Date(expires) <= new Date(currentTime)) {
+    throw new Error("OTP Expired");
+  }
+
+  // Check if the OTP is correct
+  const compareOtp = await bcrypt.compare(otp, hashedOtp);
+  if (!compareOtp) {
+    throw new Error("Incorrect OTP!");
   }
 };
 
@@ -252,14 +266,14 @@ const resetPasswordOtpService = async (
   id: string
 ): Promise<AuthenticationType | null> => {
   if (!id) {
-    throw Error("Invalid request");
+    throw new Error("Invalid request");
   } else {
     const isUserOtp = await Authentication.findOne({
       user_id: id,
     });
 
     if (!isUserOtp) {
-      throw Error("Invalid user_id");
+      throw new Error("Invalid user_id");
     } else {
       return isUserOtp;
     }
@@ -268,13 +282,21 @@ const resetPasswordOtpService = async (
 
 // resend verification token
 const resendOtpService = async (email: string, currentTime: string) => {
-  const user = await Employee.findOne({ work_email: email });
-  const user_id = user?.id;
   if (!email) {
-    throw Error("Empty user information");
-  } else {
-    await sendVerificationOtp(user_id, email, currentTime);
+    throw new Error("Email is required");
   }
+
+  const user = await Employee.findOne({ work_email: email });
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const user_id = user.id;
+  if (!user_id) {
+    throw new Error("Invalid user data");
+  }
+
+  await sendVerificationOtp(user_id, email, currentTime);
 };
 
 // export services

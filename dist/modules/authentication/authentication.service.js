@@ -22,12 +22,19 @@ const employee_model_1 = require("../employee/employee.model");
 const authentication_model_1 = require("./authentication.model");
 // password login
 const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!email || !password) {
+        throw new Error("Email and password are required");
+    }
     const isUserExist = yield employee_model_1.Employee.findOne({ work_email: email });
     if (!isUserExist)
-        throw Error("User not found");
+        throw new Error("User not found");
+    // Check if user has a password set
+    if (!isUserExist.password) {
+        throw new Error("Password not set for this user. Please use OAuth login or reset your password.");
+    }
     const isMatch = yield bcrypt_1.default.compare(password, isUserExist.password);
-    if (!isMatch && isUserExist.password) {
-        throw Error("Incorrect password");
+    if (!isMatch) {
+        throw new Error("Incorrect password");
     }
     const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({
         id: isUserExist.id,
@@ -45,20 +52,22 @@ const passwordLoginService = (email, password) => __awaiter(void 0, void 0, void
 });
 // oauth login
 const oauthLoginService = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!email) {
+        throw new Error("Email is required");
+    }
     const isUserExist = yield employee_model_1.Employee.findOne({ work_email: email });
     if (!isUserExist) {
         throw new Error("User not found");
     }
+    const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ id: isUserExist.id, role: isUserExist.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
     const userDetails = {
         userId: isUserExist.id,
         name: isUserExist.name,
         email: isUserExist.work_email,
         image: isUserExist.image,
         role: isUserExist.role,
-        accessToken: "",
+        accessToken: accessToken,
     };
-    const accessToken = jwtTokenHelper_1.jwtHelpers.createToken({ id: isUserExist.id, role: isUserExist.role }, variables_1.default.jwt_secret, variables_1.default.jwt_expire);
-    userDetails.accessToken = accessToken;
     return userDetails;
 });
 // token login
@@ -85,7 +94,7 @@ const tokenLoginService = (token) => __awaiter(void 0, void 0, void 0, function*
 const verifyUserService = (email, currentTime) => __awaiter(void 0, void 0, void 0, function* () {
     const isUserExist = yield employee_model_1.Employee.findOne({ work_email: email });
     if (!isUserExist) {
-        throw Error("Something went wrong Try again");
+        throw new Error("Something went wrong Try again");
     }
     else {
         yield sendVerificationOtp(isUserExist.id, email, currentTime);
@@ -108,37 +117,31 @@ const sendVerificationOtp = (id, email, currentTime) => __awaiter(void 0, void 0
 });
 // verify otp
 const verifyOtpService = (email, otp, currentTime) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!otp && !email) {
-        throw Error("Empty details are not allowed");
+    if (!otp || !email) {
+        throw new Error("Email and OTP are required");
     }
-    else {
-        const user = yield employee_model_1.Employee.findOne({ work_email: email });
-        const verificationToken = yield authentication_model_1.Authentication.findOne({
-            user_id: user === null || user === void 0 ? void 0 : user.id,
-        });
-        if (!verificationToken) {
-            throw Error("OTP not found");
-        }
-        else {
-            const userId = verificationToken.user_id;
-            const { token: hashedOtp, expires } = verificationToken.pass_reset_token || {};
-            // Check if the OTP is still valid
-            if (expires && new Date(expires) > new Date(currentTime)) {
-                if (!hashedOtp) {
-                    throw new Error("OTP not found");
-                }
-                const compareOtp = yield bcrypt_1.default.compare(otp, hashedOtp);
-                yield employee_model_1.Employee.updateOne({ id: userId }, { $set: { verified: true } });
-                // Check if the OTP is correct
-                if (!compareOtp) {
-                    throw Error("Incorrect OTP!");
-                }
-                // Check if the OTP has expired
-            }
-            else {
-                throw Error("OTP Expired");
-            }
-        }
+    const user = yield employee_model_1.Employee.findOne({ work_email: email });
+    if (!user) {
+        throw new Error("User not found");
+    }
+    const verificationToken = yield authentication_model_1.Authentication.findOne({
+        user_id: user.id,
+    });
+    if (!verificationToken) {
+        throw new Error("OTP not found");
+    }
+    const { token: hashedOtp, expires } = verificationToken.pass_reset_token || {};
+    if (!hashedOtp) {
+        throw new Error("OTP not found");
+    }
+    // Check if the OTP has expired
+    if (!expires || new Date(expires) <= new Date(currentTime)) {
+        throw new Error("OTP Expired");
+    }
+    // Check if the OTP is correct
+    const compareOtp = yield bcrypt_1.default.compare(otp, hashedOtp);
+    if (!compareOtp) {
+        throw new Error("Incorrect OTP!");
     }
 });
 // reset password
@@ -185,14 +188,14 @@ const updatePasswordService = (id, current_password, new_password) => __awaiter(
 // reset password otp
 const resetPasswordOtpService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     if (!id) {
-        throw Error("Invalid request");
+        throw new Error("Invalid request");
     }
     else {
         const isUserOtp = yield authentication_model_1.Authentication.findOne({
             user_id: id,
         });
         if (!isUserOtp) {
-            throw Error("Invalid user_id");
+            throw new Error("Invalid user_id");
         }
         else {
             return isUserOtp;
@@ -201,14 +204,18 @@ const resetPasswordOtpService = (id) => __awaiter(void 0, void 0, void 0, functi
 });
 // resend verification token
 const resendOtpService = (email, currentTime) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield employee_model_1.Employee.findOne({ work_email: email });
-    const user_id = user === null || user === void 0 ? void 0 : user.id;
     if (!email) {
-        throw Error("Empty user information");
+        throw new Error("Email is required");
     }
-    else {
-        yield sendVerificationOtp(user_id, email, currentTime);
+    const user = yield employee_model_1.Employee.findOne({ work_email: email });
+    if (!user) {
+        throw new Error("User not found");
     }
+    const user_id = user.id;
+    if (!user_id) {
+        throw new Error("Invalid user data");
+    }
+    yield sendVerificationOtp(user_id, email, currentTime);
 });
 // export services
 exports.authenticationService = {

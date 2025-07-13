@@ -136,7 +136,7 @@ const updateEmployeeJobService = async (
     return result;
   } catch (error) {
     console.error("Error in updateEmployeeJobService:", error);
-    throw error;
+    throw new Error();
   }
 };
 

@@ -259,7 +259,7 @@ const createEmployeeService = (employeeData) => __awaiter(void 0, void 0, void 0
     catch (error) {
         yield session.abortTransaction();
         session.endSession();
-        throw error;
+        throw new Error();
     }
 });
 // update

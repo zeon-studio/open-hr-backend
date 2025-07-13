@@ -127,7 +127,7 @@ const createMonthlyPayrollService = (payData) => __awaiter(void 0, void 0, void 
     }
     catch (error) {
         yield session.abortTransaction();
-        throw error;
+        throw new Error();
     }
     finally {
         session.endSession();
