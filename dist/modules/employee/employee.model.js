@@ -133,7 +133,6 @@ const employeeSchema = new mongoose_1.default.Schema({
 });
 employeeSchema.index({ role: 1 });
 employeeSchema.index({ work_email: 1 });
-employeeSchema.index({ id: 1 });
 employeeSchema.index({ department: 1 });
 employeeSchema.index({ status: 1 });
 exports.Employee = (0, mongoose_1.model)("employee", employeeSchema);

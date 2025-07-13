@@ -33,14 +33,12 @@ if (variables_1.default.env !== "development") {
 const mongoOptions = {
     serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
     socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-    bufferMaxEntries: 0, // Disable mongoose buffering
-    bufferCommands: false, // Disable mongoose buffering
     maxPoolSize: 10, // Maintain up to 10 socket connections
     minPoolSize: 5, // Maintain a minimum of 5 socket connections
     maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
+    connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
     retryWrites: true,
     retryReads: true,
-    connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
 };
 const dbConnect = () => __awaiter(void 0, void 0, void 0, function* () {
     let retries = 5;
