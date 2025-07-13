@@ -4,6 +4,8 @@ import router from "@/routes";
 import cors from "cors";
 import express, { Application } from "express";
 
+console.log("App module loaded");
+
 const app: Application = express();
 
 // Define CORS options for specific origins

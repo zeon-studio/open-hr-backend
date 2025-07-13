@@ -17,6 +17,7 @@ const globalErrorHandler_1 = require("./middlewares/globalErrorHandler");
 const routes_1 = __importDefault(require("./routes"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
+console.log("App module loaded");
 const app = (0, express_1.default)();
 // Define CORS options for specific origins
 const corsOptions = process.env.NODE_ENV === "development"
