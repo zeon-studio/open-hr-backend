@@ -53,5 +53,8 @@ exports.authenticationSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
+// Add index for better query performance
+exports.authenticationSchema.index({ user_id: 1 });
+exports.authenticationSchema.index({ "pass_reset_token.expires": 1 });
 exports.Authentication = (0, mongoose_1.model)("authentication", exports.authenticationSchema);
 //# sourceMappingURL=authentication.model.js.map

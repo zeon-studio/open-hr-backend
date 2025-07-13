@@ -23,6 +23,10 @@ export const authenticationSchema = new mongoose.Schema<AuthenticationType>(
   }
 );
 
+// Add index for better query performance
+authenticationSchema.index({ user_id: 1 });
+authenticationSchema.index({ "pass_reset_token.expires": 1 });
+
 export const Authentication = model<AuthenticationType>(
   "authentication",
   authenticationSchema

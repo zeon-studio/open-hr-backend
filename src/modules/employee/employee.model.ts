@@ -109,5 +109,9 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
 );
 
 employeeSchema.index({ role: 1 });
+employeeSchema.index({ work_email: 1 });
+employeeSchema.index({ id: 1 });
+employeeSchema.index({ department: 1 });
+employeeSchema.index({ status: 1 });
 
 export const Employee = model<EmployeeType>("employee", employeeSchema);
