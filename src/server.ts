@@ -143,8 +143,9 @@ if (!isInitialized) {
   });
 }
 
-// Initialize connection only once
-if (!isInitialized && !isConnected && mongoose.connection.readyState === 0) {
+// Only start server if this file is run directly (not imported as a module)
+if (require.main === module) {
+  // Initialize connection only once
   dbConnect();
 }
 
