@@ -90,14 +90,18 @@ const getUpcomingEventsAndHolidaysService = (currentDate) => __awaiter(void 0, v
     if (!calendar) {
         return { holidays: [], events: [] };
     }
-    const upcomingHolidays = calendar.holidays.filter((holiday) => (new Date(holiday.start_date) >= currentDate &&
+    const upcomingHolidays = calendar.holidays
+        .filter((holiday) => (new Date(holiday.start_date) >= currentDate &&
         new Date(holiday.start_date) <= nextMonth) ||
         (new Date(holiday.end_date) >= currentDate &&
-            new Date(holiday.end_date) <= nextMonth));
-    const upcomingEvents = calendar.events.filter((event) => (new Date(event.start_date) >= currentDate &&
+            new Date(holiday.end_date) <= nextMonth))
+        .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
+    const upcomingEvents = calendar.events
+        .filter((event) => (new Date(event.start_date) >= currentDate &&
         new Date(event.start_date) <= nextMonth) ||
         (new Date(event.end_date) >= currentDate &&
-            new Date(event.end_date) <= nextMonth));
+            new Date(event.end_date) <= nextMonth))
+        .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
     return { holidays: upcomingHolidays, events: upcomingEvents };
 });
 exports.calendarService = {
