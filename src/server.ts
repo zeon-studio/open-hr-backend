@@ -12,7 +12,7 @@ declare global {
 
 // Only log if not already initialized
 if (!global.__mongoConnected && !global.__serverStarted) {
-  console.log("🚀 Initializing ERP Solution Backend...");
+  console.log("🚀 Initializing Backend...");
 }
 
 let server: Server;

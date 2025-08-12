@@ -17,7 +17,7 @@ const variables_1 = __importDefault(require("./config/variables"));
 const mongoose_1 = __importDefault(require("mongoose"));
 // Only log if not already initialized
 if (!global.__mongoConnected && !global.__serverStarted) {
-    console.log("🚀 Initializing ERP Solution Backend...");
+    console.log("🚀 Initializing Backend...");
 }
 let server;
 // Production error handling
