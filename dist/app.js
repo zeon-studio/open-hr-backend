@@ -8,6 +8,7 @@ const globalErrorHandler_1 = require("./middlewares/globalErrorHandler");
 const routes_1 = __importDefault(require("./routes"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
+const dbConnector_1 = require("./lib/dbConnector");
 if (!global.__appLoaded) {
     console.log("📦 Loading Express application...");
     global.__appLoaded = true;
@@ -28,10 +29,12 @@ const corsOptions = {
 app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json({ limit: "10mb" })); // Add size limit
 app.use(express_1.default.urlencoded({ extended: true, limit: "10mb" }));
+// Ensure DB is connected per invocation in serverless
+app.use(dbConnector_1.ensureDbConnected);
 // Health check endpoint
 app.get("/", (req, res) => {
     res.json({
-        message: "Welcome to the backend of Open HR",
+        message: "Welcome to the backend",
         status: "OK",
         timestamp: new Date().toISOString(),
         environment: variables_1.default.env,

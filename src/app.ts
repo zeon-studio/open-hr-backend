@@ -3,6 +3,7 @@ import { globalErrorhandler } from "@/middlewares/globalErrorHandler";
 import router from "@/routes";
 import cors from "cors";
 import express, { Application } from "express";
+import { ensureDbConnected } from "./lib/dbConnector";
 
 // Use process global to persist across module reloads
 declare global {
@@ -32,11 +33,13 @@ const corsOptions: cors.CorsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "10mb" })); // Add size limit
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+// Ensure DB is connected per invocation in serverless
+app.use(ensureDbConnected);
 
 // Health check endpoint
 app.get("/", (req, res) => {
   res.json({
-    message: "Welcome to the backend of Open HR",
+    message: "Welcome to the backend",
     status: "OK",
     timestamp: new Date().toISOString(),
     environment: config.env,

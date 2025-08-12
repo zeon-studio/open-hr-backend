@@ -27,3 +27,8 @@ declare global {
     }
   }
 }
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __mongooseConn: Promise<import("mongoose").Mongoose> | null | undefined;
+}
