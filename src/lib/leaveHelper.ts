@@ -1,29 +1,11 @@
 import ApiError from "@/errors/ApiError";
-import { Calendar } from "@/modules/calendar/calendar.model";
 import { LeaveRequest } from "@/modules/leave-request/leave-request.model";
 import { LeaveRequestType } from "@/modules/leave-request/leave-request.type";
 import { Leave } from "@/modules/leave/leave.model";
-import { settingService } from "@/modules/setting/setting.service";
-import {
-  differenceInDays,
-  eachDayOfInterval,
-  endOfDay,
-  isWithinInterval,
-  parseISO,
-  startOfDay,
-} from "date-fns";
-
-// Helper function to get week number of the month (1-based)
-const getWeekOfMonth = (date: Date): number => {
-  const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-  return Math.ceil((date.getDate() + firstDayOfMonth.getDay()) / 7);
-};
+import { differenceInDays, endOfDay, startOfDay } from "date-fns";
 
 // leave day counter
-export const dayCounterWithoutHoliday = async (
-  startDate: Date,
-  endDate: Date
-) => {
+export const dayCounter = async (startDate: Date, endDate: Date) => {
   if (!startDate || !endDate) {
     throw new Error("Start date and end date are required");
   }
@@ -32,100 +14,12 @@ export const dayCounterWithoutHoliday = async (
     throw new Error("Start date cannot be after end date");
   }
 
-  const year = startDate.getFullYear();
-
+  // Count all days including holidays and weekends
   try {
-    const holidayRecords = await Calendar.find({ year });
-    const holidays = holidayRecords.flatMap((record) => record.holidays);
-
     const start = startOfDay(startDate);
     const end = endOfDay(endDate);
-    const daysInterval = eachDayOfInterval({ start, end });
-
-    const { weekends, conditionalWeekends } =
-      await settingService.getWeekendsService();
-
-    // Modify the holiday filtering logic to handle edge cases
-    const holidayDays = holidays.filter((holiday) => {
-      const holidayStart = startOfDay(
-        parseISO(new Date(holiday.start_date).toISOString())
-      );
-      const holidayEnd = endOfDay(
-        parseISO(new Date(holiday.end_date).toISOString())
-      );
-
-      // Comprehensive overlap check
-      return (
-        // Holiday starts within the range
-        (holidayStart >= start && holidayStart <= end) ||
-        // Holiday ends within the range
-        (holidayEnd >= start && holidayEnd <= end) ||
-        // Holiday completely encompasses the range
-        (holidayStart <= start && holidayEnd >= end)
-      );
-    });
-
-    // Calculate total holidays with precise overlap
-    const totalHolidays = holidayDays.reduce((count, holiday) => {
-      const holidayStart = startOfDay(
-        parseISO(new Date(holiday.start_date).toISOString())
-      );
-      const holidayEnd = endOfDay(
-        parseISO(new Date(holiday.end_date).toISOString())
-      );
-
-      // Determine the precise overlap
-      const overlapStart = holidayStart > start ? holidayStart : start;
-      const overlapEnd = holidayEnd < end ? holidayEnd : end;
-
-      // Calculate the number of overlapping days
-      const overlappingDays = differenceInDays(overlapEnd, overlapStart) + 1;
-
-      return count + overlappingDays;
-    }, 0);
-
-    // Find all weekends in the interval
-    const weekendInterval = daysInterval.filter((day) => {
-      const dayName = day.toLocaleDateString("en-US", { weekday: "long" });
-
-      // Check regular weekend days
-      if (weekends.includes(dayName)) {
-        return true;
-      }
-
-      // Check conditional weekend days
-      const conditionalWeekend = conditionalWeekends.find(
-        (cw) => cw.name === dayName
-      );
-      if (conditionalWeekend) {
-        const weekNumber = getWeekOfMonth(day);
-        return conditionalWeekend.pattern.includes(weekNumber);
-      }
-
-      return false;
-    });
-
-    // Find weekends that are not within holidays
-    const nonHolidayWeekends = weekendInterval.filter(
-      (weekend) =>
-        !holidayDays.some((holiday) => {
-          const holidayStart = startOfDay(
-            parseISO(new Date(holiday.start_date).toISOString())
-          );
-          const holidayEnd = endOfDay(
-            parseISO(new Date(holiday.end_date).toISOString())
-          );
-          return isWithinInterval(weekend, {
-            start: holidayStart,
-            end: holidayEnd,
-          });
-        })
-    );
-
     const totalDays = differenceInDays(end, start) + 1;
-    let finalDays = totalDays - totalHolidays - nonHolidayWeekends.length;
-
-    return Math.max(0, finalDays); // Ensure non-negative result
+    return Math.max(0, totalDays);
   } catch (error) {
     console.error("Error calculating leave days:", error);
     throw new Error("Failed to calculate leave days");
