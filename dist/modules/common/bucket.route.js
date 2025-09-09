@@ -17,7 +17,6 @@ const variables_1 = __importDefault(require("../../config/variables"));
 const roles_1 = require("../../enums/roles");
 const sendResponse_1 = require("../../lib/sendResponse");
 const auth_1 = __importDefault(require("../../middlewares/auth"));
-const checkToken_1 = require("../../middlewares/checkToken");
 const client_s3_1 = require("@aws-sdk/client-s3");
 const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
 const express_1 = __importDefault(require("express"));
@@ -58,7 +57,7 @@ const uploadFile = (0, multer_1.default)({
     }),
 });
 // upload router
-bucketRouter.post("/upload", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), (req, res, next) => {
+bucketRouter.post("/upload", (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), (req, res, next) => {
     const uploadSingle = uploadFile.single("file");
     uploadSingle(req, res, (err) => {
         if (err) {
@@ -121,7 +120,7 @@ const retryDelete = (key_1, ...args_1) => __awaiter(void 0, [key_1, ...args_1], 
     return false;
 });
 // delete router
-bucketRouter.delete("/delete/:key", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+bucketRouter.delete("/delete/:key", (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const key = decodeURIComponent(req.params.key);
     if (!key) {
         return (0, sendResponse_1.sendResponse)(res, {
@@ -204,7 +203,7 @@ const fetchFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.fetchFile = fetchFile;
 // fetch router
-bucketRouter.get("/fetch/:key", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), exports.fetchFile);
+bucketRouter.get("/fetch/:key", (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), exports.fetchFile);
 // generate download url
 const downloadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -229,6 +228,6 @@ const downloadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 // download router
-bucketRouter.get("/download/:key", checkToken_1.checkToken, (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), downloadFile);
+bucketRouter.get("/download/:key", (0, auth_1.default)(roles_1.ENUM_ROLE.ADMIN, roles_1.ENUM_ROLE.MODERATOR, roles_1.ENUM_ROLE.USER), downloadFile);
 exports.default = bucketRouter;
 //# sourceMappingURL=bucket.route.js.map

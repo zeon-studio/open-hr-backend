@@ -1,6 +1,5 @@
 import { ENUM_ROLE } from "@/enums/roles";
 import auth from "@/middlewares/auth";
-import { checkToken } from "@/middlewares/checkToken";
 import express from "express";
 import { employeeAchievementController } from "./employee-achievement.controller";
 
@@ -9,7 +8,6 @@ const employeeAchievementRouter = express.Router();
 // get all data
 employeeAchievementRouter.get(
   "/",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeAchievementController.getAllEmployeeAchievementController
 );
@@ -17,7 +15,6 @@ employeeAchievementRouter.get(
 // get single data
 employeeAchievementRouter.get(
   "/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.FORMER),
   employeeAchievementController.getEmployeeAchievementController
 );
@@ -25,7 +22,6 @@ employeeAchievementRouter.get(
 // update data
 employeeAchievementRouter.patch(
   "/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeAchievementController.updateEmployeeAchievementController
 );
@@ -33,7 +29,6 @@ employeeAchievementRouter.patch(
 // delete data
 employeeAchievementRouter.delete(
   "/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN),
   employeeAchievementController.deleteEmployeeAchievementController
 );

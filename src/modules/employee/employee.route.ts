@@ -1,6 +1,5 @@
 import { ENUM_ROLE } from "@/enums/roles";
 import auth from "@/middlewares/auth";
-import { checkToken } from "@/middlewares/checkToken";
 import express from "express";
 import { employeeController } from "./employee.controller";
 
@@ -9,7 +8,6 @@ const employeeRouter = express.Router();
 // get all employee
 employeeRouter.get(
   "/",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeController.getAllEmployeeController
 );
@@ -17,7 +15,6 @@ employeeRouter.get(
 // get all employee id
 employeeRouter.get(
   "/basics",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.getAllEmployeeBasicsController
 );
@@ -25,7 +22,6 @@ employeeRouter.get(
 // get admin and mods
 employeeRouter.get(
   "/admin-and-mods",
-  checkToken,
   auth(ENUM_ROLE.ADMIN),
   employeeController.getAdminAndModsController
 );
@@ -33,14 +29,13 @@ employeeRouter.get(
 // get single employee by invite token
 employeeRouter.get(
   "/invite-token/:inviteToken",
-  checkToken,
+
   employeeController.getSingleEmployeeByInviteTokenController
 );
 
 // get single employee
 employeeRouter.get(
   "/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.FORMER),
   employeeController.getSingleEmployeeController
 );
@@ -48,7 +43,6 @@ employeeRouter.get(
 // insert employee
 employeeRouter.post(
   "/",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   employeeController.createEmployeeController
 );
@@ -56,7 +50,6 @@ employeeRouter.post(
 // update employee data
 employeeRouter.patch(
   "/update/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.updateEmployeeController
 );
@@ -64,7 +57,6 @@ employeeRouter.patch(
 // update employee email
 employeeRouter.patch(
   "/email/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.updateEmployeeEmailController
 );
@@ -72,7 +64,6 @@ employeeRouter.patch(
 // update employee password
 employeeRouter.patch(
   "/password/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.updateEmployeePasswordController
 );
@@ -80,7 +71,6 @@ employeeRouter.patch(
 // update employee communication_id
 employeeRouter.patch(
   "/communication_id/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.updateEmployeeCommunicationIdController
 );
@@ -88,7 +78,6 @@ employeeRouter.patch(
 // update employee personality
 employeeRouter.patch(
   "/personality/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   employeeController.updateEmployeePersonalityController
 );
@@ -96,7 +85,6 @@ employeeRouter.patch(
 // update employee role
 employeeRouter.patch(
   "/role/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN),
   employeeController.updateEmployeeRoleController
 );
@@ -104,7 +92,6 @@ employeeRouter.patch(
 // delete testimonial
 employeeRouter.delete(
   "/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN),
   employeeController.deleteEmployeeController
 );

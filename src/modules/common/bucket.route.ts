@@ -2,7 +2,6 @@ import config from "@/config/variables";
 import { ENUM_ROLE } from "@/enums/roles";
 import { sendResponse } from "@/lib/sendResponse";
 import auth from "@/middlewares/auth";
-import { checkToken } from "@/middlewares/checkToken";
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -55,7 +54,6 @@ const uploadFile = multer({
 // upload router
 bucketRouter.post(
   "/upload",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   (req, res, next) => {
     const uploadSingle = uploadFile.single("file");
@@ -130,7 +128,6 @@ const retryDelete = async (
 // delete router
 bucketRouter.delete(
   "/delete/:key",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   async (req, res, next) => {
     const key = decodeURIComponent(req.params.key);
@@ -228,7 +225,6 @@ export const fetchFile = async (req: any, res: Response) => {
 // fetch router
 bucketRouter.get(
   "/fetch/:key",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   fetchFile
 );
@@ -262,7 +258,6 @@ const downloadFile = async (req: any, res: Response) => {
 // download router
 bucketRouter.get(
   "/download/:key",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   downloadFile
 );

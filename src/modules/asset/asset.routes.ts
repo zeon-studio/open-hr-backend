@@ -1,6 +1,5 @@
 import { ENUM_ROLE } from "@/enums/roles";
 import auth from "@/middlewares/auth";
-import { checkToken } from "@/middlewares/checkToken";
 import express from "express";
 import { assetController } from "./asset.controller";
 
@@ -9,7 +8,6 @@ const assetRouter = express.Router();
 // get all data
 assetRouter.get(
   "/",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   assetController.getAllAssetController
 );
@@ -17,7 +15,6 @@ assetRouter.get(
 // get asset by user
 assetRouter.get(
   "/user/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   assetController.getAssetsByUserController
 );
@@ -25,7 +22,6 @@ assetRouter.get(
 // get single data
 assetRouter.get(
   "/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   assetController.getAssetController
 );
@@ -33,7 +29,6 @@ assetRouter.get(
 // create data
 assetRouter.post(
   "/",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   assetController.createAssetController
 );
@@ -41,7 +36,6 @@ assetRouter.post(
 // update data
 assetRouter.patch(
   "/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR),
   assetController.updateAssetController
 );
@@ -49,7 +43,6 @@ assetRouter.patch(
 // delete data
 assetRouter.delete(
   "/:id",
-  checkToken,
   auth(ENUM_ROLE.ADMIN),
   assetController.deleteAssetController
 );
