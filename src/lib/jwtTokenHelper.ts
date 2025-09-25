@@ -1,3 +1,4 @@
+import variables from "@/config/variables";
 import jwt, { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 
 // create token
@@ -42,7 +43,36 @@ const verifyToken = (token: string, secret: Secret): JwtPayload => {
     // Check if token is not too old (additional security layer)
     if (decoded.iat) {
       const tokenAge = Date.now() - decoded.iat * 1000;
-      const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+
+      // Determine max age from configured jwt_expire (supports formats like '7d', '24h', '3600s', '30m')
+      const parseExpiryToMs = (exp?: string): number => {
+        if (!exp) return 24 * 60 * 60 * 1000; // default 24h
+        const m = String(exp)
+          .trim()
+          .toLowerCase()
+          .match(/^(\d+)([smhd])$/);
+        if (!m) {
+          // fallback: try to parse as number of seconds
+          const n = Number(exp);
+          if (!Number.isNaN(n)) return n * 1000;
+          return 24 * 60 * 60 * 1000;
+        }
+        const val = Number(m[1]);
+        const unit = m[2];
+        switch (unit) {
+          case "s":
+            return val * 1000;
+          case "m":
+            return val * 60 * 1000;
+          case "h":
+            return val * 60 * 60 * 1000;
+          case "d":
+          default:
+            return val * 24 * 60 * 60 * 1000;
+        }
+      };
+
+      const maxAge = parseExpiryToMs(variables.jwt_expire as string);
       if (tokenAge > maxAge) {
         throw new Error("Token too old");
       }
@@ -50,6 +80,8 @@ const verifyToken = (token: string, secret: Secret): JwtPayload => {
 
     return decoded;
   } catch (error) {
+    // Preserve original JWT error messages when possible so callers can react (e.g. "jwt expired")
+    if (error instanceof Error) throw error;
     throw new Error("Token verification failed");
   }
 };

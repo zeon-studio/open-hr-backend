@@ -5,3 +5,4 @@ logs
 yarn-error.log
 .vercel
 .DS_Store
+dist

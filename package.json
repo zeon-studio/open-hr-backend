@@ -8,8 +8,7 @@
     "start": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only ./src/server.ts",
     "build": "tsc && tsc-alias",
     "server": "ts-node-dev ./dist/server.js",
-    "format": "prettier --w ./src",
-    "prepare": "husky"
+    "format": "prettier --w ./src"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.844.0",
@@ -36,7 +35,6 @@
     "@types/multer-s3": "^3.0.3",
     "@types/node": "^24.0.13",
     "@types/nodemailer": "^6.4.17",
-    "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "ts-node-dev": "^2.0.0",
     "tsc-alias": "^1.8.16",

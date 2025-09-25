@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "buildCommand": "yarn build",
+  "installCommand": "yarn install --frozen-lockfile",
   "builds": [
     {
-      "src": "dist/server.js",
+      "src": "src/vercel-entry.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/server.js"
+      "dest": "src/vercel-entry.ts"
     }
   ]
 }
