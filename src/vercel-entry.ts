@@ -1,11 +1,9 @@
 // Runtime bootstrap for Vercel when running TypeScript sources.
 import fs from "fs";
 import Module from "module";
-import mongoose from "mongoose";
 import path from "path";
-import app from "./app";
-import config from "./config/variables";
 
+// Patch Node's module resolution first so any subsequent requires/imports can use '@/...' aliases.
 const originalResolve = (Module as any)._resolveFilename;
 (Module as any)._resolveFilename = function (
   request: string,
@@ -46,6 +44,11 @@ const originalResolve = (Module as any)._resolveFilename;
   return originalResolve.call(this, request, parent, isMain, options);
 };
 
+// Now require the rest of the modules
+import mongoose from "mongoose";
+import app from "./app";
+import config from "./config/variables";
+
 // Ensure mongoose connection is established on cold start and reused across invocations.
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,14 +62,14 @@ if (!global.__mongoConnectPromise) {
     .then(() => {
       console.log("MongoDB connected");
     })
-    .catch((err) => {
+    .catch((err: any) => {
       console.error("MongoDB connection error:", err);
       throw err;
     });
 }
 
 // Middleware to wait for DB connection before handling requests
-app.use(async (req, res, next) => {
+app.use(async (req: any, res: any, next: any) => {
   try {
     await global.__mongoConnectPromise;
     next();
