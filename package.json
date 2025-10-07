@@ -11,34 +11,34 @@
     "format": "prettier --w ./src"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.844.0",
-    "@aws-sdk/s3-request-presigner": "^3.844.0",
-    "axios": "^1.10.0",
+    "@aws-sdk/client-s3": "^3.901.0",
+    "@aws-sdk/s3-request-presigner": "^3.901.0",
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
-    "dotenv": "^17.2.0",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.16.3",
-    "multer": "^2.0.1",
+    "mongoose": "^8.19.1",
+    "multer": "^2.0.2",
     "multer-s3": "^3.0.1",
-    "nodemailer": "^7.0.5"
+    "nodemailer": "^7.0.7"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/multer-s3": "^3.0.3",
-    "@types/node": "^24.0.13",
-    "@types/nodemailer": "^6.4.17",
+    "@types/node": "^24.7.0",
+    "@types/nodemailer": "^7.0.2",
     "prettier": "^3.6.2",
     "ts-node-dev": "^2.0.0",
     "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   }
 }
