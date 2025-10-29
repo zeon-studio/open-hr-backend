@@ -1,7 +1,9 @@
 import variables from "@/config/variables";
+import ApiError from "@/errors/ApiError";
 import { jwtHelpers } from "@/lib/jwtTokenHelper";
 import { mailSender } from "@/lib/mailSender";
 import bcrypt from "bcrypt";
+import httpStatus from "http-status";
 import { Secret } from "jsonwebtoken";
 import mongoose from "mongoose";
 import { Employee } from "../employee/employee.model";
@@ -87,9 +89,10 @@ const tokenLoginService = async (token: string) => {
 };
 
 // user verification for password recovery
-const verifyUserService = async (email: string, currentTime: string) => {
-  if (!email || !currentTime) {
-    throw new Error("Email and current time are required");
+// NOTE: Do not trust client time. Server computes expiry based on its own clock.
+const verifyUserService = async (email: string) => {
+  if (!email) {
+    throw new Error("Email is required");
   }
 
   const user = await Employee.findOne({ work_email: email });
@@ -97,20 +100,15 @@ const verifyUserService = async (email: string, currentTime: string) => {
     throw new Error("User not found");
   }
 
-  await sendVerificationOtp(user.id!, email, currentTime);
+  await sendVerificationOtp(user.id!, email);
   return user;
 };
 
 // send verification otp
-const sendVerificationOtp = async (
-  id: string,
-  email: string,
-  currentTime: string
-) => {
+// Server computes expiration using its own clock to prevent client tampering.
+const sendVerificationOtp = async (id: string, email: string) => {
   const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
-  const expiringTime = new Date(
-    new Date(currentTime).getTime() + 5 * 60000
-  ).toISOString();
+  const expiringTime = new Date(Date.now() + 5 * 60000).toISOString();
 
   const userVerification = {
     pass_reset_token: {
@@ -129,13 +127,9 @@ const sendVerificationOtp = async (
 };
 
 // verify otp
-const verifyOtpService = async (
-  email: string,
-  otp: string,
-  currentTime: string
-) => {
-  if (!otp || !email || !currentTime) {
-    throw new Error("Email, OTP, and current time are required");
+const verifyOtpService = async (email: string, otp: string) => {
+  if (!otp || !email) {
+    throw new Error("Email and OTP are required");
   }
 
   const user = await Employee.findOne({ work_email: email });
@@ -150,7 +144,8 @@ const verifyOtpService = async (
 
   const { token: hashedOtp, expires } = verificationToken.pass_reset_token;
 
-  if (!hashedOtp || !expires || new Date(expires) <= new Date(currentTime)) {
+  // Compare against server time to avoid trusting client-provided time.
+  if (!hashedOtp || !expires || new Date(expires) <= new Date()) {
     throw new Error("OTP expired");
   }
 
@@ -164,9 +159,40 @@ const verifyOtpService = async (
 };
 
 // reset password
-const resetPasswordService = async (email: string, password: string) => {
-  if (!email || !password) {
-    throw new Error("Email and password are required");
+const resetPasswordService = async (
+  email: string,
+  password: string,
+  reset_token: string
+) => {
+  if (!email || !password || !reset_token) {
+    throw new Error("Email, Password and reset_token are required");
+  }
+
+  const user = await Employee.findOne({ work_email: email });
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Verify the OTP/reset_token first
+  const verificationDoc = await Authentication.findOne({ user_id: user.id });
+  if (!verificationDoc?.pass_reset_token) {
+    throw new ApiError("OTP not found", httpStatus.FORBIDDEN, "");
+  }
+
+  const { token: hashedOtp, expires } = verificationDoc.pass_reset_token;
+  const now = new Date();
+  if (!hashedOtp || !expires || new Date(expires) <= now) {
+    // remove expired token and fail
+    await Authentication.updateOne(
+      { user_id: user.id },
+      { $unset: { pass_reset_token: "" } }
+    );
+    throw new ApiError("OTP Expired", httpStatus.FORBIDDEN, "");
+  }
+
+  const isOtpMatch = await bcrypt.compare(reset_token, hashedOtp);
+  if (!isOtpMatch) {
+    throw new ApiError("Incorrect OTP", httpStatus.FORBIDDEN, "");
   }
 
   const session = await mongoose.startSession();
@@ -175,7 +201,7 @@ const resetPasswordService = async (email: string, password: string) => {
 
     const hashedPassword = await bcrypt.hash(password, variables.salt);
     const updatedUser = await Employee.findOneAndUpdate(
-      { work_email: email },
+      { id: user.id },
       { $set: { password: hashedPassword } },
       { session, new: true }
     );
@@ -184,7 +210,15 @@ const resetPasswordService = async (email: string, password: string) => {
       throw new Error("User not found");
     }
 
+    // Remove the used reset token
+    await Authentication.updateOne(
+      { user_id: user.id },
+      { $unset: { pass_reset_token: "" } },
+      { session }
+    );
+
     await session.commitTransaction();
+    return updatedUser;
   } catch (error) {
     await session.abortTransaction();
     throw error;
@@ -236,9 +270,9 @@ const resetPasswordOtpService = async (
 };
 
 // resend verification token
-const resendOtpService = async (email: string, currentTime: string) => {
-  if (!email || !currentTime) {
-    throw new Error("Email and current time are required");
+const resendOtpService = async (email: string) => {
+  if (!email) {
+    throw new Error("Email is required");
   }
 
   const user = await Employee.findOne({ work_email: email });
@@ -246,7 +280,7 @@ const resendOtpService = async (email: string, currentTime: string) => {
     throw new Error("User not found");
   }
 
-  await sendVerificationOtp(user.id, email, currentTime);
+  await sendVerificationOtp(user.id, email);
 };
 
 export const authenticationService = {

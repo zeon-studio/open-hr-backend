@@ -50,11 +50,8 @@ const tokenLoginController = catchAsync(async (req: Request, res: Response) => {
 
 // verify user
 const verifyUserController = catchAsync(async (req, res) => {
-  const { email, currentTime } = req.body;
-  const user = await authenticationService.verifyUserService(
-    email,
-    currentTime
-  );
+  const { email } = req.body;
+  const user = await authenticationService.verifyUserService(email);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -66,8 +63,8 @@ const verifyUserController = catchAsync(async (req, res) => {
 
 // verify token
 const verifyTokenController = catchAsync(async (req, res) => {
-  const { email, otp, currentTime } = req.body;
-  await authenticationService.verifyOtpService(email, otp, currentTime);
+  const { email, otp } = req.body;
+  await authenticationService.verifyOtpService(email, otp);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -78,8 +75,12 @@ const verifyTokenController = catchAsync(async (req, res) => {
 
 // reset password
 const resetPasswordController = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
-  await authenticationService.resetPasswordService(email, password);
+  const { email, password, reset_token } = req.body;
+  await authenticationService.resetPasswordService(
+    email,
+    password,
+    reset_token
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -106,8 +107,8 @@ const updatePasswordController = catchAsync(async (req, res) => {
 
 // resend otp
 const resendOtpController = catchAsync(async (req, res) => {
-  const { currentTime, email } = req.body;
-  await authenticationService.resendOtpService(email, currentTime);
+  const { email } = req.body;
+  await authenticationService.resendOtpService(email);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
