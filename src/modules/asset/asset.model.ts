@@ -30,7 +30,7 @@ const assetSchema = new mongoose.Schema<AssetType>(
     },
     currency: {
       type: String,
-      enum: ECurrency,
+      enum: Object.values(ECurrency),
       required: true,
     },
     purchase_date: {
@@ -40,7 +40,7 @@ const assetSchema = new mongoose.Schema<AssetType>(
     status: {
       type: String,
       required: true,
-      enum: EAssetStatus,
+      enum: Object.values(EAssetStatus),
     },
     note: {
       type: String,

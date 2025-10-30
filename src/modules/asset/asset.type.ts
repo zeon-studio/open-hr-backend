@@ -34,7 +34,7 @@ export enum EAssetStatus {
   SOLD = "sold",
 }
 
-export type Log = {
+export type TAssetLog = {
   type: EAssetLogType;
   description: string;
   date: Date;
@@ -51,7 +51,7 @@ export type AssetType = {
   purchase_date: Date;
   status: EAssetStatus;
   note: string;
-  logs: Log[];
+  logs: TAssetLog[];
 };
 
 export type AssetFilterOptions = {

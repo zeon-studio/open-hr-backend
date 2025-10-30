@@ -79,7 +79,7 @@ const settingSchema = new mongoose.Schema<SettingType>(
         name: {
           type: String,
           required: true,
-          enum: ELeaveRequestType,
+          enum: Object.values(ELeaveRequestType),
         },
         days: {
           type: Number,

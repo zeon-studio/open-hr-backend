@@ -14,7 +14,7 @@ const leaveSchema = new mongoose.Schema<LeaveRequestType>(
     leave_type: {
       type: String,
       required: true,
-      enum: ELeaveRequestType,
+      enum: Object.values(ELeaveRequestType),
     },
     start_date: {
       type: Date,
@@ -34,7 +34,7 @@ const leaveSchema = new mongoose.Schema<LeaveRequestType>(
     status: {
       type: String,
       required: true,
-      enum: ELeaveRequestStatus,
+      enum: Object.values(ELeaveRequestStatus),
       default: ELeaveRequestStatus.PENDING,
     },
     response_date: {

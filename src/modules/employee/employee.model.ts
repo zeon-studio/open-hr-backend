@@ -36,7 +36,7 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     },
     department: {
       type: String,
-      enum: EDepartment,
+      enum: Object.values(EDepartment),
     },
     designation: {
       type: String,
@@ -56,11 +56,11 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     },
     gender: {
       type: String,
-      enum: EGender,
+      enum: Object.values(EGender),
     },
     blood_group: {
       type: String,
-      enum: EBloodGroup,
+      enum: Object.values(EBloodGroup),
     },
     blood_donor: {
       type: Boolean,
@@ -68,7 +68,7 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     },
     marital_status: {
       type: String,
-      enum: EMaritalStatus,
+      enum: Object.values(EMaritalStatus),
     },
     present_address: {
       type: String,
@@ -93,13 +93,13 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     },
     status: {
       type: String,
-      enum: EEmployeeStatus,
+      enum: Object.values(EEmployeeStatus),
       default: EEmployeeStatus.ACTIVE,
     },
     role: {
       type: String,
       required: true,
-      enum: ERole,
+      enum: Object.values(ERole),
       default: ERole.USER,
     },
   },

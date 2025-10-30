@@ -33,7 +33,7 @@ const courseSchema = new mongoose.Schema<CourseType>(
         currency: {
           type: String,
           required: true,
-          enum: ECurrency,
+          enum: Object.values(ECurrency),
         },
         users: [
           {

@@ -111,15 +111,16 @@ const deleteToolService = async (id: string) => {
 // get tool by user
 const getToolByUserService = async (id: string) => {
   const tools = await Tool.find({
-    $or: [
-      { "organizations.users": { $in: [id] } },
-      { "organizations.users": { $in: ["everyone"] } },
-    ],
+    "organizations.users": { $in: [id, "everyone"] },
   });
 
   const result = tools.flatMap((tool) =>
     tool.organizations
-      .filter((org) => org.users.includes(id))
+      .filter(
+        (org) =>
+          (org.users || []).includes(id) ||
+          (org.users || []).includes("everyone")
+      )
       .map((org) => ({
         name: org.name,
         login_id: org.login_id,
@@ -129,6 +130,7 @@ const getToolByUserService = async (id: string) => {
         platform: tool.platform,
         website: tool.website,
         _id: org._id,
+        status: org.status,
       }))
   );
 

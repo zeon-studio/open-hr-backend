@@ -28,7 +28,7 @@ const payrollSchema = new mongoose.Schema<PayrollType>(
         type: {
           type: String,
           required: true,
-          enum: EBonusType,
+          enum: Object.values(EBonusType),
         },
         reason: {
           type: String,
@@ -62,7 +62,7 @@ const payrollSchema = new mongoose.Schema<PayrollType>(
     status: {
       type: String,
       required: true,
-      enum: EPayrollStatus,
+      enum: Object.values(EPayrollStatus),
       default: EPayrollStatus.ACTIVE,
     },
   },

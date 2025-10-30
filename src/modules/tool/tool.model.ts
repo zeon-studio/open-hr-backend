@@ -1,5 +1,11 @@
 import mongoose, { model } from "mongoose";
-import { EBilling, ECurrency, ToolType } from "./tool.type";
+import {
+  EBilling,
+  ECurrency,
+  EOrganizationLogType,
+  EOrganizationStatus,
+  ToolType,
+} from "./tool.type";
 
 const toolSchema = new mongoose.Schema<ToolType>(
   {
@@ -34,16 +40,37 @@ const toolSchema = new mongoose.Schema<ToolType>(
         currency: {
           type: String,
           required: true,
-          enum: ECurrency,
+          enum: Object.values(ECurrency),
         },
         billing: {
           type: String,
           required: true,
-          enum: EBilling,
+          enum: Object.values(EBilling),
         },
         users: [
           {
             type: String,
+          },
+        ],
+        status: {
+          type: String,
+          required: true,
+          enum: Object.values(EOrganizationStatus),
+          default: EOrganizationStatus.ACTIVE,
+        },
+        logs: [
+          {
+            type: {
+              type: String,
+              enum: Object.values(EOrganizationLogType),
+            },
+            description: {
+              type: String,
+            },
+            date: {
+              type: Date,
+              default: Date.now,
+            },
           },
         ],
         purchase_date: {
@@ -59,5 +86,9 @@ const toolSchema = new mongoose.Schema<ToolType>(
     timestamps: true,
   }
 );
+
+// Indexes to speed up queries by organization status and expire date
+toolSchema.index({ "organizations.status": 1 });
+toolSchema.index({ "organizations.expire_date": 1 });
 
 export const Tool = model<ToolType>("tool", toolSchema);

@@ -28,7 +28,7 @@ const employeeEducationSchema = new mongoose.Schema<EmployeeEducationType>(
         result_type: {
           type: String,
           required: true,
-          enum: EResultType,
+          enum: Object.values(EResultType),
         },
         major: {
           type: String,

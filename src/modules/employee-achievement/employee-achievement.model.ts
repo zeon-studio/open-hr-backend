@@ -15,7 +15,7 @@ const employeeAchievementSchema = new mongoose.Schema<EmployeeAchievementType>(
         type: {
           type: String,
           required: true,
-          enum: EAchievementType,
+          enum: Object.values(EAchievementType),
         },
         description: {
           type: String,

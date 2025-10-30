@@ -8,6 +8,26 @@ export enum EBilling {
   YEARLY = "yearly",
   ONETIME = "onetime",
 }
+
+export enum EOrganizationStatus {
+  ACTIVE = "active",
+  EXPIRED = "expired",
+  ARCHIVED = "archived",
+}
+
+export enum EOrganizationLogType {
+  RENEWED = "renewed",
+  CANCELLED = "cancelled",
+  PAUSED = "paused",
+  RESUMED = "RESUMED",
+}
+
+export type TOrganizationLog = {
+  type: EOrganizationLogType;
+  description: string;
+  date: Date;
+};
+
 export type Organization = {
   _id: string;
   name: string;
@@ -19,6 +39,8 @@ export type Organization = {
   users: string[];
   purchase_date: Date;
   expire_date: Date;
+  status: EOrganizationStatus;
+  logs: TOrganizationLog[];
 };
 
 export type ToolType = {

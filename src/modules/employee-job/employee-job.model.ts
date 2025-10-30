@@ -10,7 +10,7 @@ const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
     job_type: {
       type: String,
       required: true,
-      enum: EJobType,
+      enum: Object.values(EJobType),
     },
     joining_date: {
       type: Date,
@@ -53,7 +53,7 @@ const employeeJobSchema = new mongoose.Schema<EmployeeJobType>(
           job_type: {
             type: String,
             required: true,
-            enum: EJobType,
+            enum: Object.values(EJobType),
           },
         },
       ],
