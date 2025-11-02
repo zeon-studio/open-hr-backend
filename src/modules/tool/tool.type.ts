@@ -5,6 +5,8 @@ export enum ECurrency {
 
 export enum EBilling {
   MONTHLY = "monthly",
+  QUARTERLY = "quarterly",
+  HALF_YEARLY = "half-yearly",
   YEARLY = "yearly",
   ONETIME = "onetime",
 }
