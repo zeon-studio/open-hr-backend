@@ -49,19 +49,31 @@ export async function invitationTemplate(
 }
 
 // offboarding template
-export function offboardingTemplate(
+export async function offboardingTemplate(
   name: string,
   resignation_date: Date
-): string {
+): Promise<string> {
+  const settings = await Setting.findOne().exec();
+  if (!settings) {
+    throw new Error("Settings not found");
+  }
+
   return `
   <div style="font-family: Arial, sans-serif; color: #333;">
     <p>Dear ${name},</p>
 
-    <p>We regret to inform you that your employment has been terminated effective ${formatDate(resignation_date)}.</p>
+    <p>As you transition out of ${settings.company_name}, effective ${formatDate(resignation_date)}, we kindly request your cooperation to ensure the offboarding process is completed smoothly. Please assist by completing the following steps:</p>
 
-    <p>We appreciate your contributions to the company and wish you all the best in your future endeavors.</p>
+    <ol>
+      <li>Provide all necessary notes, files, and updates on the tasks you were responsible for, and share the final updates directly with your team lead.</li>
+      <li>Share your work email credentials so we can manage the transition properly.</li>
+      <li>Return all company devices, equipment, and your employee ID to the Admin team.</li>
+      <li>Complete the remaining exit formalities with the HR department.</li>
+    </ol>
 
-    <p>Best Regards,<br>Admin Team</p>
+    <p>Thank you for your contributions during your time here. We wish you the very best in your next steps.</p>
+
+    <p>Regards,<br>HR Department, ${settings.company_name}</p>
   </div>
   `;
 }

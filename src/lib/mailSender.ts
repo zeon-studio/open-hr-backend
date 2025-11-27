@@ -64,7 +64,7 @@ const offboardingInitiate = async (
     from: config.sender_email,
     to: email,
     subject: `Offboarding Initiated from ${settings.company_name}`,
-    html: offboardingTemplate(name, resignation_date),
+    html: await offboardingTemplate(name, resignation_date),
   };
   await mailTransporter.sendMail(mailDetails);
 };
