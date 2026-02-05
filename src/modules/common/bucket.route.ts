@@ -46,7 +46,15 @@ const uploadFile = multer({
       if (!folder) {
         return cb(new Error("Folder name is required"));
       }
-      cb(null, folder + "/" + Date.now().toString() + "-" + file.originalname);
+      cb(
+        null,
+        "open-hr/" +
+          folder +
+          "/" +
+          Date.now().toString() +
+          "-" +
+          file.originalname,
+      );
     },
   }),
 });
@@ -69,7 +77,7 @@ bucketRouter.post(
         result: req.file,
       });
     });
-  }
+  },
 );
 
 // delete file from s3
@@ -107,7 +115,7 @@ const checkFileExists = async (key: string) => {
 // Helper function for retry deletion
 const retryDelete = async (
   key: string,
-  maxRetries: number = 3
+  maxRetries: number = 3,
 ): Promise<boolean> => {
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -173,7 +181,7 @@ bucketRouter.delete(
       console.error("Delete file error:", error);
       next(error);
     }
-  }
+  },
 );
 
 // fetch file from s3
@@ -200,7 +208,7 @@ export const fetchFile = async (req: any, res: Response) => {
       const bodyStream = data.Body as Readable;
       res.setHeader(
         "Content-Type",
-        data.ContentType || "application/octet-stream"
+        data.ContentType || "application/octet-stream",
       );
       res.setHeader("Content-Length", data.ContentLength?.toString() || "0");
       bodyStream.pipe(res);
@@ -226,7 +234,7 @@ export const fetchFile = async (req: any, res: Response) => {
 bucketRouter.get(
   "/fetch/:key",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
-  fetchFile
+  fetchFile,
 );
 
 // generate download url
@@ -259,7 +267,7 @@ const downloadFile = async (req: any, res: Response) => {
 bucketRouter.get(
   "/download/:key",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
-  downloadFile
+  downloadFile,
 );
 
 export default bucketRouter;
