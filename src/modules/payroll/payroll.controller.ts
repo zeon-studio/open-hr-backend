@@ -41,7 +41,7 @@ const getPayrollBasicsController = catchAsync(
 
 // get single data
 const getPayrollController = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const id = req.params.id as string;
   const payroll = await payrollService.getPayrollService(id);
   sendResponse(res, {
     success: true,
@@ -67,7 +67,7 @@ const createMonthlyPayrollController = catchAsync(
 // update data
 const updatePayrollController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await payrollService.updatePayrollService(id, updateData);
@@ -82,7 +82,7 @@ const updatePayrollController = catchAsync(
 // delete data
 const deletePayrollController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await payrollService.deletePayrollService(id);
 
     sendResponse(res, {

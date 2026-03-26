@@ -28,7 +28,7 @@ const getAllCourseController = catchAsync(
 
 // get single data
 const getCourseController = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const id = req.params.id as string;
   const course = await courseService.getCourseService(id);
 
   sendResponse(res, {
@@ -56,7 +56,7 @@ const createCourseController = catchAsync(
 // update data
 const updateCourseController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await courseService.updateCourseService(id, updateData);
@@ -71,7 +71,7 @@ const updateCourseController = catchAsync(
 // delete data
 const deleteCourseController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await courseService.deleteCourseService(id);
 
     sendResponse(res, {
@@ -85,7 +85,7 @@ const deleteCourseController = catchAsync(
 // get course by user
 const getCoursesByUserController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const course = await courseService.getCoursesByUserService(id);
     sendResponse(res, {
       success: true,

@@ -51,7 +51,7 @@ const createCalendarController = catchAsync(
 // update data
 const updateCalendarController = catchAsync(
   async (req: Request, res: Response) => {
-    const year = req.params.year;
+    const year = req.params.year as string;
     const updateData = req.body;
 
     await calendarService.updateCalendarService(year, updateData);
@@ -66,7 +66,7 @@ const updateCalendarController = catchAsync(
 // delete data
 const deleteCalendarController = catchAsync(
   async (req: Request, res: Response) => {
-    const year = req.params.year;
+    const year = req.params.year as string;
     await calendarService.deleteCalendarService(year);
 
     sendResponse(res, {

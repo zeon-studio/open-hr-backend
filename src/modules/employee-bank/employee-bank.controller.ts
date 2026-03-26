@@ -29,7 +29,7 @@ const getAllEmployeeBankController = catchAsync(
 // get single data
 const getEmployeeBankController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const employeeBank = await employeeBankService.getEmployeeBankService(id);
 
     sendResponse(res, {
@@ -44,7 +44,7 @@ const getEmployeeBankController = catchAsync(
 // update data
 const updateEmployeeBankController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await employeeBankService.updateEmployeeBankService(id, updateData);
@@ -59,7 +59,7 @@ const updateEmployeeBankController = catchAsync(
 // delete data
 const deleteEmployeeBankController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await employeeBankService.deleteEmployeeBankService(id);
 
     sendResponse(res, {

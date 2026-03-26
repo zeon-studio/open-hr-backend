@@ -105,7 +105,7 @@ const updateCalendarService = async (
     start_date: localDate(new Date(event.start_date)),
     end_date: localDate(new Date(event.end_date)),
   }));
-  const calendar = await Calendar.findOneAndUpdate({ year }, updateData, {
+  const calendar = await Calendar.findOneAndUpdate({ year: Number(year) }, updateData, {
     new: true,
   });
 
@@ -114,7 +114,7 @@ const updateCalendarService = async (
 
 // delete calendar
 const deleteCalendarService = async (year: string) => {
-  const calendar = await Calendar.findOneAndDelete({ year });
+  const calendar = await Calendar.findOneAndDelete({ year: Number(year) });
   return calendar;
 };
 

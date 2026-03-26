@@ -51,7 +51,7 @@ const getAllEmployeeBasicsController = catchAsync(
 const getSingleEmployeeController = catchAsync(
   async (req: Request, res: Response) => {
     const employee = await employeeService.getSingleEmployeeService(
-      req.params.id
+      req.params.id as string
     );
 
     sendResponse(res, {
@@ -68,7 +68,7 @@ const getSingleEmployeeByInviteTokenController = catchAsync(
   async (req: Request, res: Response) => {
     const employee =
       await employeeService.getSingleEmployeeByInviteTokenService(
-        req.params.inviteToken
+        req.params.inviteToken as string
       );
 
     sendResponse(res, {
@@ -115,7 +115,7 @@ const updateEmployeeController = catchAsync(
     const employeeData = req.body;
     const updateData = await employeeService.updateEmployeeService(
       employeeData,
-      req.params.id
+      req.params.id as string
     );
 
     sendResponse(res, {
@@ -133,7 +133,7 @@ const updateEmployeeEmailController = catchAsync(
     const email = req.body.email;
     const updateEmail = await employeeService.updateEmployeeEmailService(
       email,
-      req.params.id
+      req.params.id as string
     );
 
     sendResponse(res, {
@@ -151,7 +151,7 @@ const updateEmployeePasswordController = catchAsync(
     const password = req.body.password;
     const updatePassword = await employeeService.updateEmployeePasswordService(
       password,
-      req.params.id
+      req.params.id as string
     );
 
     sendResponse(res, {
@@ -170,7 +170,7 @@ const updateEmployeeCommunicationIdController = catchAsync(
     const updateCommunicationId =
       await employeeService.updateEmployeeCommunicationIdService(
         communication_id,
-        req.params.id
+        req.params.id as string
       );
     sendResponse(res, {
       success: true,
@@ -188,7 +188,7 @@ const updateEmployeePersonalityController = catchAsync(
     const updatePersonality =
       await employeeService.updateEmployeePersonalityService(
         personality,
-        req.params.id
+        req.params.id as string
       );
     sendResponse(res, {
       success: true,
@@ -204,7 +204,7 @@ const updateEmployeeRoleController = catchAsync(
   async (req: Request, res: Response) => {
     const role = req.body.role;
     const updateRole = await employeeService.updateEmployeeRoleService(
-      req.params.id,
+      req.params.id as string,
       role
     );
     sendResponse(res, {
@@ -219,7 +219,7 @@ const updateEmployeeRoleController = catchAsync(
 // delete showcase
 const deleteEmployeeController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
 
     const deleteEmployee = await employeeService.deleteEmployeeService(id);
     sendResponse(res, {

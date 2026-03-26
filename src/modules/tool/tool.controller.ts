@@ -26,7 +26,7 @@ const getAllToolController = catchAsync(async (req: Request, res: Response) => {
 
 // get single data
 const getToolController = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const id = req.params.id as string;
   const tool = await toolService.getToolService(id);
 
   sendResponse(res, {
@@ -51,7 +51,7 @@ const createToolController = catchAsync(async (req: Request, res: Response) => {
 
 // update data
 const updateToolController = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const id = req.params.id as string;
   const updateData = req.body;
 
   await toolService.updateToolService(id, updateData);
@@ -64,7 +64,7 @@ const updateToolController = catchAsync(async (req: Request, res: Response) => {
 
 // delete data
 const deleteToolController = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const id = req.params.id as string;
   await toolService.deleteToolService(id);
 
   sendResponse(res, {
@@ -77,7 +77,7 @@ const deleteToolController = catchAsync(async (req: Request, res: Response) => {
 // get tool by user
 const getToolByUserController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const tool = await toolService.getToolByUserService(id);
 
     sendResponse(res, {

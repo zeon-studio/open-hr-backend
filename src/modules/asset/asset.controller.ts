@@ -28,7 +28,7 @@ const getAllAssetController = catchAsync(
 
 // get single data
 const getAssetController = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const id = req.params.id as string;
   const asset = await assetService.getAssetService(id);
 
   sendResponse(res, {
@@ -56,7 +56,7 @@ const createAssetController = catchAsync(
 // update data
 const updateAssetController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await assetService.updateAssetService(id, updateData);
@@ -71,7 +71,7 @@ const updateAssetController = catchAsync(
 // delete data
 const deleteAssetController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await assetService.deleteAssetService(id);
 
     sendResponse(res, {
@@ -85,7 +85,7 @@ const deleteAssetController = catchAsync(
 // get asset by user
 const getAssetsByUserController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const asset = await assetService.getAssetsByUserService(id);
     sendResponse(res, {
       success: true,

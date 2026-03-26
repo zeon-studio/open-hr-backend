@@ -30,7 +30,7 @@ const getAllEmployeeOnboardingController = catchAsync(
 // get single data
 const getEmployeeOnboardingController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const employeeOnboarding =
       await employeeOnboardingService.getEmployeeOnboardingService(id);
 
@@ -46,7 +46,7 @@ const getEmployeeOnboardingController = catchAsync(
 // update data
 const updateEmployeeOnboardingController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await employeeOnboardingService.updateEmployeeOnboardingService(
@@ -64,8 +64,8 @@ const updateEmployeeOnboardingController = catchAsync(
 // update onboarding task status
 const updateOnboardingTaskStatusController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const taskName = req.params.taskName;
+    const id = req.params.id as string;
+    const taskName = req.params.taskName as string;
     await employeeOnboardingService.updateOnboardingTaskStatusService(
       id,
       taskName
@@ -82,7 +82,7 @@ const updateOnboardingTaskStatusController = catchAsync(
 // delete data
 const deleteEmployeeOnboardingController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await employeeOnboardingService.deleteEmployeeOnboardingService(id);
 
     sendResponse(res, {

@@ -138,7 +138,7 @@ bucketRouter.delete(
   "/delete/:key",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
   async (req, res, next) => {
-    const key = decodeURIComponent(req.params.key);
+    const key = decodeURIComponent(req.params.key as string);
 
     if (!key) {
       return sendResponse(res, {
@@ -187,7 +187,7 @@ bucketRouter.delete(
 // fetch file from s3
 export const fetchFile = async (req: any, res: Response) => {
   try {
-    const key = decodeURIComponent(req.params.key);
+    const key = decodeURIComponent(req.params.key as string);
 
     if (!key) {
       return sendResponse(res, {
@@ -240,7 +240,7 @@ bucketRouter.get(
 // generate download url
 const downloadFile = async (req: any, res: Response) => {
   try {
-    const key = decodeURIComponent(req.params.key);
+    const key = decodeURIComponent(req.params.key as string);
 
     if (!key) {
       return sendResponse(res, {

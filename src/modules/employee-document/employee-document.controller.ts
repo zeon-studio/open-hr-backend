@@ -30,7 +30,7 @@ const getAllEmployeeDocumentController = catchAsync(
 // get single data
 const getEmployeeDocumentController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const employeeDocument =
       await employeeDocumentService.getEmployeeDocumentService(id);
 
@@ -46,7 +46,7 @@ const getEmployeeDocumentController = catchAsync(
 // update data
 const updateEmployeeDocumentController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await employeeDocumentService.updateEmployeeDocumentService(id, updateData);
@@ -61,7 +61,7 @@ const updateEmployeeDocumentController = catchAsync(
 // delete data
 const deleteEmployeeDocumentController = catchAsync(
   async (req: Request, res: Response) => {
-    const { employeeId, documentId } = req.params;
+    const { employeeId, documentId } = req.params as Record<string, string>;
     await employeeDocumentService.deleteEmployeeDocumentService({
       employeeId: employeeId,
       documentId: documentId,

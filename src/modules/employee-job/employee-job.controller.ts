@@ -29,7 +29,7 @@ const getAllEmployeeJobController = catchAsync(
 // get single data
 const getEmployeeJobController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const employeeJob = await employeeJobService.getEmployeeJobService(id);
     sendResponse(res, {
       success: true,
@@ -43,7 +43,7 @@ const getEmployeeJobController = catchAsync(
 // update data
 const updateEmployeeJobController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await employeeJobService.updateEmployeeJobService(id, updateData);
@@ -58,7 +58,7 @@ const updateEmployeeJobController = catchAsync(
 // delete data
 const deleteEmployeeJobController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await employeeJobService.deleteEmployeeJobService(id);
 
     sendResponse(res, {

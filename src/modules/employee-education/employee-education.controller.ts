@@ -30,7 +30,7 @@ const getAllEmployeeEducationController = catchAsync(
 // get single data
 const getEmployeeEducationController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const employeeEducation =
       await employeeEducationService.getEmployeeEducationService(id);
 
@@ -46,7 +46,7 @@ const getEmployeeEducationController = catchAsync(
 // update data
 const updateEmployeeEducationController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await employeeEducationService.updateEmployeeEducationService(
@@ -64,7 +64,7 @@ const updateEmployeeEducationController = catchAsync(
 // delete data
 const deleteEmployeeEducationController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await employeeEducationService.deleteEmployeeEducationService(id);
 
     sendResponse(res, {

@@ -30,7 +30,7 @@ const getAllEmployeeOffboardingController = catchAsync(
 // get single data
 const getEmployeeOffboardingController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const employeeOffboarding =
       await employeeOffboardingService.getEmployeeOffboardingService(id);
 
@@ -63,7 +63,7 @@ const createEmployeeOffboardingController = catchAsync(
 // update data
 const updateEmployeeOffboardingController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await employeeOffboardingService.updateEmployeeOffboardingService(
@@ -81,8 +81,8 @@ const updateEmployeeOffboardingController = catchAsync(
 // update offboarding task status
 const updateOffboardingTaskStatusController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const taskName = req.params.taskName;
+    const id = req.params.id as string;
+    const taskName = req.params.taskName as string;
     await employeeOffboardingService.updateOffboardingTaskStatusService(
       id,
       taskName
@@ -98,7 +98,7 @@ const updateOffboardingTaskStatusController = catchAsync(
 // delete data
 const deleteEmployeeOffboardingController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await employeeOffboardingService.deleteEmployeeOffboardingService(id);
 
     sendResponse(res, {

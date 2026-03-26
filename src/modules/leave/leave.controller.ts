@@ -28,7 +28,7 @@ const getAllLeaveController = catchAsync(
 
 // get single data
 const getLeaveController = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const id = req.params.id as string;
   const leave = await leaveService.getLeaveService(id);
 
   sendResponse(res, {
@@ -56,7 +56,7 @@ const addNewYearLeaveController = catchAsync(
 // update data
 const updateLeaveController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const year = Number(req.params.year);
     const updateData = req.body;
 
@@ -72,7 +72,7 @@ const updateLeaveController = catchAsync(
 // delete data
 const deleteLeaveController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await leaveService.deleteLeaveService(id);
 
     sendResponse(res, {

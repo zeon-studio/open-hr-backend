@@ -30,7 +30,7 @@ const getAllEmployeeAchievementController = catchAsync(
 // get single data
 const getEmployeeAchievementController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const employeeAchievement =
       await employeeAchievementService.getEmployeeAchievementService(id);
 
@@ -46,7 +46,7 @@ const getEmployeeAchievementController = catchAsync(
 // update data
 const updateEmployeeAchievementController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await employeeAchievementService.updateEmployeeAchievementService(
@@ -64,7 +64,7 @@ const updateEmployeeAchievementController = catchAsync(
 // delete data
 const deleteEmployeeAchievementController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await employeeAchievementService.deleteEmployeeAchievementService(id);
 
     sendResponse(res, {

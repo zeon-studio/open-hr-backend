@@ -29,7 +29,7 @@ const getAllLeaveRequestController = catchAsync(
 // get single data
 const getLeaveRequestController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const leave = await leaveRequestService.getLeaveRequestService(id);
 
     sendResponse(res, {
@@ -59,7 +59,7 @@ const createLeaveRequestController = catchAsync(
 // update data
 const updateLeaveRequestController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const updateData = req.body;
 
     await leaveRequestService.updateLeaveRequestService(id, updateData);
@@ -74,7 +74,7 @@ const updateLeaveRequestController = catchAsync(
 // delete data
 const deleteLeaveRequestController = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await leaveRequestService.deleteLeaveRequestService(id);
 
     sendResponse(res, {
