@@ -366,9 +366,30 @@ const updateEmployeeEmailService = async (work_email: string, id: string) => {
 };
 
 // update employee password
+//
+// SECURITY: This endpoint is intended *only* for the onboarding flow,
+// where the user follows an invite link and sets their initial password.
+// To prevent account takeover (any authenticated user changing any other
+// user's password), only allow it when the target account does NOT yet
+// have a password set. Established users must reset via the proper
+// /authentication/update-password (current-password verified) or
+// /authentication/recovery-password (OTP verified) flows.
 const updateEmployeePasswordService = async (password: string, id: string) => {
   if (!password || !id) {
     throw new Error("Password and employee ID are required");
+  }
+
+  const employee = await Employee.findOne({ id }).select("+password");
+  if (!employee) {
+    throw new Error("Employee not found");
+  }
+
+  if (employee.password) {
+    throw new ApiError(
+      "Password already set; use the recovery or update-password flow",
+      httpStatus.FORBIDDEN,
+      ""
+    );
   }
 
   const hashedPassword = await bcrypt.hash(password, variables.salt);
@@ -377,10 +398,6 @@ const updateEmployeePasswordService = async (password: string, id: string) => {
     { password: hashedPassword },
     { new: true }
   );
-
-  if (!result) {
-    throw new Error("Employee not found");
-  }
 
   return result;
 };

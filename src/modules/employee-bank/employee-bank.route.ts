@@ -1,5 +1,6 @@
 import { ENUM_ROLE } from "@/enums/roles";
 import auth from "@/middlewares/auth";
+import requireSelfOrPrivileged from "@/middlewares/requireSelfOrPrivileged";
 import express from "express";
 import { employeeBankController } from "./employee-bank.controller";
 
@@ -16,6 +17,7 @@ employeeBankRouter.get(
 employeeBankRouter.get(
   "/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  requireSelfOrPrivileged("id"),
   employeeBankController.getEmployeeBankController
 );
 
@@ -23,6 +25,7 @@ employeeBankRouter.get(
 employeeBankRouter.patch(
   "/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  requireSelfOrPrivileged("id"),
   employeeBankController.updateEmployeeBankController
 );
 
