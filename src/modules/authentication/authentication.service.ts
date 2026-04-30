@@ -35,7 +35,9 @@ const passwordLoginService = async (email: string, password: string) => {
     throw new Error("Email and password are required");
   }
 
-  const user = await Employee.findOne({ work_email: email });
+  const user = await Employee.findOne({ work_email: email }).select(
+    "+password"
+  );
   if (!user) throw new Error("User not found");
 
   if (!user.password) {
@@ -237,7 +239,7 @@ const updatePasswordService = async (
     throw new Error("All fields are required");
   }
 
-  const user = await Employee.findOne({ id });
+  const user = await Employee.findOne({ id }).select("+password");
   if (!user) {
     throw new Error("User not found");
   }
