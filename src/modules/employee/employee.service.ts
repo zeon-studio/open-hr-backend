@@ -58,9 +58,11 @@ const getAllEmployeeService = async (
     matchStage.$match.$or = searchConditions;
   }
 
-  // status condition
+  // status condition (controller may pass a comma-split array)
   if (status) {
-    matchStage.$match.status = status;
+    matchStage.$match.status = Array.isArray(status)
+      ? { $in: status }
+      : status;
   }
 
   // department condition
