@@ -47,6 +47,7 @@ const employeeSchema = new mongoose.Schema<EmployeeType>(
     },
     password: {
       type: String,
+      select: false,
     },
     nid: {
       type: String,
