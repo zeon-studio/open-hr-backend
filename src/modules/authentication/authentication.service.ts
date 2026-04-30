@@ -3,12 +3,21 @@ import ApiError from "@/errors/ApiError";
 import { jwtHelpers } from "@/lib/jwtTokenHelper";
 import { mailSender } from "@/lib/mailSender";
 import bcrypt from "bcrypt";
+import { OAuth2Client } from "google-auth-library";
 import httpStatus from "http-status";
 import { Secret } from "jsonwebtoken";
 import mongoose from "mongoose";
 import { Employee } from "../employee/employee.model";
 import { Authentication } from "./authentication.model";
 import { AuthenticationType } from "./authentication.type";
+
+// Lazily-built Google OAuth client. We don't construct it at module load
+// because deployments that don't use Google login shouldn't need the env var.
+let _googleClient: OAuth2Client | null = null;
+const googleClient = () => {
+  if (!_googleClient) _googleClient = new OAuth2Client();
+  return _googleClient;
+};
 
 // Helper function to create JWT token
 const createJwtToken = (id: string, role: string) => {
@@ -35,7 +44,9 @@ const passwordLoginService = async (email: string, password: string) => {
     throw new Error("Email and password are required");
   }
 
-  const user = await Employee.findOne({ work_email: email });
+  const user = await Employee.findOne({ work_email: email }).select(
+    "+password"
+  );
   if (!user) throw new Error("User not found");
 
   if (!user.password) {
@@ -54,14 +65,51 @@ const passwordLoginService = async (email: string, password: string) => {
 };
 
 // oauth login
-const oauthLoginService = async (email: string) => {
-  if (!email) {
-    throw new Error("Email is required");
+//
+// SECURITY: The previous implementation accepted any email in the request
+// body and issued a JWT for that email — i.e., any caller with network
+// access to /oauth-login could log in as anyone. We now require a Google
+// ID token, verify its signature against Google's public keys, and only
+// trust the email contained in that verified token. Audience is pinned
+// to our own GOOGLE_CLIENT_ID to reject tokens minted for other apps.
+const oauthLoginService = async (idToken: string) => {
+  if (!idToken) {
+    throw new ApiError("idToken is required", httpStatus.BAD_REQUEST, "");
+  }
+  if (!variables.google_client_id) {
+    throw new ApiError(
+      "Google OAuth is not configured on this server (GOOGLE_CLIENT_ID missing)",
+      httpStatus.SERVICE_UNAVAILABLE,
+      ""
+    );
   }
 
-  const user = await Employee.findOne({ work_email: email });
+  let payload;
+  try {
+    const ticket = await googleClient().verifyIdToken({
+      idToken,
+      audience: variables.google_client_id,
+    });
+    payload = ticket.getPayload();
+  } catch (err) {
+    throw new ApiError(
+      "Invalid Google ID token",
+      httpStatus.UNAUTHORIZED,
+      ""
+    );
+  }
+
+  if (!payload?.email || !payload.email_verified) {
+    throw new ApiError(
+      "Google ID token did not contain a verified email",
+      httpStatus.UNAUTHORIZED,
+      ""
+    );
+  }
+
+  const user = await Employee.findOne({ work_email: payload.email });
   if (!user) {
-    throw new Error("User not found");
+    throw new ApiError("User not found", httpStatus.NOT_FOUND, "");
   }
 
   const accessToken = createJwtToken(user.id, user.role);
@@ -237,7 +285,7 @@ const updatePasswordService = async (
     throw new Error("All fields are required");
   }
 
-  const user = await Employee.findOne({ id });
+  const user = await Employee.findOne({ id }).select("+password");
   if (!user) {
     throw new Error("User not found");
   }
