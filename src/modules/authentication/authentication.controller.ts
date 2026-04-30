@@ -24,8 +24,8 @@ const passwordLoginController = catchAsync(
 
 // oauth login
 const oauthLoginController = catchAsync(async (req: Request, res: Response) => {
-  const { email } = req.body;
-  const user = await authenticationService.oauthLoginService(email);
+  const { idToken } = req.body;
+  const user = await authenticationService.oauthLoginService(idToken);
 
   sendResponse(res, {
     success: true,

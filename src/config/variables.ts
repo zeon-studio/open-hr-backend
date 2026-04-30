@@ -19,4 +19,5 @@ export default {
   discord_webhook_url: process.env.DISCORD_WEBHOOK_URL,
   id_prefix: process.env.ID_GENERATOR_PREFIX,
   cors_origin: String(process.env.CORS_ORIGIN),
+  google_client_id: process.env.GOOGLE_CLIENT_ID,
 };
