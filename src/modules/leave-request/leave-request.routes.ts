@@ -1,5 +1,6 @@
 import { ENUM_ROLE } from "@/enums/roles";
 import auth from "@/middlewares/auth";
+import requireSelfOrPrivileged from "@/middlewares/requireSelfOrPrivileged";
 import express from "express";
 import { leaveRequestController } from "./leave-request.controller";
 
@@ -26,10 +27,11 @@ leaveRequestRouter.get(
   leaveRequestController.getUpcomingLeaveRequestDatesController
 );
 
-// get single data
+// get single data (param :id is the employee_id)
 leaveRequestRouter.get(
   "/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  requireSelfOrPrivileged("id"),
   leaveRequestController.getLeaveRequestController
 );
 
@@ -47,7 +49,9 @@ leaveRequestRouter.patch(
   leaveRequestController.updateLeaveRequestController
 );
 
-// delete data
+// delete data — ownership enforced inside the service because :id is a
+// Mongo _id, not employee_id (so the requireSelfOrPrivileged middleware
+// cannot compare it directly).
 leaveRequestRouter.delete(
   "/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),

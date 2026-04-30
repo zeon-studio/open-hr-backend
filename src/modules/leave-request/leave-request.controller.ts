@@ -75,7 +75,9 @@ const updateLeaveRequestController = catchAsync(
 const deleteLeaveRequestController = catchAsync(
   async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    await leaveRequestService.deleteLeaveRequestService(id);
+    // Privileged roles may delete any pending request; users may only
+    // delete their own. Pass the requester so the service can scope.
+    await leaveRequestService.deleteLeaveRequestService(id, req.user);
 
     sendResponse(res, {
       success: true,

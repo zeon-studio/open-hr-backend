@@ -1,5 +1,6 @@
 import { ENUM_ROLE } from "@/enums/roles";
 import auth from "@/middlewares/auth";
+import requireSelfOrPrivileged from "@/middlewares/requireSelfOrPrivileged";
 import express from "express";
 import { employeeController } from "./employee.controller";
 
@@ -37,6 +38,7 @@ employeeRouter.get(
 employeeRouter.get(
   "/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.FORMER),
+  requireSelfOrPrivileged("id"),
   employeeController.getSingleEmployeeController
 );
 
@@ -51,6 +53,7 @@ employeeRouter.post(
 employeeRouter.patch(
   "/update/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  requireSelfOrPrivileged("id"),
   employeeController.updateEmployeeController
 );
 
@@ -58,6 +61,7 @@ employeeRouter.patch(
 employeeRouter.patch(
   "/email/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  requireSelfOrPrivileged("id"),
   employeeController.updateEmployeeEmailController
 );
 
@@ -65,6 +69,7 @@ employeeRouter.patch(
 employeeRouter.patch(
   "/password/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  requireSelfOrPrivileged("id"),
   employeeController.updateEmployeePasswordController
 );
 
@@ -72,6 +77,7 @@ employeeRouter.patch(
 employeeRouter.patch(
   "/communication_id/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  requireSelfOrPrivileged("id"),
   employeeController.updateEmployeeCommunicationIdController
 );
 
@@ -79,6 +85,7 @@ employeeRouter.patch(
 employeeRouter.patch(
   "/personality/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER),
+  requireSelfOrPrivileged("id"),
   employeeController.updateEmployeePersonalityController
 );
 

@@ -290,22 +290,43 @@ const updateLeaveRequestService = async (
 };
 
 // delete
-const deleteLeaveRequestService = async (id: string) => {
+const deleteLeaveRequestService = async (
+  id: string,
+  requester?: { id?: string; role?: string }
+) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
     const leaveReqData = await LeaveRequest.findOne({ _id: id }).session(
       session
     );
+    if (!leaveReqData) {
+      throw new ApiError("Leave request not found", 404, "");
+    }
+
+    // Ownership check: non-admin/moderator users may only delete their own
+    // pending leave request. Without this, any USER can guess (or list via
+    // GET /) any other employee's leave-request _id and delete it,
+    // silently rolling back their consumed leave days.
+    const role = requester?.role;
+    if (role !== "admin" && role !== "moderator") {
+      if (!requester?.id || requester.id !== leaveReqData.employee_id) {
+        throw new ApiError(
+          "You may only delete your own leave request",
+          403,
+          ""
+        );
+      }
+    }
 
     // deduct leave days
-    const currentYear = leaveReqData!.start_date.getFullYear();
+    const currentYear = leaveReqData.start_date.getFullYear();
     await Leave.findOneAndUpdate(
-      { employee_id: leaveReqData!.employee_id, "years.year": currentYear },
+      { employee_id: leaveReqData.employee_id, "years.year": currentYear },
       {
         $inc: {
-          [`years.$.${leaveReqData!.leave_type}.consumed`]:
-            -leaveReqData!.day_count,
+          [`years.$.${leaveReqData.leave_type}.consumed`]:
+            -leaveReqData.day_count,
         },
       },
       { session }
@@ -319,7 +340,7 @@ const deleteLeaveRequestService = async (id: string) => {
   } catch (error: any) {
     await session.abortTransaction();
     console.log(error);
-    throw new ApiError(error.message, 400);
+    throw new ApiError(error.message, error.statusCode || 400, "");
   } finally {
     session.endSession();
   }

@@ -1,5 +1,6 @@
 import { ENUM_ROLE } from "@/enums/roles";
 import auth from "@/middlewares/auth";
+import requireSelfOrPrivileged from "@/middlewares/requireSelfOrPrivileged";
 import express from "express";
 import { employeeAchievementController } from "./employee-achievement.controller";
 
@@ -16,6 +17,7 @@ employeeAchievementRouter.get(
 employeeAchievementRouter.get(
   "/:id",
   auth(ENUM_ROLE.ADMIN, ENUM_ROLE.MODERATOR, ENUM_ROLE.USER, ENUM_ROLE.FORMER),
+  requireSelfOrPrivileged("id"),
   employeeAchievementController.getEmployeeAchievementController
 );
 
